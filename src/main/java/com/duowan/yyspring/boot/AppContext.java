@@ -404,6 +404,7 @@ public class AppContext {
 
     public static Resource getClasspathResource(String classpathResource) {
 
+        classpathResource = environment.resolvePlaceholders(classpathResource);
         String path = classpathResource.replaceFirst("(?i)classpath\\*?:", "");
         Resource resource = new ClassPathResource(path);
         if (!resource.exists()) {
@@ -413,6 +414,7 @@ public class AppContext {
     }
 
     public static Resource getResourceFromAbsPath(String filePath) {
+        filePath = environment.resolvePlaceholders(filePath);
         File file = new File(filePath);
         if (file.exists()) {
             try {
@@ -424,6 +426,29 @@ public class AppContext {
             }
         }
         return null;
+    }
+
+    public static Resource tryGetResource(String path) {
+        path = environment.resolvePlaceholders(path);
+        Resource resource = getClasspathResource(path);
+        if (null == resource) {
+            resource = getResourceFromAbsPath(path);
+        }
+
+        return resource;
+    }
+
+    public static List<Resource> tryGetResources(String[] paths) {
+        List<Resource> resourceList = new ArrayList<>();
+        if (!StringUtils.isAllBlank(paths)) {
+            for (String path : paths) {
+                Resource resource = tryGetResource(path);
+                if (null != resource) {
+                    resourceList.add(resource);
+                }
+            }
+        }
+        return resourceList;
     }
 
     /**

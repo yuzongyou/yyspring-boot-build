@@ -1,3 +1,3 @@
 # Initializers
 org.springframework.boot.SpringApplicationRunListener=\
-  com.duowan.yyspring.boot.YySpringApplicationRunListener
+com.duowan.yyspring.boot.YySpringApplicationRunListener
