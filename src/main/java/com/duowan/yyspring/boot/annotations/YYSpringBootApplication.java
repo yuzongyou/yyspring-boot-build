@@ -40,4 +40,11 @@ public @interface YYSpringBootApplication {
      * @return 返回附加的资源文件搜索目录
      */
     String[] resourceLookupDirs() default {};
+
+    /**
+     * 是否尝试使用默认的 BeanNameGenerator, 默认是尝试
+     *
+     * @return 是否尝试
+     */
+    boolean tryEnabledDefaultBeanNameGenerator() default true;
 }

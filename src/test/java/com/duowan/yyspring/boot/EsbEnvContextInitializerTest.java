@@ -1,20 +1,16 @@
-package com.duowan.esb.core;
+package com.duowan.yyspring.boot;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Arvin
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = EsbEnvContextInitializerTest.class)
-@Import({EsbEnvContextInitializer.class})
+@SpringBootTest(classes = {EsbEnvContextInitializerTest.class})
 public class EsbEnvContextInitializerTest {
 
     static {

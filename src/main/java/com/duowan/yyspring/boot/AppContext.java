@@ -4,36 +4,37 @@ import com.duowan.common.exception.CodeException;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.PathUtil;
-import com.duowan.esb.core.DefaultEnvReader;
-import com.duowan.esb.core.EnvReader;
-import com.duowan.esb.core.KeyFilter;
+import com.duowan.common.utils.exception.AssertFailException;
+import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.ApplicationHome;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * App 应用环境上下文
- *
  * @author Arvin
+ * @version 1.0
+ * @since 2018/9/1 17:50
  */
-public final class AppContext {
+public class AppContext {
 
-    /**
-     * 日志
-     */
-    protected static Logger logger = LoggerFactory.getLogger(AppContext.class);
+    private AppContext() {
+    }
+
+    private static List<String> initInfo = new ArrayList<>();
+
+    private static ConfigurableApplicationContext acx;
 
     public static final String DEFAULT_SERVER_PORT = "8081";
 
@@ -46,237 +47,56 @@ public final class AppContext {
      */
     private static volatile String env;
 
-    /** 项目代号 */
+    /**
+     * 项目代号
+     */
     private static volatile String projectNo;
 
     /**
-     * Spring 容器上下文
-     */
-    private static ApplicationContext acx;
+     * 运行当前项目的目录，这个选项在开发环境下和模块目录才有区别
+     **/
+    private static volatile String projectDir;
 
     /**
-     * Spring 环境上下文
-     */
-    private static Environment environment;
+     * 当前运行模块的根路径
+     **/
+    private static volatile String moduleDir;
 
     /**
-     * 自定义资源文件搜索路径列表
-     */
-    private static List<String> customResourceLookupPaths;
+     * 资源文件搜索目录
+     **/
+    private static List<String> resourceLookupDirs = new ArrayList<>();
 
-    private static List<String> lazyLogMessages = new ArrayList<>();
-
-    public static ApplicationContext getAcx() {
-        return acx;
-    }
-
-    public static Environment getEnvironment() {
-        return environment;
-    }
-
-    public static void lazyLogMessage(String message) {
-        lazyLogMessages.add(message);
-    }
-
-    public static void prepareAppEnv() {
-
-        if (StringUtils.isNotBlank(AppContext.env)) {
-            return;
-        }
-
-        // 优先读取 classpath 路径下指定的 EnvReader
-        EnvReader envReader = lookupEnvReaderFromEsbFactories();
-        if (null == envReader) {
-            envReader = new DefaultEnvReader();
-        }
-        boolean hadGetEnv = false;
-
-        try {
-
-            lazyLogMessage("使用EnvReader: " + envReader.getClass());
-            String env = envReader.readEnv();
-            if (StringUtils.isNotBlank(env)) {
-                customResourceLookupPaths = envReader.getResourceLookupPaths();
-                AppContext.setEnv(env);
-                hadGetEnv = true;
-            }
-
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
-
-        if (!hadGetEnv) {
-            throw new RuntimeException("无法读取当前应用环境，请实现 EnvReader 接口，并编写[/META-INF/services/com.duowan.esb.env.EnvReader] 内容为实现类的全新类名, 或者在classpath:/META-INF/esb.factories 中配置com.duowan.esb.env.EnvReader=实现类");
-        }
-    }
+    private static Map<String, Object> projectInfoMap = new HashMap<>();
 
     /**
-     * 从 classpath:/META-INF/esb.factories 中配置com.duowan.esb.env.EnvReader=实现类
-     *
-     * @return 返回EnvReader
-     */
-    private static EnvReader lookupEnvReaderFromEsbFactories() {
+     * 应用程序属性配置
+     **/
+    private static Map<String, Object> applicationProperties = new HashMap<>();
 
-        Resource resource = getClasspathResource("/META-INF/esb.factories");
-
-        if (null != resource && resource.exists()) {
-            Properties properties = new Properties();
-            try {
-                properties.load(resource.getInputStream());
-
-                String readerClass = properties.getProperty(EnvReader.class.getName());
-
-                return BeanUtils.instantiateClass(Class.forName(readerClass), EnvReader.class);
-
-            } catch (Exception ignored) {
-            }
-        }
-
-        return null;
-    }
-
-    private static EnvReader lookupEnvReaderFromSPI() {
-        ServiceLoader<EnvReader> readers = ServiceLoader.load(EnvReader.class);
-        Iterator<EnvReader> iterator = readers.iterator();
-        if (iterator.hasNext()) {
-            return iterator.next();
-        }
-        return null;
-    }
-
-    public static void setEnv(String env) {
-        if (StringUtils.isBlank(AppContext.env) || !AppContext.env.equals(env)) {
-            AppContext.env = env;
-
-            // 设置日志
-            lookupLog4j2Configuration();
-
-            // 初始化搜索配置文件资源的路径
-            initLookupConfigResourcePaths();
-
-            // 初始化 app 配置
-            initAppActiveProperties();
-
-            // 初始化项目代号
-            initProjectNo();
-        }
-
-    }
-
-    private static void initProjectNo() {
-
-        List<String> projectNoKeys = Arrays.asList("DWPROJECTNO", "PROJECTNO");
-
-        for (String key : projectNoKeys) {
-            String projectNo = getAppProperty(key, null);
-            if (StringUtils.isBlank(projectNo)) {
-                projectNo = System.getProperty(key);
-            }
-            if (StringUtils.isBlank(projectNo)) {
-                projectNo = System.getenv(key);
-            }
-            if (StringUtils.isNotBlank(projectNo)) {
-                AppContext.projectNo = projectNo;
-                return;
-            }
-        }
-    }
-
-    private static String logFilePath;
-
-    /**
-     * <pre>
-     * 搜索日志配置文件，这个约定放在classpath路径下， 识别类型包含(同时也是应用顺序， 序号小的将优先应用)：
-     * 1. log4j2.xml
-     * 2. log4j2-spring.xml
-     * 3. log4j2-[当前环境].xml
-     * 4. log4j2-spring-[当前环境].xml
-     * </pre>
-     */
-    private static void lookupLog4j2Configuration() {
-
-        String loggingConfigKey = "logging.config";
-
-        String[] lookupConfigurationPaths = new String[]{
-                "classpath:log4j2-" + env + ".xml",
-                "classpath:log4j2-spring-" + env + ".xml",
-                "classpath:log4j2.xml",
-                "classpath:log4j2-spring.xml"
-        };
-
-        for (String configurationPath : lookupConfigurationPaths) {
-            Resource resource = getClasspathResource(configurationPath);
-            if (null != resource && resource.exists()) {
-                System.setProperty(loggingConfigKey, configurationPath);
-                logFilePath = configurationPath;
-                break;
-            }
-        }
-    }
-
-    public synchronized static void setAcx(ApplicationContext acx) {
-        if (AppContext.acx == null || !AppContext.acx.equals(acx)) {
-
-            if (!lazyLogMessages.isEmpty()) {
-                for (String message : lazyLogMessages) {
-                    logger.info(message);
-                }
-            }
-
-            logger.info("当前运行环境： " + env);
-            logger.info("当前日志配置： " + logFilePath);
-
-            AppContext.acx = acx;
-            AppContext.environment = acx.getEnvironment();
-
-            // 初始化
-            initAppContext();
-        }
-    }
+    private static StandardEnvironment environment = new StandardEnvironment();
 
     /**
      * App 应用所有的key集合
      */
     private static volatile Set<String> appKeySet;
 
-    private static volatile boolean hadInit = false;
-
-    /**
-     * 初始化上下文
-     */
-    private static void initAppContext() {
-
-        if (!hadInit) {
-            hadInit = true;
-
-            // 将 app 自己的属性配置追加到 Environment 中
-            appendAppPropertiesToEnvironment();
-
-            // 初始化所有的 key 集合
-            initAppAllKeySet();
-
-        }
+    public static Set<String> getAppKeySet() {
+        return appKeySet;
     }
 
     public static String getEnv() {
         return env;
     }
 
-    public static String getProjectNo() {
-        if (StringUtils.isBlank(projectNo)) {
-            initProjectNo();
-        }
-        return projectNo;
-    }
-
     /**
      * 给定的环境是否一致
      *
-     * @param env 环境
+     * @param givenEnv 环境
      * @return 返回是否和给定的环境一致
      */
-    public static boolean isEnvMatched(String env) {
-        return StringUtils.equals(AppContext.env, env);
+    public static boolean isEnvMatched(String givenEnv) {
+        return StringUtils.equals(givenEnv, env);
     }
 
     public static boolean isDev() {
@@ -291,86 +111,90 @@ public final class AppContext {
         return ENV_PROD.equals(env);
     }
 
-    /**
-     * 获取指定 Appkey 对应的 配置值
-     *
-     * @param appKey       appKey
-     * @param defaultValue 默认值
-     * @return 返回对应key的值
-     */
-    public static String getAppProperty(String appKey, String defaultValue) {
+    public static String getProjectNo() {
+        return projectNo;
+    }
 
-        String value = null;
-        if (null != environment) {
-            value = environment.getProperty(appKey, defaultValue);
-        }
+    public static ConfigurableApplicationContext getAcx() {
+        return acx;
+    }
 
-        if (StringUtils.isBlank(value) && null != customAppProperties) {
-            return customAppProperties.getProperty(appKey, defaultValue);
-        }
+    public static void setAcx(ConfigurableApplicationContext acx) {
+        AppContext.acx = acx;
+    }
 
-        if (StringUtils.isBlank(value)) {
-            return defaultValue;
-        }
+    public static StandardEnvironment getEnvironment() {
+        return environment;
+    }
 
-        return environment.resolvePlaceholders(value);
+    public static void setEnvironment(StandardEnvironment environment) {
+        AppContext.environment = environment;
+        initAppAllKeySet();
+    }
+
+    public static String getProjectDir() {
+        return projectDir;
+    }
+
+    public static String getModuleDir() {
+        return moduleDir;
+    }
+
+    public static Map<String, Object> getProjectInfoMap() {
+        return projectInfoMap;
+    }
+
+    public static Map<String, Object> getApplicationProperties() {
+        return applicationProperties;
+    }
+
+    public static List<String> getInitInfo() {
+        return initInfo;
     }
 
     /**
-     * 获取指定 Appkey 对应的 配置值
+     * 初始化应用环境， 项目代号， 环境， 日志等
      *
-     * @param appKey       appKey
-     * @param defaultValue 默认值
-     * @return 返回对应key的值
+     * @param sourceClass 应用启动来源
      */
-    public static String getCustomAppProperty(String appKey, String defaultValue) {
+    public static void initialize(Class<?> sourceClass) {
 
-        if (null == customAppProperties) {
-            return defaultValue;
-        }
+        initInfo.clear();
+        initInfo.add("Initialize AppContext By Source : " + sourceClass);
 
-        String value = customAppProperties.getProperty(appKey, defaultValue);
+        AssertUtil.assertNotNull(sourceClass, "必须提供应用Source对象");
 
-        if (StringUtils.isBlank(value)) {
-            return value;
-        }
+        YYSpringBootApplication applicationAnn = sourceClass.getAnnotation(YYSpringBootApplication.class);
 
-        return value;
+        env = deduceRuntimeEnv(environment, sourceClass, applicationAnn);
+        moduleDir = deduceModuleDir(environment, sourceClass, applicationAnn);
+        projectDir = deduceProjectDir(environment, sourceClass, applicationAnn);
+        projectNo = deduceProjectNo(environment, sourceClass, applicationAnn);
+
+        projectInfoMap.put("projectNo", projectNo);
+        projectInfoMap.put("env", env);
+        projectInfoMap.put("moduleDir", moduleDir);
+        projectInfoMap.put("projectDir", projectDir);
+        environment.getPropertySources().addLast(new MapPropertySource("projectInfo", projectInfoMap));
+
+        resourceLookupDirs = deduceResourceLookupDirs(environment, sourceClass, applicationAnn);
+        projectInfoMap.put("resourceLookupDirs", resourceLookupDirs);
+
+        // 初始化应用程序属性
+        initializeApplicationProperties();
+
+        fixServerPort();
+
+        environment.getPropertySources().addLast(new MapPropertySource("yyApplicationProperties", applicationProperties));
+
+        initInfo.add(JsonUtil.toPrettyJson(projectInfoMap));
+
+        initAppAllKeySet();
     }
 
-    /**
-     * 获取 APP 所有的配置 key
-     *
-     * @return 返回 配置
-     */
-    public static Set<String> getAppKeySet() {
-        return appKeySet;
-    }
-
-    public static Map<String, String> getAppConfigMap() {
-
-        Set<String> keySet = getAppKeySet();
-
-        Map<String, String> configMap = new HashMap<>();
-
-        if (null == keySet || keySet.isEmpty()) {
-            return configMap;
-        }
-
-        for (String key : keySet) {
-            String value = environment.getProperty(key, String.class, null);
-            if (StringUtils.isNotBlank(value)) {
-                value = environment.resolvePlaceholders(value);
-            }
-            configMap.put(key, value);
-        }
-
-        return configMap;
-    }
 
     private static void initAppAllKeySet() {
-        AbstractEnvironment springEnv = (AbstractEnvironment) environment;
-        MutablePropertySources propertySources = springEnv.getPropertySources();
+        MutablePropertySources propertySources = environment.getPropertySources();
 
         Set<String> allKeySet = new HashSet<>();
 
@@ -383,123 +207,128 @@ public final class AppContext {
         AppContext.appKeySet = Collections.unmodifiableSet(allKeySet);
     }
 
-    private static void appendAppPropertiesToEnvironment() {
-        AbstractEnvironment springEnv = (AbstractEnvironment) environment;
-        MutablePropertySources propertySources = springEnv.getPropertySources();
-        propertySources.addFirst(new MapPropertySource("app_props", toMap(customAppProperties)));
-    }
-
-    private static Map<String, Object> toMap(Properties properties) {
-        Map<String, Object> map = new HashMap<>();
-
-        if (null == properties || properties.isEmpty()) {
-            return map;
+    public static Set<String> lookupKeys(Set<String> keySet, KeyFilter keyFilter) {
+        if (keySet == null || keySet.isEmpty()) {
+            return keySet;
         }
 
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            map.put(String.valueOf(entry.getKey()), entry.getValue());
+        if (null == keyFilter) {
+            return keySet;
         }
-
-        return map;
+        Set<String> resultKeySet = new HashSet<>();
+        for (String key : keySet) {
+            if (keyFilter.filter(key)) {
+                resultKeySet.add(key);
+            }
+        }
+        return resultKeySet;
     }
 
-    /**
-     * 自定义的 App 配置
-     */
-    private static volatile Properties customAppProperties;
 
-    /**
-     * 自定义 App Key 集合
-     */
-    private static volatile Set<String> customAppKeySet;
-
-    /**
-     * 初始化 App 配置，同时追加到 Environment 对象中
-     */
-    private static void initAppActiveProperties() {
+    private static void initializeApplicationProperties() {
 
         List<Resource> resourceList = lookupConfigResourceList("application.properties");
 
         if (null != resourceList && !resourceList.isEmpty()) {
-
-            customAppProperties = new Properties();
-
-            for (Resource resource : resourceList) {
-
-                Properties properties = new Properties();
-
+            for (int i = resourceList.size() - 1; i >= 0; --i) {
+                Resource resource = resourceList.get(i);
                 try {
-
-                    logger.info("加载配置文件： " + resource.getURL());
-
+                    initInfo.add("加载配置文件： " + resource.getURL());
+                    Properties properties = new Properties();
                     properties.load(resource.getInputStream());
-
                     if (!properties.isEmpty()) {
-                        customAppProperties.putAll(properties);
+                        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                            applicationProperties.put(String.valueOf(entry.getKey()), entry.getValue());
+                        }
                     }
 
                 } catch (Exception e) {
                     throw new CodeException("加载App资源错误：" + e.getMessage(), e);
                 }
-
             }
-
-            fixServerPort(customAppProperties);
-
-            customAppKeySet = new HashSet<>();
-
-            for (Object key : customAppProperties.keySet()) {
-                customAppKeySet.add(String.valueOf(key));
-            }
-
-            customAppKeySet = Collections.unmodifiableSet(customAppKeySet);
         }
 
     }
 
-    private static void fixServerPort(Properties properties) {
+    private static void fixServerPort() {
         String serverPortKey = "server.port";
         String serverPort = System.getProperty(serverPortKey);
         if (StringUtils.isNotBlank(serverPort)) {
-            properties.put(serverPortKey, serverPort);
+            applicationProperties.put(serverPortKey, serverPort);
         }
 
-        if (!properties.containsKey(serverPortKey)) {
+        if (!applicationProperties.containsKey(serverPortKey)) {
             // 默认使用8081
-            properties.setProperty(serverPortKey, DEFAULT_SERVER_PORT);
+            applicationProperties.put(serverPortKey, DEFAULT_SERVER_PORT);
         }
     }
 
+
     /**
-     * 搜索 配置文件
-     *
-     * @param configFilename 配置文件名称
-     * @return 返回配置文件资源
+     * 推断资源搜索目录，当查找一个资源的时候，在指定的目录下，根据不同环境，会读取不同的配置文件，假设要搜索的资源文件标识为 config.suffix
+     * 那么会在资源搜索目录下按如下顺序搜索文件：
+     * 1. ${LOOKUP_DIR}/${env}/config.suffix
+     * 2. ${LOOKUP_DIR}/config-${env}.suffix
+     * <p>
+     * 生效的顺序为搜索的顺序，假设 1、2 中都有相同的配置项，那么 1 的会生效
+     * <p>
+     * 关于资源搜索目录，默认是:
+     * 1. classpath:/config/
+     * 2. classpath:/
+     * 5. /data/app/${projectNo}/config/      这个只有在非开发环境下才生效
+     * 6. ${projectDir}/config/               这个只有在开发环境下才生效
      */
-    public static Resource lookupConfigResource(String configFilename) {
+    private static List<String> deduceResourceLookupDirs(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
+        List<String> lookupDirs = new ArrayList<>();
 
-        List<String> lookupPaths = extractLookupConfigResourcePaths(configFilename);
-
-        if (null == lookupPaths || lookupPaths.isEmpty()) {
-            return null;
+        try {
+            ClassPathResource classPathResource = new ClassPathResource("/config/");
+            if (classPathResource.exists()) {
+                lookupDirs.add("classpath:/config/");
+            }
+        } catch (Exception ignored) {
         }
 
-        for (String lookupPath : lookupPaths) {
+        lookupDirs.add("classpath:/");
 
-            if (lookupPath.startsWith("classpath")) {
-                Resource resource = getClasspathResource(lookupPath);
-                if (null != resource && resource.exists()) {
-                    return resource;
-                }
-            } else {
-                Resource resource = getResourceFromAbsPath(lookupPath);
-                if (null != resource && resource.exists()) {
-                    return resource;
+        File dir;
+        if (!isDev()) {
+            dir = tryGetExistsDirFile(appEnvironment, "/data/app/${projectNo}/config/");
+            if (null != dir) {
+                lookupDirs.add(dir.getAbsolutePath());
+            }
+        } else {
+            dir = tryGetExistsDirFile(appEnvironment, "${projectDir}/config/");
+            if (null != dir) {
+                lookupDirs.add(dir.getAbsolutePath());
+            }
+        }
+
+        if (null != applicationAnn) {
+            String[] customDirs = applicationAnn.resourceLookupDirs();
+            if (customDirs.length > 1) {
+                for (String path : customDirs) {
+                    dir = tryGetExistsDirFile(appEnvironment, path);
+                    if (null != dir) {
+                        lookupDirs.add(dir.getAbsolutePath());
+                    }
                 }
             }
-
         }
 
+        return lookupDirs;
+    }
+
+    private static File tryGetExistsDirFile(StandardEnvironment appEnvironment, String path) {
+
+        try {
+            String filePath = appEnvironment.resolveRequiredPlaceholders(path);
+            File dir = new File(filePath);
+            if (dir.exists() && dir.isDirectory()) {
+                return dir;
+            }
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
@@ -538,78 +367,6 @@ public final class AppContext {
         return resourceList;
     }
 
-    protected static Resource getClasspathResource(String classpathResource) {
-
-        String path = classpathResource.replaceFirst("(?i)classpath\\*?:", "");
-        Resource resource = new ClassPathResource(path);
-        if (!resource.exists()) {
-            return null;
-        }
-        return resource;
-    }
-
-    protected static Resource getResourceFromAbsPath(String filePath) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            try {
-                Resource resource = new FileSystemResource(file);
-                if (resource.exists()) {
-                    return resource;
-                }
-            } catch (Exception ignored) {
-            }
-        }
-        return null;
-    }
-
-    private static List<String> CONFIG_LOOKUP_PATHS;
-
-    /**
-     * 初始化搜索配置文件资源的路径， 配置文件生效顺序：
-     * 1. classpath:/config/{env}/application.properties
-     * 2. classpath:/config/application-env.properties
-     * 3. classpath:/{env}/application.properties
-     * 4. classpath:/application-env.properties
-     * 5. 自定义 EnvReader 中的配置基路径 /config/{env}/application.properties
-     */
-    private static void initLookupConfigResourcePaths() {
-
-        List<String> lookupPaths = new ArrayList<>();
-
-        List<String> paths = customResourceLookupPaths;
-        if (paths != null && !paths.isEmpty()) {
-            lookupPaths.addAll(paths);
-        }
-
-        if (isDev()) {
-            // 从当前目录开始，读取第一个含有 config 的目录
-            try {
-                String userDir = String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""));
-
-                userDir = userDir.replaceFirst("(?i)^jar:", "");
-                userDir = userDir.replaceFirst("(?i)^file:/", "");
-                userDir = userDir.replaceFirst("(?i)[/\\\\][^./\\\\]+\\.jar!.*$", "");
-
-                int index = userDir.lastIndexOf("/target");
-                if (index > -1) {
-                    userDir = userDir.substring(0, index);
-                    userDir = userDir.replaceFirst("(?i)[/\\\\][^./\\\\]+$", "");
-                }
-
-                lookupPaths.add(userDir + "/config/");
-
-            } catch (Exception ignored) {
-            }
-        }
-
-        lookupPaths.add("classpath:/");
-        lookupPaths.add("classpath:/config/");
-
-        lazyLogMessage("配置文件搜索路径目录：" + JsonUtil.toJson(lookupPaths));
-
-        CONFIG_LOOKUP_PATHS = lookupPaths;
-    }
-
     /**
      * 提取完整的配置文件路徑
      *
@@ -635,105 +392,83 @@ public final class AppContext {
 
         List<String> pathList = new ArrayList<>();
 
-        for (String basePath : CONFIG_LOOKUP_PATHS) {
-            pathList.add(PathUtil.normalizePath(basePath + "/" + name + "-" + env + suffix));
+        for (String basePath : resourceLookupDirs) {
             pathList.add(PathUtil.normalizePath(basePath + "/" + env + "/" + configFilename));
+            pathList.add(PathUtil.normalizePath(basePath + "/" + name + "-" + env + suffix));
+            pathList.add(PathUtil.normalizePath(basePath + "/" + configFilename));
         }
 
         return pathList;
     }
 
-    /**
-     * 获取符合规则的key集合
-     *
-     * @param keyFilter key过滤器，满足指定条件的key才会接受
-     * @return 返回非 null 集合
-     */
-    public static Set<String> lookupAllKeys(KeyFilter keyFilter) {
-        return lookupKeys(appKeySet, keyFilter);
+    public static Resource getClasspathResource(String classpathResource) {
+
+        String path = classpathResource.replaceFirst("(?i)classpath\\*?:", "");
+        Resource resource = new ClassPathResource(path);
+        if (!resource.exists()) {
+            return null;
+        }
+        return resource;
     }
 
-    /**
-     * 获取符合规则的key集合
-     *
-     * @param keyFilter key过滤器，满足指定条件的key才会接受
-     * @return 返回非 null 集合
-     */
-    public static Set<String> lookupCustomKeys(KeyFilter keyFilter) {
-        return lookupKeys(customAppKeySet, keyFilter);
-    }
-
-    private static Set<String> lookupKeys(Set<String> keySet, KeyFilter keyFilter) {
-        if (keySet == null || keySet.isEmpty()) {
-            return keySet;
-        }
-
-        if (null == keyFilter) {
-            return keySet;
-        }
-        Set<String> resultKeySet = new HashSet<>();
-        for (String key : keySet) {
-            if (keyFilter.filter(key)) {
-                resultKeySet.add(key);
+    public static Resource getResourceFromAbsPath(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            try {
+                Resource resource = new FileSystemResource(file);
+                if (resource.exists()) {
+                    return resource;
+                }
+            } catch (Exception ignored) {
             }
         }
-        return resultKeySet;
-    }
-
-
-    /**
-     * 获取 资源路径跟路径
-     *
-     * @return 返回绝对路径
-     */
-    public static String getAppRootResourceDir() {
-        return appRootDir + "src/main/resources/";
+        return null;
     }
 
     /**
-     * 获取 测试资源路径跟路径
-     *
-     * @return 返回绝对路径
+     * 推断项目的目录，这个在开发环境下才会和 模块DIR不一样
      */
-    public static String getAppRootTestResourceDir() {
-        return appRootDir + "src/test/resources/";
-    }
+    private static String deduceProjectDir(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
 
-    /**
-     * 启动类
-     */
-    private static Class<?> startClass;
+        if (isDev()) {
+            // 搜索模块DIR上一层目录，直到搜索不到 pom.xml 文件为止则认为是项目的根目录
+            File parent = new File(moduleDir).getParentFile();
+            List<File> list = new ArrayList<>();
+            while (null != parent && parent.exists()) {
+                list.add(parent);
+                parent = parent.getParentFile();
+            }
 
-    /**
-     * 设置启动类
-     *
-     * @param startClass 启动类
-     */
-    public static void setStartClass(Class<?> startClass) {
-        AssertUtil.assertTrue(null == AppContext.startClass || AppContext.startClass.equals(startClass), "已经设置了启动class");
-
-        if (null == AppContext.startClass || !AppContext.startClass.equals(startClass)) {
-            AppContext.startClass = startClass;
-
-            initForStartClass();
+            int projectDirIndex = -1;
+            for (int i = 0; i < list.size(); ++i) {
+                File file = list.get(i);
+                String[] filenames = file.list(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return "pom.xml".equalsIgnoreCase(name);
+                    }
+                });
+                if (null != filenames && filenames.length > 0) {
+                    if (projectDirIndex == -1) {
+                        projectDirIndex = i;
+                    } else {
+                        if (projectDirIndex + 1 == i) {
+                            projectDirIndex = i;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (projectDirIndex < 0) {
+                return moduleDir;
+            }
+            return list.get(projectDirIndex).getAbsolutePath();
+        } else {
+            // 非开发环境则和模块目录一样
+            return moduleDir;
         }
 
-    }
-
-    private static String projectRootDir;
-    private static String appRootDir;
-
-    public static String getAppRootDir() {
-        return appRootDir;
-    }
-
-    public static String getProjectRootDir() {
-        return projectRootDir;
-    }
-
-    private static void initForStartClass() {
-
-        initAppRootDir();
     }
 
     /**
@@ -743,41 +478,23 @@ public final class AppContext {
     private static final String WAR_CLASSES_FOLDER_REGEX_PREFIX = "(?i)(.*)[/\\\\]WEB-INF[/\\\\]classes[/\\\\]";
 
     /**
-     * <pre>
-     * 初始化项目根目录， parent pom.xml 所在目录
-     * 1. 如果是使用外部容器启动， 那么 user.dir 就是容器命令所在目录，比如 tomcat 容器那么返回的就是tomcat启动脚本命令所在目录，如D:\apache-tomcat-7.0.57\bin
-     * 2. 非 外部容器可以直接获取到项目根路径
-     *
-     * 因此不能使用 userdir 来计算项目路径， 可以采用 SpringBoot 中的 ApplicationHome 来计算
-     *
-     * ApplicationHome:
-     * 1. 打包成 jar 模式，所有的资源都会打包成一个可执行的 jar， 因此获取到目录就是 该可执行的 jar 目录
-     * 2. 打包成 war 模式，结果是标准的 war 包， 因此 返回的目录是 本类所在 jar 的目录， 通常是 WEB-INF/lib
-     *   (一般使用本模版的话， env 模块会打包到 WEB-INF/lib)
-     *
-     * </pre>
+     * 推断模块目录
      */
-    private static void initAppRootDir() {
+    private static String deduceModuleDir(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
 
-        ApplicationHome home = new ApplicationHome(startClass);
+        ApplicationHome home = new ApplicationHome(sourceClass);
 
         String homeDir = home.getDir().getAbsolutePath();
 
         if (isDev()) {
-
-            // 项目根目录
-            projectRootDir = PathUtil.normalizePath(homeDir.replaceFirst("[/\\\\][^/\\\\]+[/\\\\]target[/\\\\].*$", "/") + "/");
-            // 模块APP目录
-            appRootDir = PathUtil.normalizePath(homeDir.replaceFirst("[/\\\\]target[/\\\\].*$", "/") + "/");
-
+            // 开发环境下，计算项目模块路径
+            return PathUtil.normalizePath(homeDir.replaceFirst("[/\\\\]target[/\\\\].*$", "/") + "/");
         } else {
-
             Matcher matcher = WAR_LIB_FOLDER_REGEX.matcher(homeDir);
             if (matcher.find()) {
-                projectRootDir = PathUtil.normalizePath(matcher.replaceAll("$1/"));
-                appRootDir = projectRootDir;
+                return PathUtil.normalizePath(matcher.replaceAll("$1/"));
             } else {
-                String sourceClassPackage = startClass.getPackage().getName();
+                String sourceClassPackage = sourceClass.getPackage().getName();
 
                 String packageToRegex = sourceClassPackage.replaceAll("\\.", "[/\\\\\\\\]");
 
@@ -786,51 +503,75 @@ public final class AppContext {
                 matcher = pattern.matcher(homeDir);
 
                 if (matcher.find()) {
-                    projectRootDir = PathUtil.normalizePath(matcher.replaceAll("$1/"));
-                    appRootDir = projectRootDir;
+                    return PathUtil.normalizePath(matcher.replaceAll("$1/"));
                 } else {
                     // 非 war， jar模式
-                    projectRootDir = PathUtil.normalizePath(homeDir.replaceAll("classes$", "/"));
-                    appRootDir = PathUtil.normalizePath(homeDir.replaceAll("classes$", "/"));
+                    return PathUtil.normalizePath(homeDir.replaceAll("classes$", "/"));
                 }
             }
         }
-
-        lazyLogMessage(getEnv() + "HomeDir: " + homeDir);
-        lazyLogMessage(getEnv() + "ProjectRootDir: " + projectRootDir);
-        lazyLogMessage(getEnv() + "DevAppRootDir: " + projectRootDir);
     }
 
-    /**
-     * 忽略自动配置类
-     */
-    private static List<String> autoconfigExcludeClassList = new ArrayList<>();
+    private static String deduceRuntimeEnv(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
 
-    /**
-     * 忽略自动配置
-     *
-     * @param clazz 要忽略的自动配置类全路径
-     */
-    public synchronized static void excludeAutoConfigClass(String clazz) {
-
-        if (StringUtils.isBlank(clazz)) {
-            return;
+        String[] lookupEnvKeys = null;
+        if (null != applicationAnn) {
+            lookupEnvKeys = applicationAnn.envKeys();
+        }
+        if (StringUtils.isAllBlank(lookupEnvKeys)) {
+            lookupEnvKeys = new String[]{"DWENV", "ENV"};
         }
 
-        int size = autoconfigExcludeClassList.size();
-        int searchIndex = 0;
-        if (autoconfigExcludeClassList.contains(clazz)) {
-            for (int i = 0; i < size; ++i) {
-                if (clazz.equals(autoconfigExcludeClassList.get(i))) {
-                    searchIndex = i;
-                }
+        return lookupFirstNotBlankValue(appEnvironment, lookupEnvKeys, ENV_DEV);
+    }
+
+    private static String deduceProjectNo(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
+        String pno = null;
+        if (null != applicationAnn) {
+            pno = applicationAnn.projectNo();
+        }
+        if (StringUtils.isBlank(pno)) {
+            String[] lookupProjectNoKeys = new String[]{"DWPROJECTNO", "PROJECTNO", "APPNO", "DWAPPNO"};
+            pno = lookupFirstNotBlankValue(appEnvironment, lookupProjectNoKeys, null);
+            if (StringUtils.isNotBlank(pno)) {
+                return pno;
             }
-        } else {
-            autoconfigExcludeClassList.add(clazz);
-            searchIndex = autoconfigExcludeClassList.size() - 1;
+        }
+        // 如果还是为空，则抛出异常，表示无法识别项目代号
+        throw new CodeException(500, "无法识别项目代号！");
+    }
+
+    private static String lookupFirstNotBlankValue(StandardEnvironment appEnvironment, String[] keys, String defaultValue) {
+        for (String projectNoKey : keys) {
+            try {
+                String value = appEnvironment.resolveRequiredPlaceholders("${" + projectNoKey + "}");
+                if (StringUtils.isNotBlank(value)) {
+                    return value;
+                }
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+        return defaultValue;
+    }
+
+    public static String getSystemVar(String key, String defaultValue) {
+        String env = System.getenv(key);
+
+        if (StringUtils.isBlank(env)) {
+            return System.getProperty(key, defaultValue);
         }
 
-        System.setProperty("spring.autoconfigure.exclude[" + searchIndex + "]", clazz);
+        return env;
+    }
 
+    public static String getAppProperty(String key, String defaultValue) {
+        try {
+            String value = environment.resolveRequiredPlaceholders(key);
+            if (StringUtils.isBlank(value)) {
+                return defaultValue;
+            }
+        } catch (Exception ignored) {
+        }
+        return defaultValue;
     }
 }

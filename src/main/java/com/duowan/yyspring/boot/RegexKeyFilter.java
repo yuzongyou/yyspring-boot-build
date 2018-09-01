@@ -1,4 +1,4 @@
-package com.duowan.esb.core;
+package com.duowan.yyspring.boot;
 
 import org.apache.commons.lang3.StringUtils;
 
