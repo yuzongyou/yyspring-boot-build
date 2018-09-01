@@ -1,5 +1,10 @@
 package com.duowan.yyspring.boot.annotations;
 
+import com.duowan.yyspring.boot.DefaultEnvReader;
+import com.duowan.yyspring.boot.DefaultProjectNoReader;
+import com.duowan.yyspring.boot.EnvReader;
+import com.duowan.yyspring.boot.ProjectNoReader;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,18 +20,18 @@ import java.lang.annotation.Target;
 public @interface YYSpringBootApplication {
 
     /**
-     * 应用名称，默认按顺序从JVM和环境变量读取变量 DWPROJECTNO, PROJECTNO, APPNO, DWAPPNO
+     * 项目代号读取器
      *
-     * @return 返回应用名称
+     * @return 返回应用代号读取类
      */
-    String projectNo() default "";
+    Class<? extends ProjectNoReader> projectNoReader() default DefaultProjectNoReader.class;
 
     /**
-     * 获取当前运行环境的 KEY 值
+     * 运行环境读取器
      *
-     * @return 返回获取环境的key值
+     * @return 返回环境读取类
      */
-    String[] envKeys() default {"DWENV", "ENV"};
+    Class<? extends EnvReader> envReader() default DefaultEnvReader.class;
 
     /**
      * 资源文件搜索目录，允许自定义路径，自定义的路径会在默认的路径之后， 允许使用 projectNo 变量和系统变量；

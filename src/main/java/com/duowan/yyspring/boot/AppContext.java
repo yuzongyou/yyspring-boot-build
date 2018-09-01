@@ -9,6 +9,7 @@ import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.ApplicationHome;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.*;
@@ -513,35 +514,38 @@ public class AppContext {
     }
 
     private static String deduceRuntimeEnv(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
-
-        String[] lookupEnvKeys = null;
+        EnvReader envReader;
         if (null != applicationAnn) {
-            lookupEnvKeys = applicationAnn.envKeys();
+            Class<? extends EnvReader> readerClass = applicationAnn.envReader();
+            envReader = BeanUtils.instantiate(readerClass);
+        } else {
+            envReader = new DefaultEnvReader();
         }
-        if (StringUtils.isAllBlank(lookupEnvKeys)) {
-            lookupEnvKeys = new String[]{"DWENV", "ENV"};
+        String env = envReader.readRuntimeEnv(appEnvironment, sourceClass);
+        if (StringUtils.isBlank(env)) {
+            return ENV_DEV;
         }
-
-        return lookupFirstNotBlankValue(appEnvironment, lookupEnvKeys, ENV_DEV);
+        return env;
     }
 
     private static String deduceProjectNo(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
-        String pno = null;
+
+        ProjectNoReader reader;
         if (null != applicationAnn) {
-            pno = applicationAnn.projectNo();
+            Class<? extends ProjectNoReader> readerClass = applicationAnn.projectNoReader();
+            reader = BeanUtils.instantiate(readerClass);
+        } else {
+            reader = new DefaultProjectNoReader();
         }
-        if (StringUtils.isBlank(pno)) {
-            String[] lookupProjectNoKeys = new String[]{"DWPROJECTNO", "PROJECTNO", "APPNO", "DWAPPNO"};
-            pno = lookupFirstNotBlankValue(appEnvironment, lookupProjectNoKeys, null);
-            if (StringUtils.isNotBlank(pno)) {
-                return pno;
-            }
+        String projectNo = reader.readProjectNo(appEnvironment, sourceClass);
+        if (StringUtils.isNotBlank(projectNo)) {
+            return projectNo;
         }
         // 如果还是为空，则抛出异常，表示无法识别项目代号
         throw new CodeException(500, "无法识别项目代号！");
     }
 
-    private static String lookupFirstNotBlankValue(StandardEnvironment appEnvironment, String[] keys, String defaultValue) {
+    public static String lookupFirstNotBlankValue(StandardEnvironment appEnvironment, String[] keys, String defaultValue) {
         for (String projectNoKey : keys) {
             try {
                 String value = appEnvironment.resolveRequiredPlaceholders("${" + projectNoKey + "}");
