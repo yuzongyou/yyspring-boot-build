@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
@@ -32,7 +33,7 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     }
 
     private void initialize() {
-        Set<Object> sources = application.getSources();
+        Set<Object> sources = application.getAllSources();
         Class<?> sourceClass = validateSourcesThenReturnFirstHasYYSpringApplicationAnnotationSource(sources);
         // 初始化
         AppContext.initialize(sourceClass);
@@ -50,7 +51,8 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
             }
         }
 
-        if (application.isWebEnvironment()) {
+        WebApplicationType webApplicationType = application.getWebApplicationType();
+        if (WebApplicationType.REACTIVE.equals(webApplicationType) || WebApplicationType.SERVLET.equals(webApplicationType)) {
             if (AppContext.isDev()) {
                 WebPrepareUtil.prepareStaticResourceLocations(AppContext.getEnvironment(), AppContext.getModuleDir());
                 WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getEnvironment(), AppContext.getModuleDir());
@@ -121,8 +123,7 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     }
 
     @Override
-    public void finished(ConfigurableApplicationContext context, Throwable exception) {
-
+    public void started(ConfigurableApplicationContext context) {
         Logger appContextLogger = LoggerFactory.getLogger(AppContext.class);
         List<String> infoList = AppContext.getInitInfo();
         for (String info : infoList) {
@@ -134,5 +135,15 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
         for (String info : infoList) {
             webPrepareUtilLogger.info(info);
         }
+    }
+
+    @Override
+    public void running(ConfigurableApplicationContext context) {
+
+    }
+
+    @Override
+    public void failed(ConfigurableApplicationContext context, Throwable exception) {
+
     }
 }

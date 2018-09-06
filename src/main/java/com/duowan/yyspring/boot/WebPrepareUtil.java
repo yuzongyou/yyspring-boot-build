@@ -3,7 +3,8 @@ package com.duowan.yyspring.boot;
 import com.duowan.common.utils.ClassUtil;
 import com.duowan.common.utils.PathUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.UrlResource;
 
@@ -41,6 +42,7 @@ public class WebPrepareUtil {
      * 如果是开发环境的话，重置静态资源路径
      *
      */
+    @SuppressWarnings("unchecked")
     public static void prepareStaticResourceLocations(StandardEnvironment appEnvironment, String moduleDir) {
         String resourceLocationPrefix = PathUtil.normalizePath(moduleDir + "/src/main/resources/");
 
@@ -48,9 +50,12 @@ public class WebPrepareUtil {
 
         String locationKeyPrefix = "spring.resources.static-locations";
 
-        RelaxedPropertyResolver rootPropertyResolver = new RelaxedPropertyResolver(appEnvironment, locationKeyPrefix);
-
-        Map<String, Object> map = rootPropertyResolver.getSubProperties("");
+        Binder binder = Binder.get(appEnvironment);
+        Map<String, Object> map = null;
+        BindResult<Map> result = binder.bind(locationKeyPrefix, Map.class);
+        if (result.isBound()) {
+            map = result.get();
+        }
 
         if(map == null || map.isEmpty()) {
             resetStaticResourceLocationsAsDefault(resourceLocationPrefix, locationKeyPrefix);
