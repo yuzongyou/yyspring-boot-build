@@ -2,18 +2,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <groupId>com.duowan</groupId>
-        <artifactId>yyspring-boot-bom</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
-    </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yyspring-boot</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <parent>
+        <groupId>io.spring.platform</groupId>
+        <artifactId>platform-bom</artifactId>
+        <version>Cairo-SR3</version>
+    </parent>
+
+    <groupId>com.duowan</groupId>
+    <artifactId>yyspring-boot-build</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
     <url>https://git.yy.com/opensource/yygame/yyspring-boot/</url>
+
+    <properties>
+        <revision>2.0.0-SNAPSHOT</revision>
+        <main.basedir>${basedir}</main.basedir>
+    </properties>
 
     <licenses>
         <license>
@@ -41,23 +49,212 @@
         <url>https://git.yy.com/opensource/yygame/yyspring-boot/issues</url>
     </issueManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.duowan</groupId>
-            <artifactId>common-utils</artifactId>
-        </dependency>
+    <profiles>
+        <!-- Default profile for command line build -->
+        <profile>
+            <id>default</id>
+            <activation>
+                <property>
+                    <name>!disable-spring-boot-default-profile</name>
+                </property>
+            </activation>
+            <properties>
+                <spring-javaformat.version>0.0.6</spring-javaformat.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.puppycrawl.tools</groupId>
+                                <artifactId>checkstyle</artifactId>
+                                <version>8.11</version>
+                            </dependency>
+                            <dependency>
+                                <groupId>io.spring.javaformat</groupId>
+                                <artifactId>spring-javaformat-checkstyle</artifactId>
+                                <version>${spring-javaformat.version}</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <id>checkstyle-validation</id>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <!--<skip>${disable.checks}</skip>-->
+                                    <skip>true</skip>
+                                    <configLocation>src/checkstyle/checkstyle.xml</configLocation>
+                                    <suppressionsLocation>src/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+                                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                                </configuration>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <version>${spring-javaformat.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <!--<skip>${disable.checks}</skip>-->
+                                    <skip>true</skip>
+                                </configuration>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <modules>
+                <module>yyspring-boot-project</module>
+                <module>yycommon-project</module>
+                <!-- Samples are built via the invoker plugin -->
+            </modules>
+        </profile>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
-        </dependency>
+        <!-- M2E profile to allow easy import into Eclipse -->
+        <profile>
+            <id>m2e</id>
+            <activation>
+                <property>
+                    <name>m2e.version</name>
+                </property>
+            </activation>
+            <modules>
+                <module>yyspring-boot-project</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>repository</id>
+            <activation>
+                <property>
+                    <name>repository</name>
+                </property>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>repository</id>
+                    <url>${repository}</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>repository</id>
+                    <url>${repository}</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-milestone</id>
+            <name>Spring Milestone</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-snapshot</id>
+            <name>Spring Snapshot</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
-    </dependencies>
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <url>http://devserv-game.yy.com/nexus/content/groups/public</url>
+        </repository>
 
+        <repository>
+            <id>snapshots</id>
+            <url>http://devserv-game.yy.com/nexus/content/groups/public-snapshots</url>
+        </repository>
+
+        <repository>
+            <id>spring-snapshots</id>
+            <url>http://repo.spring.io/libs-snapshot</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Internal Releases</name>
+            <url>http://devserv-game.yy.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Internal snapshots</name>
+            <url>http://devserv-game.yy.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.jetbrains.kotlin
+                                        </groupId>
+                                        <artifactId>
+                                            kotlin-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.1.51,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>compile</goal>
+                                            <goal>test-compile</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

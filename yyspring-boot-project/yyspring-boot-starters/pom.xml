@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.duowan</groupId>
+        <artifactId>yyspring-boot-bom</artifactId>
+        <version>${revision}</version>
+        <relativePath>../yyspring-boot-bom</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yyspring-boot-starters</artifactId>
+    <packaging>pom</packaging>
+    <name>YYSpring Boot Starters</name>
+    <description>YYSpring Boot Starters</description>
+
+    <properties>
+        <main.basedir>${basedir}/../..</main.basedir>
+    </properties>
+
+    <modules>
+        <module>yyspring-boot-starter</module>
+        <module>yyspring-boot-starter-virtualdns</module>
+        <module>yyspring-boot-starter-recachedns</module>
+        <module>yyspring-boot-starter-timer</module>
+        <module>yyspring-boot-starter-alarm</module>
+    </modules>
+</project>

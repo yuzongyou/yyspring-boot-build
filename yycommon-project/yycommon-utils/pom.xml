@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.duowan</groupId>
+        <artifactId>yycommon-bom</artifactId>
+        <version>${revision}</version>
+        <relativePath>../yycommon-bom</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>yycommon-utils</artifactId>
+    <packaging>jar</packaging>
+    <description>基础工具类集合</description>
+
+    <properties>
+
+        <slf4j.version>1.7.25</slf4j.version>
+        <servlet.version>3.1.0</servlet.version>
+        <jackson.version>2.9.5</jackson.version>
+        <commons.lang3.version>3.7</commons.lang3.version>
+        <commons.codec.version>1.10</commons.codec.version>
+        <commons.collections.version>3.2.1</commons.collections.version>
+        <commons.text.version>1.3</commons.text.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-exception</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>${commons.codec.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons.collections.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Jackson start -->
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Jackson end -->
+
+        <!-- Servlet 容器相关 开始 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Servlet 容器相关 结束 -->
+    </dependencies>
+
+
+</project>

@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.recachedns.ReCacheDnsAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.alarm.AlarmAutoConfiguration
