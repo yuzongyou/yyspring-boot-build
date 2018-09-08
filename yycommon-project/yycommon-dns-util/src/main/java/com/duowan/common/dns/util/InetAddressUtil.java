@@ -75,6 +75,7 @@ public class InetAddressUtil {
      * @param fieldName    属性名称
      * @param <T>          结果类型
      * @return 返回属性结果
+     * @throws Exception 计算错误抛出任何可能的异常
      */
     public static <T> T getFieldInstance(Class<T> requiredType, String fieldName) throws Exception {
         Class<?> clazz = INET_ADDRESS_CLASS;

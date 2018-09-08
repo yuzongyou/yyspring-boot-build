@@ -147,6 +147,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-apollo</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- Jackson start -->
 
             <dependency>

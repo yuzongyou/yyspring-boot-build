@@ -304,11 +304,15 @@ public class AppContext {
 
         if (null != applicationAnn) {
             String[] customDirs = applicationAnn.resourceLookupDirs();
-            if (customDirs.length > 1) {
+            if (customDirs.length > 0) {
                 for (String path : customDirs) {
-                    dir = tryGetExistsDirFile(appEnvironment, path);
-                    if (null != dir) {
-                        lookupDirs.add(dir.getAbsolutePath());
+                    if (path.matches("(?i)^classpath:.*")) {
+                        lookupDirs.add(path);
+                    } else {
+                        dir = tryGetExistsDirFile(appEnvironment, path);
+                        if (null != dir) {
+                            lookupDirs.add(dir.getAbsolutePath());
+                        }
                     }
                 }
             }
@@ -607,10 +611,11 @@ public class AppContext {
 
     public static String getAppProperty(String key, String defaultValue) {
         try {
-            String value = environment.resolveRequiredPlaceholders(key);
-            if (StringUtils.isBlank(value)) {
+            String realKey = environment.resolveRequiredPlaceholders(key);
+            if (StringUtils.isBlank(realKey)) {
                 return defaultValue;
             }
+            return environment.getProperty(realKey, defaultValue);
         } catch (Exception ignored) {
         }
         return defaultValue;

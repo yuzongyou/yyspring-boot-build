@@ -40,7 +40,7 @@ public class FixTimeDelay implements Delay {
          * 月份
          *
          * @param month 1月就是1，2月就是2，以此类推
-         * @return
+         * @return 返回Builder本身
          */
         public Builder month(int month) {
             this.month = month - 1;
@@ -56,6 +56,7 @@ public class FixTimeDelay implements Delay {
          * 24 小时 制
          *
          * @param hour 小时
+         * @return 返回Builder本身
          */
         public Builder hour(int hour) {
             this.hour = hour;

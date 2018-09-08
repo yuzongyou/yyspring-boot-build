@@ -43,6 +43,7 @@ public class DnsCacheUtil {
      * 刷新DNS
      *
      * @param host 主机地址
+     * @throws Exception 任何异常
      */
     static void refreshDns(final String host) throws Exception {
         if (null != host && !"".equals(host.trim())) {
@@ -77,6 +78,7 @@ public class DnsCacheUtil {
      *
      * @param host               主机地址
      * @param runOnceImmediately 立即调用一次
+     * @throws Exception 任何异常
      */
     static void scheduleDnsAutoRefreshCache(final String host, final boolean runOnceImmediately) throws Exception {
 
@@ -239,6 +241,7 @@ public class DnsCacheUtil {
      * 设置 DNS 解析最大时间，预估值，传递一个最大的DNS解析时间
      *
      * @param maxDnsMillis DNS 最大解析时间，只是一个预估
+     * @throws Exception 任何异常
      */
     public static void setMaxDnsMillis(int maxDnsMillis) throws Exception {
         MAX_DNS_MILLIS = maxDnsMillis < 1000 ? 15000 : maxDnsMillis;
@@ -271,6 +274,7 @@ public class DnsCacheUtil {
      * 设置 DNS 缓存时间
      *
      * @param seconds 缓存时间，单位是秒, 0 表示不缓存，-1表示永久缓存， 正数表示缓存的秒数
+     * @throws Exception 任何异常
      */
     public static void setDnsCacheTime(int seconds) throws Exception {
         int expire = seconds;

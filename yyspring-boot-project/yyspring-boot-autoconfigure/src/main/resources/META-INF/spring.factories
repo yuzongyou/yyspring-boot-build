@@ -1,3 +1,7 @@
+# Initializers
+org.springframework.boot.SpringApplicationRunListener=\
+com.duowan.yyspringboot.autoconfigure.apollo.ApolloConfigApplicationRunListener
+
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration,\

@@ -1,0 +1,15 @@
+{
+  "properties": [
+    {
+      "name": "yyspring.apollo.app.id",
+      "type": "java.lang.String",
+      "description": "Apollo 配置中心 APPID，默认是项目代号ProjectNo."
+    },
+    {
+      "name": "yyspring.apollo.meta",
+      "type": "java.lang.String",
+      "description": "默认是 apollo-env.properties 中的不同环境值."
+    }
+  ]
+}
+

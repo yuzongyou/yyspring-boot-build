@@ -25,5 +25,6 @@
         <module>yyspring-boot-starter-recachedns</module>
         <module>yyspring-boot-starter-timer</module>
         <module>yyspring-boot-starter-alarm</module>
+        <module>yyspring-boot-starter-apollo</module>
     </modules>
 </project>

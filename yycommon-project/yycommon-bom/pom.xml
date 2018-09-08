@@ -30,6 +30,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <guava.version>18.0</guava.version>
         <zxa.version>1.1.0-SNAPSHOT</zxa.version>
+        <apollo.client.version>0.10.3-SNAPSHOT</apollo.client.version>
     </properties>
 
     <dependencies>
@@ -116,6 +117,12 @@
                 <groupId>com.duowan</groupId>
                 <artifactId>yycommon-alarm</artifactId>
                 <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ctrip.framework.apollo</groupId>
+                <artifactId>apollo-client</artifactId>
+                <version>${apollo.client.version}</version>
             </dependency>
 
         </dependencies>

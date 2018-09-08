@@ -41,6 +41,8 @@ public class WebPrepareUtil {
     /**
      * 如果是开发环境的话，重置静态资源路径
      *
+     * @param appEnvironment 环境熟悉
+     * @param moduleDir      模块所在目录
      */
     @SuppressWarnings("unchecked")
     public static void prepareStaticResourceLocations(StandardEnvironment appEnvironment, String moduleDir) {
@@ -57,10 +59,10 @@ public class WebPrepareUtil {
             map = result.get();
         }
 
-        if(map == null || map.isEmpty()) {
+        if (map == null || map.isEmpty()) {
             resetStaticResourceLocationsAsDefault(resourceLocationPrefix, locationKeyPrefix);
         } else {
-            for (Map.Entry<String,Object> entry : map.entrySet()) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
                 String value = String.valueOf(entry.getValue());
                 String locationKey = locationKeyPrefix + entry.getKey();
                 if (StringUtils.isBlank(value)) {

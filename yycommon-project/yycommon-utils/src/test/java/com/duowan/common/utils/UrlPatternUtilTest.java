@@ -21,7 +21,7 @@ public class UrlPatternUtilTest {
                 "/*.do"
         ))));
 
-        assertTrue(UrlPatternUtil.isMatch("/admin/xa", new HashSet<String>(Arrays.asList(
+        assertFalse(UrlPatternUtil.isMatch("/admin/xa", new HashSet<String>(Arrays.asList(
                 "*.do"
         ))));
 

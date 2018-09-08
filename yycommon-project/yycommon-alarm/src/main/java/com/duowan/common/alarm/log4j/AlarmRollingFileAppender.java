@@ -357,6 +357,7 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
      * @param advertise      "true" if the appender configuration should be advertised, "false" otherwise.
      * @param advertiseUri   The advertised URI which can be used to retrieve the file contents.
      * @param config         The Configuration.
+     * @param <B>            Builder 的类型
      * @return A RollingFileAppender.
      * @deprecated Use {@link #newBuilder()}.
      */

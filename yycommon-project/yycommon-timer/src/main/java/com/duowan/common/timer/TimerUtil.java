@@ -35,6 +35,7 @@ public class TimerUtil {
      * 调度指定的定时器执行
      *
      * @param timer 定时器
+     * @return 返回调度任务进行的线程列表
      */
     public synchronized static List<Thread> scheduleTimerExecute(final Timer timer) {
 

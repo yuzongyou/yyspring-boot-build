@@ -20,7 +20,7 @@ public abstract class AbstractPeriod implements Period {
     /**
      * sleep 指定的毫秒数
      *
-     * @param millis
+     * @param millis 毫秒数
      */
     protected void sleepMillis(long millis) {
         try {

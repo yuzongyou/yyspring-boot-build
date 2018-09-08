@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
@@ -21,7 +22,7 @@ import java.util.Set;
  * @version 1.0
  * @since 2018/9/1 17:36
  */
-public class YySpringApplicationRunListener implements SpringApplicationRunListener {
+public class YySpringApplicationRunListener implements SpringApplicationRunListener, Ordered {
 
     private final SpringApplication application;
 
@@ -145,5 +146,10 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     @Override
     public void failed(ConfigurableApplicationContext context, Throwable exception) {
 
+    }
+
+    @Override
+    public int getOrder() {
+        return 1;
     }
 }
