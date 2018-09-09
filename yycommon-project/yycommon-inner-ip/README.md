@@ -17,9 +17,9 @@
     
 ## 办公网IP使用方法
     在你的 spring 配置文件中，定义：
-    <bean id="officialIpService" class="com.duowan.iptool.impl.OfficialIpServiceImpl" init-method="init"/>
+    <bean id="innerIpService" class="com.duowan.common.innerip.impl.InnerIpServiceImpl" init-method="init"/>
     
     然后直接使用下面这个代码可引入：
         @Autowired
-        private OfficialIpService officialIpService;
+        private InnerIpService innerIpService;
      
