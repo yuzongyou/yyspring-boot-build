@@ -1,0 +1,34 @@
+package com.duowan.yyspringboot.autoconfigure.ipowner;
+
+import com.duowan.common.ipowner.IpOwnerInfo;
+import com.duowan.common.ipowner.IpOwnerService;
+import com.duowan.common.utils.JsonUtil;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author xiajiqiu
+ * @version 1.0
+ * @since 2018/9/9 21:21
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = {IpOwnerAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+public class IpOwnerAutoConfigurationTest {
+
+    @Autowired
+    private IpOwnerService ipOwnerService;
+
+    @Test
+    public void testIpOwner() {
+
+        String ip = "58.248.229.154";
+
+        IpOwnerInfo ipInfo = ipOwnerService.getIpOwnerInfo(ip, true, true, true);
+        System.out.println(JsonUtil.toPrettyJson(ipInfo));
+    }
+}

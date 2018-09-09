@@ -80,6 +80,12 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-ip-owner</artifactId>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
     <build>

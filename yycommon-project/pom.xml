@@ -28,6 +28,7 @@
         <module>yycommon-timer</module>
         <module>yycommon-alarm</module>
         <module>yycommon-inner-ip</module>
+        <module>yycommon-ip-owner</module>
     </modules>
 
 </project>
