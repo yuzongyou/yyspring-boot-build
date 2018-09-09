@@ -153,6 +153,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-innerip</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- Jackson start -->
 
             <dependency>

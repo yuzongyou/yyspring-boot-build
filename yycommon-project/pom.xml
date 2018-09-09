@@ -27,6 +27,7 @@
         <module>yycommon-recache-dns</module>
         <module>yycommon-timer</module>
         <module>yycommon-alarm</module>
+        <module>yycommon-inner-ip</module>
     </modules>
 
 </project>

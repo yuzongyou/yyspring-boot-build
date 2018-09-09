@@ -26,5 +26,6 @@
         <module>yyspring-boot-starter-timer</module>
         <module>yyspring-boot-starter-alarm</module>
         <module>yyspring-boot-starter-apollo</module>
+        <module>yyspring-boot-starter-innerip</module>
     </modules>
 </project>

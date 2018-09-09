@@ -10,6 +10,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>yycommon-dns-util</artifactId>
+    <artifactId>yycommon-inner-ip</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>
