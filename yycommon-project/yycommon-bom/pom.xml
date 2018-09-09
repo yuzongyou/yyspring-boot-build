@@ -137,6 +137,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-webmvc</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>
