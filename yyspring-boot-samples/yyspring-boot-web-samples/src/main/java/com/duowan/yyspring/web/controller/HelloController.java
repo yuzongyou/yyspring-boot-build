@@ -20,6 +20,7 @@ public class HelloController {
     @RequestMapping("/hello/{name}")
     public JsonView hello(@PathVariable String name, String requestUri) {
         logger.info(requestUri + ": " + name);
+        logger.error(requestUri + ": " + name);
         return new JsonView("Hello, " + name + ": " + requestUri);
     }
 

@@ -1,5 +1,6 @@
 # Initializers
 org.springframework.boot.SpringApplicationRunListener=\
+com.duowan.yyspringboot.autoconfigure.logging.YyLoggingSpringApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.apollo.ApolloConfigApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebSpringApplicationRunListener
 

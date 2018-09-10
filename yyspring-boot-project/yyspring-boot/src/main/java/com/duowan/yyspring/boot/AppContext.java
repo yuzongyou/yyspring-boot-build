@@ -49,6 +49,11 @@ public class AppContext {
     private static volatile String projectNo;
 
     /**
+     * 模块代号
+     **/
+    private static volatile String moduleNo;
+
+    /**
      * 运行当前项目的目录，这个选项在开发环境下和模块目录才有区别
      **/
     private static volatile String projectDir;
@@ -57,6 +62,11 @@ public class AppContext {
      * 当前运行模块的根路径
      **/
     private static volatile String moduleDir;
+
+    /**
+     * 日志目录
+     **/
+    private static volatile String logDir;
 
     /**
      * 资源文件搜索目录
@@ -111,6 +121,10 @@ public class AppContext {
         return projectNo;
     }
 
+    public static String getModuleNo() {
+        return moduleNo;
+    }
+
     public static ConfigurableApplicationContext getAcx() {
         return acx;
     }
@@ -134,6 +148,10 @@ public class AppContext {
 
     public static String getModuleDir() {
         return moduleDir;
+    }
+
+    public static String getLogDir() {
+        return logDir;
     }
 
     public static Map<String, Object> getProjectInfoMap() {
@@ -166,8 +184,11 @@ public class AppContext {
         moduleDir = deduceModuleDir(environment, sourceClass, applicationAnn);
         projectDir = deduceProjectDir(environment, sourceClass, applicationAnn);
         projectNo = deduceProjectNo(environment, sourceClass, applicationAnn);
+        moduleNo = deduceModuleNo(environment, sourceClass, applicationAnn);
+        logDir = deduceLogDir(environment, sourceClass, applicationAnn);
 
         projectInfoMap.put("projectNo", projectNo);
+        projectInfoMap.put("moduleNo", moduleNo);
         projectInfoMap.put("env", env);
         projectInfoMap.put("moduleDir", moduleDir);
         projectInfoMap.put("projectDir", projectDir);
@@ -186,6 +207,28 @@ public class AppContext {
         initAppAllKeySet();
     }
 
+    private static String deduceLogDir(StandardEnvironment environment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
+
+        String logDir = null;
+        if (null != applicationAnn) {
+            logDir = applicationAnn.logDir();
+        }
+
+        if (StringUtils.isBlank(logDir)) {
+            if (isDev()) {
+                logDir = System.getProperty("user.dir");
+            } else {
+                logDir = "/data2/log/resin/";
+            }
+        }
+
+        if (StringUtils.isNotBlank(logDir)) {
+            logDir = environment.resolvePlaceholders(logDir);
+        }
+
+        return logDir;
+
+    }
 
     private static void initAppAllKeySet() {
         MutablePropertySources propertySources = environment.getPropertySources();
@@ -560,9 +603,9 @@ public class AppContext {
         if (StringUtils.isBlank(projectNo) && isDev()) {
             // 开发环境的话，允许直接通过项目目录计算项目代号，如果项目目录为空则通过模块目录计算
             if (StringUtils.isNotBlank(projectDir)) {
-                projectNo = projectDir.replaceFirst(".*[\\\\/](.*)$", "$1");
+                projectNo = getLastSepFolderName(projectDir);
             } else if (StringUtils.isNotBlank(moduleDir)) {
-                projectNo = moduleDir.replaceFirst(".*[\\\\/](.*)$", "$1");
+                projectNo = getLastSepFolderName(moduleDir);
             } else {
                 projectNo = "dev";
             }
@@ -570,6 +613,33 @@ public class AppContext {
         }
         // 如果还是为空，则抛出异常，表示无法识别项目代号
         throw new CodeException(500, "无法识别项目代号！");
+    }
+
+    private static String deduceModuleNo(StandardEnvironment environment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
+
+        String mno = environment.getProperty("MODULENO");
+
+        if (StringUtils.isBlank(mno)) {
+            if (null != applicationAnn) {
+                mno = applicationAnn.moduleNo();
+            }
+        }
+        if (StringUtils.isBlank(mno)) {
+            if (StringUtils.isNotBlank(moduleDir)) {
+                mno = getLastSepFolderName(moduleDir);
+            }
+        }
+        if (StringUtils.isNotBlank(mno)) {
+            mno = environment.resolvePlaceholders(mno);
+        }
+        return mno;
+    }
+
+    private static String getLastSepFolderName(String dirPath) {
+        if (StringUtils.isBlank(dirPath)) {
+            return null;
+        }
+        return dirPath.replaceAll("[\\\\/]*$", "").replaceFirst(".*[\\\\/](.*)$", "$1");
     }
 
     public static String lookupFirstNotBlankValue(StandardEnvironment appEnvironment, String[] keys, String defaultValue) {

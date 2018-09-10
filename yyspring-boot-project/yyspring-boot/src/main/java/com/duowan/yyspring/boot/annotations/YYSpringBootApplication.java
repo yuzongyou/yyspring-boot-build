@@ -52,4 +52,18 @@ public @interface YYSpringBootApplication {
      * @return 是否尝试
      */
     boolean tryEnabledDefaultBeanNameGenerator() default true;
+
+    /**
+     * 模块代号
+     *
+     * @return 返回模块代号
+     */
+    String moduleNo() default "";
+
+    /**
+     * 日志文件根目录，默认是 /data2/log/resin/
+     *
+     * @return 返回日志目录
+     */
+    String logDir() default "/data2/log/resin/";
 }

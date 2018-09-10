@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Alarm {
 
-    private static final Logger logger = LoggerFactory.getLogger(Alarm.class);
-
     private static AsyncEventService eventBus = AsyncEventService.getInstance();
 
     private static boolean NEED_ALARM = false;
@@ -44,7 +42,7 @@ public class Alarm {
     public static void alarm(String alarmNo, String message) {
 
         if (!NEED_ALARM) {
-            logger.info("忽略发送告警[" + alarmNo + "][" + message + "]");
+            System.err.println("[" + PROJECT_NO + "] 忽略发送告警[" + alarmNo + "][" + message + "]");
             return;
         }
         if (StringUtils.isBlank(alarmNo) || SYSTEM_ALARM.equalsIgnoreCase(alarmNo)) {

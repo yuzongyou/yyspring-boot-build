@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Arvin
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {EsbEnvContextInitializerTest.class})
-public class EsbEnvContextInitializerTest {
+@SpringBootTest(classes = {YyEnvContextInitializerTest.class})
+public class YyEnvContextInitializerTest {
 
     static {
         System.setProperty("DWENV", "dev");
