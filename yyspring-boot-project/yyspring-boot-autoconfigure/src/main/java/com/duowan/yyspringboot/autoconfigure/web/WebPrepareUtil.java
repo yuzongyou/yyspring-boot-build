@@ -1,7 +1,8 @@
-package com.duowan.yyspring.boot;
+package com.duowan.yyspringboot.autoconfigure.web;
 
 import com.duowan.common.utils.ClassUtil;
 import com.duowan.common.utils.PathUtil;
+import com.duowan.yyspring.boot.AppContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.boot.context.properties.bind.Binder;

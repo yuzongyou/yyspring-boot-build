@@ -17,6 +17,7 @@
         <module>yyspring-boot-recachedns-samples</module>
         <module>yyspring-boot-logback-samples</module>
         <module>yyspring-boot-apollo-samples</module>
+        <module>yyspring-boot-web-samples</module>
     </modules>
 
     <properties>

@@ -34,8 +34,6 @@ public class AppContext {
 
     private static ConfigurableApplicationContext acx;
 
-    public static final String DEFAULT_SERVER_PORT = "8081";
-
     public static final String ENV_DEV = "dev";
     public static final String ENV_TEST = "test";
     public static final String ENV_PROD = "prod";
@@ -181,8 +179,6 @@ public class AppContext {
         // 初始化应用程序属性
         initializeApplicationProperties();
 
-        fixServerPort();
-
         environment.getPropertySources().addLast(new MapPropertySource("yyApplicationProperties", applicationProperties));
 
         initInfo.add(JsonUtil.toPrettyJson(projectInfoMap));
@@ -247,20 +243,6 @@ public class AppContext {
         }
 
     }
-
-    private static void fixServerPort() {
-        String serverPortKey = "server.port";
-        String serverPort = System.getProperty(serverPortKey);
-        if (StringUtils.isNotBlank(serverPort)) {
-            applicationProperties.put(serverPortKey, serverPort);
-        }
-
-        if (!applicationProperties.containsKey(serverPortKey)) {
-            // 默认使用8081
-            applicationProperties.put(serverPortKey, DEFAULT_SERVER_PORT);
-        }
-    }
-
 
     /**
      * 推断资源搜索目录，当查找一个资源的时候，在指定的目录下，根据不同环境，会读取不同的配置文件，假设要搜索的资源文件标识为 config.suffix
@@ -540,11 +522,15 @@ public class AppContext {
     }
 
     private static String deduceRuntimeEnv(StandardEnvironment appEnvironment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {
-        EnvReader envReader;
+        EnvReader envReader = null;
         if (null != applicationAnn) {
             Class<? extends EnvReader> readerClass = applicationAnn.envReader();
-            envReader = BeanUtils.instantiate(readerClass);
-        } else {
+            try {
+                envReader = readerClass.newInstance();
+            } catch (Exception ignored) {
+            }
+        }
+        if (envReader == null) {
             envReader = new DefaultEnvReader();
         }
         String env = envReader.readRuntimeEnv(appEnvironment, sourceClass);

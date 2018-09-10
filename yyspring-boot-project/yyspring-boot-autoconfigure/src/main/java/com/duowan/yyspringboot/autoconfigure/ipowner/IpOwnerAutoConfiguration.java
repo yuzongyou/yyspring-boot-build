@@ -25,6 +25,8 @@ public class IpOwnerAutoConfiguration {
     /**
      * 不存在 IpSeekerDistrictProvider Bean 的时候才会创建
      *
+     * @param environment 当前运行环境
+     * @param properties  IP归属属性配置
      * @return 返回实例
      */
     @Bean(initMethod = "init")
@@ -49,6 +51,8 @@ public class IpOwnerAutoConfiguration {
     /**
      * 不存在 IpSeekerProvinceAndCityProvider Bean 的时候才会创建
      *
+     * @param environment 当前运行环境
+     * @param properties  IP归属属性配置
      * @return 返回实例
      */
     @Bean(initMethod = "init")

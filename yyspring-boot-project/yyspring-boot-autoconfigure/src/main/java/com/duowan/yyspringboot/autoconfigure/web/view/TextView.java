@@ -1,6 +1,5 @@
 package com.duowan.yyspringboot.autoconfigure.web.view;
 
-import com.duowan.esb.webmvc.util.ViewUtil;
 import org.springframework.http.MediaType;
 
 import javax.servlet.http.HttpServletRequest;

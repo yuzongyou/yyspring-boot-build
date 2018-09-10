@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.web.view;
 
-import com.duowan.esb.webmvc.exception.InvalidPagingParamException;
+import com.duowan.yyspringboot.autoconfigure.web.exception.InvalidPagingParamException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.web.converter.json;
 
-import com.duowan.esb.webmvc.util.ViewUtil;
+import com.duowan.yyspringboot.autoconfigure.web.WebContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractJsonpResponseBodyAdvice;
@@ -18,6 +18,6 @@ public class JsonpAdvice extends AbstractJsonpResponseBodyAdvice {
      * 指定如法存在JSONP参数，则返回JSONP结果
      */
     public JsonpAdvice() {
-        super(ViewUtil.getJsonpCallbackVars());
+        super(WebContext.getJsonpCallbackVars());
     }
 }

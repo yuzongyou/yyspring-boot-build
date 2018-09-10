@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.web.converter.json;
 
-import com.duowan.esb.webmvc.util.ViewUtil;
+import com.duowan.yyspringboot.autoconfigure.web.view.ViewUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;

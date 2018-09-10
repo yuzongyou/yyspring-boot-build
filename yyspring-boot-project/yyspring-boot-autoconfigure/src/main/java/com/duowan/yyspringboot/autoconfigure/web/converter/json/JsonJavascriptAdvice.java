@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.web.converter.json;
 
-import com.duowan.esb.webmvc.util.ViewUtil;
+import com.duowan.yyspringboot.autoconfigure.web.view.ViewUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,31 +22,25 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 自定义结果返回，返回为 javascript 语句
  * ControllerAdvice 只能通过 @Order 来指定顺序， 实现, PriorityOrdered, Ordered 都没有用
- * <p>
  * 详情请看源码：
  * {@link ControllerAdviceBean#findAnnotatedBeans(org.springframework.context.ApplicationContext)}
- * <p>
  * 内部new 了一个Bean：
  * new ControllerAdviceBean(name, applicationContext)
- * <p>
  * 最后通过 {@link ControllerAdviceBean#initOrderFromBeanType(Class)}
- * <p>
  * 来确定顺序， 具体代码实现：
- * <p>
  * <pre>
- *     public static Integer getOrder(Class<?> type, Integer defaultOrder) {
- *         Order order = AnnotationUtils.findAnnotation(type, Order.class);
- *         if (order != null) {
- *             return order.value();
- *         }
- *         Integer priorityOrder = getPriority(type);
- *         if (priorityOrder != null) {
- *             return priorityOrder;
- *         }
- *         return defaultOrder;
- *     }
- *
- *  Order 注解的value越小越排在前面
+ * public static Integer getOrder(Class&lt;?&gt; type, Integer defaultOrder) {
+ * Order order = AnnotationUtils.findAnnotation(type, Order.class);
+ * if (order != null) {
+ * return order.value();
+ * }
+ * Integer priorityOrder = getPriority(type);
+ * if (priorityOrder != null) {
+ * return priorityOrder;
+ * }
+ * return defaultOrder;
+ * }
+ * Order 注解的value越小越排在前面
  * </pre>
  *
  * @author Arvin

@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -49,14 +48,6 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
             Object beanNameGenerator = ReflectUtil.getFieldValue(application, "beanNameGenerator");
             if (null == beanNameGenerator) {
                 application.setBeanNameGenerator(new DefaultAnnotationBeanNameGenerator());
-            }
-        }
-
-        WebApplicationType webApplicationType = application.getWebApplicationType();
-        if (WebApplicationType.REACTIVE.equals(webApplicationType) || WebApplicationType.SERVLET.equals(webApplicationType)) {
-            if (AppContext.isDev()) {
-                WebPrepareUtil.prepareStaticResourceLocations(AppContext.getEnvironment(), AppContext.getModuleDir());
-                WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getEnvironment(), AppContext.getModuleDir());
             }
         }
     }
@@ -129,12 +120,6 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
         List<String> infoList = AppContext.getInitInfo();
         for (String info : infoList) {
             appContextLogger.info(info);
-        }
-
-        Logger webPrepareUtilLogger = LoggerFactory.getLogger(AppContext.class);
-        infoList = WebPrepareUtil.getInitInfo();
-        for (String info : infoList) {
-            webPrepareUtilLogger.info(info);
         }
     }
 

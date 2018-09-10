@@ -28,5 +28,6 @@
         <module>yyspring-boot-starter-apollo</module>
         <module>yyspring-boot-starter-innerip</module>
         <module>yyspring-boot-starter-ipowner</module>
+        <module>yyspring-boot-starter-web</module>
     </modules>
 </project>
