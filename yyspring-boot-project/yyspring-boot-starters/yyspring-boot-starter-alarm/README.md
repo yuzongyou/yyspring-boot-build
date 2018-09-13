@@ -12,8 +12,7 @@
 ```xml
 <dependency>
     <groupId>com.duowan</groupId>
-    <artifactId>esb-alarm-starter</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <artifactId>yyspring-boot-starter-alarm</artifactId>
 </dependency>
 ```
 
