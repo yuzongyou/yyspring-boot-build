@@ -11,4 +11,6 @@ com.duowan.yyspringboot.autoconfigure.recachedns.ReCacheDnsAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.alarm.AlarmAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.innerip.InnerIpAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.error.YyErrorMvcAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration
+com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.udb.UdbAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration

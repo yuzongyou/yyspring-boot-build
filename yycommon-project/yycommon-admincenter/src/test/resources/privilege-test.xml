@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+    <privilege privilegeId="contact" privilegeName="联系表" showMenu="true" id="contact" cssClass="fa fa-address-book">
+        <privilege privilegeId="contact.inner" privilegeName="内部联系表" showMenu="true" id="inner">
+            <privilege privilegeId="contact.inner.sysUser" privilegeName="用户管理" showMenu="true" id="sysUser">
+                <url>/views/contact/inner/sysUser/list.html</url>
+                <privilege privilegeId="contact.inner.sysUser.query" privilegeName="查询" id="query">
+                    <url>/contact/inner/sysUser/list.do</url>
+                    <url>/contact/inner/sysUser/get.do</url>
+                    <url>/contact/inner/sysUser/query/*.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysUser.add" privilegeName="添加" id="add">
+                    <url>/contact/inner/sysUser/add.do</url>
+                    <url>/contact/inner/sysUserGroup/delete.do</url>
+                    <url>/contact/inner/sysGroup/select.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysUser.update" privilegeName="更新" id="update">
+                    <url>/contact/inner/sysUser/update.do</url>
+                    <url>/contact/inner/sysUserGroup/delete.do</url>
+                    <url>/contact/inner/sysGroup/select.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysUser.deleted" privilegeName="删除" id="deleted">
+                    <url>/contact/inner/sysUser/delete.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysUser.export" privilegeName="导出" id="export">
+                    <url>/contact/inner/sysUser/export.do</url>
+                </privilege>
+            </privilege>
+
+            <privilege privilegeId="contact.inner.sysGroup" privilegeName="用户组管理" showMenu="true" id="sysGroup">
+                <url>/views/contact/inner/sysGroup/list.html</url>
+                <privilege privilegeId="contact.inner.sysGroup.query" privilegeName="查询" id="query">
+                    <url>/contact/inner/sysGroup/list.do</url>
+                    <url>/contact/inner/sysGroup/get.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysGroup.add" privilegeName="添加" id="add">
+                    <url>/contact/inner/sysGroup/add.do</url>
+                    <url>/contact/inner/sysUserGroup/delete.do</url>
+                    <url>/contact/inner/sysUser/select.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysGroup.update" privilegeName="编辑" id="update">
+                    <url>/contact/inner/sysGroup/update.do</url>
+                    <url>/contact/inner/sysUserGroup/delete.do</url>
+                    <url>/contact/inner/sysUser/select.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysGroup.deleted" privilegeName="删除" id="deleted">
+                    <url>/contact/inner/sysGroup/delete.do</url>
+                </privilege>
+                <privilege privilegeId="contact.inner.sysGroup.exported" privilegeName="导出" id="exported">
+                    <url>/contact/inner/sysGroup/export.do</url>
+                </privilege>
+            </privilege>
+        </privilege>
+
+        <privilege privilegeId="contact.outer" privilegeName="厂商联系表" showMenu="true" id="outer">
+            <privilege privilegeId="contact.outer.provider" privilegeName="厂商管理" showMenu="true" id="provider">
+                <url>/views/contact/outer/provider/list.html</url>
+                <privilege privilegeId="contact.outer.provider.query" privilegeName="查询" id="query">
+                    <url>/contact/outer/provider/list.do</url>
+                    <url>/contact/outer/provider/get.do</url>
+                    <url>/admin/common/selectProviders.do</url>
+                    <url>/admin/common/selectQualificationTableItemStatus.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.provider.add" privilegeName="添加" id="add">
+                    <url>/contact/outer/provider/add.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.provider.update" privilegeName="编辑" id="update">
+                    <url>/contact/outer/provider/update.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.provider.deleted" privilegeName="删除" id="deleted">
+                    <url>/contact/outer/provider/delete.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.provider.export" privilegeName="导出" id="export">
+                    <url>/contact/outer/provider/export.do</url>
+                </privilege>
+            </privilege>
+
+            <privilege privilegeId="contact.outer.user" privilegeName="厂商联系人管理" showMenu="true" id="user">
+                <url>/views/contact/outer/user/list.html</url>
+                <privilege privilegeId="contact.outer.user.query" privilegeName="查询" id="query">
+                    <url>/contact/outer/user/list.do</url>
+                    <url>/contact/outer/user/get.do</url>
+                    <url>/admin/common/selectProviderUsers.do</url>
+                    <url>/admin/common/providerUser/selectProviderUsersPosition.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.user.add" privilegeName="添加" id="add">
+                    <url>/contact/outer/user/add.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.user.update" privilegeName="编辑" id="update">
+                    <url>/contact/outer/user/update.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.user.deleted" privilegeName="删除" id="deleted">
+                    <url>/contact/outer/user/delete.do</url>
+                </privilege>
+                <privilege privilegeId="contact.outer.user.export" privilegeName="导出" id="export">
+                    <url>/contact/outer/user/export.do</url>
+                </privilege>
+
+
+            </privilege>
+        </privilege>
+    </privilege>
+</root>
