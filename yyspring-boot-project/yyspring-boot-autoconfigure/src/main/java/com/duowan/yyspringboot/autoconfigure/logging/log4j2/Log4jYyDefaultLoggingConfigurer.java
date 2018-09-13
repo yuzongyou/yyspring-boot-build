@@ -13,12 +13,10 @@ import org.springframework.util.ClassUtils;
 public class Log4jYyDefaultLoggingConfigurer extends AbstractYyDefaultLoggingConfigurer {
 
     @Override
-    protected String getDefaultConfigFile(StandardEnvironment environment, String[] args) {
-        ClassLoader classLoader = this.getClass().getClassLoader();
-        boolean hasAlarmImported = ClassUtils.isPresent("com.duowan.common.alarm.Alarm", classLoader);
+    protected String getDefaultConfigFile(boolean needLogErrorAlarm, StandardEnvironment environment, String[] args) {
         // 根据环境设置默认日志文件
         String loggingFilePrefix = "classpath:com/duowan/yyspringboot/autoconfigure/logging/log4j2/log4j2-default-" + AppContext.getEnv();
-        if (hasAlarmImported && AppContext.isProd()) {
+        if (needLogErrorAlarm && AppContext.isProd()) {
             return loggingFilePrefix + "-alarm.xml";
         } else {
             return loggingFilePrefix + ".xml";

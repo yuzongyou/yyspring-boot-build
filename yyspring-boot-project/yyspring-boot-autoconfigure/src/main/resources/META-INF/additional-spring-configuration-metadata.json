@@ -9,6 +9,12 @@
       "name": "yyspring.apollo.meta",
       "type": "java.lang.String",
       "description": "默认是 apollo-env.properties 中的不同环境值."
+    },
+    {
+      "name": "yyspring.alarm.log-error-enabled",
+      "type": "java.lang.Boolean",
+      "description": "log.error() 是否使用告警用的Appender，默认是.",
+      "defaultValue": true
     }
   ]
 }

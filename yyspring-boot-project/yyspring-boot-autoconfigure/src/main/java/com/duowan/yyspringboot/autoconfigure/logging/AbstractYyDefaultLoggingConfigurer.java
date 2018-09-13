@@ -1,8 +1,10 @@
 package com.duowan.yyspringboot.autoconfigure.logging;
 
+import com.duowan.common.utils.ConvertUtil;
 import com.duowan.yyspring.boot.AppContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.StandardEnvironment;
+import org.springframework.util.ClassUtils;
 
 /**
  * @author Arvin
@@ -14,7 +16,8 @@ public abstract class AbstractYyDefaultLoggingConfigurer implements YyDefaultLog
     @Override
     public void configure(StandardEnvironment environment, String[] args) {
 
-        String defaultConfigFile = getDefaultConfigFile(environment, args);
+        boolean needLogErrorAlarm = needLogErrorAppenderAlarm(environment, args);
+        String defaultConfigFile = getDefaultConfigFile(needLogErrorAlarm, environment, args);
 
         System.err.println("使用默认的日志配置文件： " + defaultConfigFile);
         // 设置日志配置文件
@@ -25,6 +28,17 @@ public abstract class AbstractYyDefaultLoggingConfigurer implements YyDefaultLog
 
         // 其他配置
         customConfigure(environment, args);
+    }
+
+    protected boolean needLogErrorAppenderAlarm(StandardEnvironment environment, String[] args) {
+
+        boolean enabledLogErrorAppender = ConvertUtil.toBoolean(environment.getProperty("yyspring.alarm.log-error-enabled", "true"), true);
+
+        ClassLoader classLoader = this.getClass().getClassLoader();
+        boolean hasAlarmImported = ClassUtils.isPresent("com.duowan.common.alarm.Alarm", classLoader);
+
+        return hasAlarmImported && enabledLogErrorAppender;
+
     }
 
     protected void commonPropertySet(StandardEnvironment environment, String[] args) {
@@ -73,9 +87,10 @@ public abstract class AbstractYyDefaultLoggingConfigurer implements YyDefaultLog
     /**
      * 获取默认的日志配置文件路径
      *
-     * @param environment 环境
-     * @param args        jvm启动参数
+     * @param needLogErrorAlarm 日志是否需要进行告警
+     * @param environment       环境
+     * @param args              jvm启动参数
      * @return 返回默认日志配置文件
      */
-    protected abstract String getDefaultConfigFile(StandardEnvironment environment, String[] args);
+    protected abstract String getDefaultConfigFile(boolean needLogErrorAlarm, StandardEnvironment environment, String[] args);
 }
