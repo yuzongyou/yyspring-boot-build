@@ -40,3 +40,7 @@ mvn clean deploy
 | [yyspring-boot](yyspring-boot-project/yyspring-boot)   | 应用程序启动核心引导，处理环境，资源加载等。 |
 | [yyspring-autoconfigure](yyspring-boot-project/yyspring-boot-autoconfigure)   | 内部自动配置，集成内部常用组件的自动配置。 |
 | [yyspring-bom](yyspring-boot-project/yyspring-boot-bom)   | 组件依赖，管理各种版本问题。 |
+
+
+# 附录
+[GitLab Markdown 语法参考指南](https://docs.gitlab.com/ee/user/markdown.html)

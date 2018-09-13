@@ -30,6 +30,7 @@
         <module>yycommon-ip-owner</module>
         <module>yycommon-udb-security</module>
         <module>yycommon-admincenter</module>
+        <module>yycommon-jdbc</module>
     </modules>
 
 </project>

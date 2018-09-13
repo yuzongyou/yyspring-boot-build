@@ -1,0 +1,10 @@
+<ul :class="isFirst ? 'sidebar-menu' : 'treeview-menu'" :data-widget="isFirst ? 'tree' : ''" :ref="isFirst ? 'sidebar-menu' : 'treeview-menu'">
+    <li v-for="(item, index) in entitys" :class="item.treeViewClass">
+        <a :href="'#' + (item.privilegeUrl || '')" @click.prevent="clickMenu(item)">
+            <i class="fa fa-share" v-if="isFirst"></i>
+            <span>{{item.privilegeName}}</span>
+            <span class="pull-right-container" v-if="(item.children || []).length > 0"><i class="fa fa-angle-left pull-right"></i></span>
+        </a>
+        <gview-sidebar-menu v-if="(item.children || []).length > 0" :entitys="item.children" :is-first="false" @on-click-menu="clickMenuCycle"></gview-sidebar-menu>
+    </li>
+</ul>

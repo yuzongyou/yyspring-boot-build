@@ -13,4 +13,5 @@ com.duowan.yyspringboot.autoconfigure.innerip.InnerIpAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.error.YyErrorMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.udb.UdbAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration
+com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.jdbc.JdbcAutoConfiguration

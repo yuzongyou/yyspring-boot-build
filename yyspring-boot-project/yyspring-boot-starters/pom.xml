@@ -32,5 +32,6 @@
         <module>yyspring-boot-starter-udb-security</module>
         <module>yyspring-boot-starter-admincenter</module>
         <module>yyspring-boot-starter-admincenter-ui</module>
+        <module>yyspring-boot-starter-jdbc</module>
     </modules>
 </project>

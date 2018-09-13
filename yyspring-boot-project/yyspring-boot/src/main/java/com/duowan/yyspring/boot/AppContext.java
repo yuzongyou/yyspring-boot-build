@@ -7,8 +7,11 @@ import com.duowan.common.utils.PathUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.system.ApplicationHome;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.env.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -164,6 +167,26 @@ public class AppContext {
 
     public static List<String> getInitInfo() {
         return initInfo;
+    }
+
+
+    /**
+     * Get the bean definition registry.
+     *
+     * @return the BeanDefinitionRegistry if it can be determined
+     */
+    public static BeanDefinitionRegistry getBeanDefinitionRegistry() {
+        if (acx == null) {
+            throw new IllegalStateException("AppContext not init yet, Cloud not locate BeanDefinitionRegistry");
+        }
+        if (acx instanceof BeanDefinitionRegistry) {
+            return (BeanDefinitionRegistry) acx;
+        }
+        if (acx instanceof AbstractApplicationContext) {
+            return (BeanDefinitionRegistry) acx
+                    .getBeanFactory();
+        }
+        throw new IllegalStateException("Could not locate BeanDefinitionRegistry");
     }
 
     /**
