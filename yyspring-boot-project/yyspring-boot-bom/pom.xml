@@ -177,6 +177,18 @@
                 <version>${yyproject.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-admincenter</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-admincenter-ui</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
             <!-- Jackson start -->
 
             <dependency>

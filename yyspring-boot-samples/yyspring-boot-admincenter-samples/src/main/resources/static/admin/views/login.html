@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <!-- 公共=======================-->
+    <link rel="stylesheet" type="text/css" href="../libs/iview/styles/iview.css"/>
+    <link rel="stylesheet" type="text/css" href="../libs/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../libs/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../libs/admin-lte/css/AdminLTE.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../libs/admin-lte/css/skins/_all-skins.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="../styles/css/gview.css"/>
+
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="../libs/html5shiv/html5shiv.min.js"></script>
+    <script type="text/javascript" src="../libs/respond.js/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="../libs/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script type="text/javascript" src="../libs/fastclick/fastclick.min.js"></script>
+    <script type="text/javascript" src="../libs/vue/vue.min.js"></script>
+    <script type="text/javascript" src="../libs/iview/iview.min.js"></script>
+    <script type="text/javascript" src="../libs/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../libs/admin-lte/js/adminlte.min.js"></script>
+    <script type="text/javascript" src="../plugins/layer/layer.js"></script>
+    <!-- 公共=======================-->
+
+    <!-- gview-公共=======================-->
+    <script type="text/javascript" src="../scripts/gviews/gview.config.js"></script>
+    <script type="text/javascript" src="../scripts/gviews/gview.utils.js"></script>
+    <script type="text/javascript" src="../scripts/gviews/gview.webapp.js"></script>
+    <!-- gview-公共=======================-->
+
+
+</head>
+
+<body class="hold-transition login-page">
+
+<div id="main-wrapper" v-cloak>
+</div>
+
+
+</body>
+
+<script type="text/javascript" src="http://res.udb.duowan.com/lgn/js/oauth/udbsdk/pcweb/proxy/udb.sdk.pcweb.proxy.min.js"></script>
+<script>
+
+    (function ($) {
+        'use strict';
+
+
+        var gconfig = top.gconfig;
+        var gutils = top.gutils;
+        var gwebapp = top.gwebapp;
+
+        gwebapp.start({requiresAuth: false}).done(function () {
+            new Vue(vueOpts());
+        });
+
+        function vueOpts() {
+            // 属性
+            var options = {
+                el: "#main-wrapper",
+                data: {
+                },
+                methods: {},
+                created:function(){
+                },
+                mounted: function () {
+                    this.$nextTick(function () {
+                        setTimeout(function () {
+                            UDBSDKProxy.openByFixProxy(top.location.protocol + "//" + top.location.host + top.location.pathname || '');
+                        }, 500)
+                    });
+                }
+            };
+            return options;
+        }
+
+
+    }(jQuery));
+
+
+</script>
+</html>

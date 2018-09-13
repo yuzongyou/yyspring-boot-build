@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <privilege privilegeId="entity" privilegeName="对象管理" showMenu="true">
+        <privilege privilegeId="entity.list" privilegeName="对象列表" showMenu="true" id="inner">
+            <url>/views/sample/list.html</url>
+            <privilege privilegeId="entity.query" privilegeName="查询">
+                <url>/admin/entity/list.do</url>
+                <url>/admin/entity/get.do</url>
+            </privilege>
+            <privilege privilegeId="entity.add" privilegeName="添加">
+                <url>/admin/entity/add.do</url>
+            </privilege>
+            <privilege privilegeId="entity.delete" privilegeName="删除">
+                <url>/admin/entity/delete.do</url>
+            </privilege>
+            <privilege privilegeId="entity.edit" privilegeName="编辑">
+                <url>/admin/entity/edit.do</url>
+                <url>/admin/entity/update.do</url>
+            </privilege>
+        </privilege>
+    </privilege>
+</root>

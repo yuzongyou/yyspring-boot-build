@@ -1,0 +1,27 @@
+<div class="inline-block">
+    <Modal v-model="entityForm.showModal" width="1024" :mask-closable="false" :scrollable="true">
+        <div slot="header">
+            <h4 class="no-margin"><i class="fa fa-edit"></i> 表单</h4>
+        </div>
+
+        <i-form :label-width="100" :model="entityForm.entity" ref="entityFormValidate">
+            <Form-item v-if="entityForm.entity.id" label="id" prop="id" :rules="{required: true, message: '必填字段'}">
+                <i-input type="text" placeholder="id" v-model="entityForm.entity.id" :maxlength="100" :readonly="true"></i-input>
+            </Form-item>
+
+            <Form-item label="名称" prop="name" :rules="{required: true, message: '必填字段'}">
+                <i-input type="text" placeholder="名称" v-model="entityForm.entity.name" :maxlength="100"></i-input>
+            </Form-item>
+
+
+            <Form-item label="邮箱" prop="email" :rules="[{validator: $gutils.validator.valid.email}]">
+                <i-input type="text" placeholder="邮箱" v-model="entityForm.entity.email" :maxlength="100"></i-input>
+            </Form-item>
+
+        </i-form>
+
+        <div slot="footer">
+            <button type="button" class="btn btn-primary btn-sm" @click="submit">提交</button>
+        </div>
+    </Modal>
+</div>

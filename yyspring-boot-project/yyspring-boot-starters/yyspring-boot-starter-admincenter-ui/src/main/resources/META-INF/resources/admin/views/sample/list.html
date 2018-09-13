@@ -1,0 +1,270 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <!-- 公共=======================-->
+    <link rel="stylesheet" type="text/css" href="../../libs/iview/styles/iview.css"/>
+    <link rel="stylesheet" type="text/css" href="../../libs/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../libs/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../libs/admin-lte/css/AdminLTE.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../libs/admin-lte/css/skins/_all-skins.min.css"/>
+
+    <link rel="stylesheet" type="text/css" href="../../styles/css/gview.css"/>
+
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="../../libs/html5shiv/html5shiv.min.js"></script>
+    <script type="text/javascript" src="../../libs/respond.js/respond.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="../../libs/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script type="text/javascript" src="../../libs/fastclick/fastclick.min.js"></script>
+    <script type="text/javascript" src="../../libs/vue/vue.min.js"></script>
+    <script type="text/javascript" src="../../libs/iview/iview.min.js"></script>
+    <script type="text/javascript" src="../../libs/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../../libs/admin-lte/js/adminlte.min.js"></script>
+    <script type="text/javascript" src="../../plugins/layer/layer.js"></script>
+    <!-- 公共=======================-->
+
+    <!-- gview-公共=======================-->
+    <script type="text/javascript" src="../../scripts/gviews/gview.config.js"></script>
+    <script type="text/javascript" src="../../scripts/gviews/gview.utils.js"></script>
+    <script type="text/javascript" src="../../scripts/gviews/gview.webapp.js"></script>
+    <script type="text/javascript" src="../../scripts/gviews/gview.directive.js"></script>
+    <script type="text/javascript" src="../../scripts/gviews/gview.filter.js"></script>
+    <!-- gview-公共=======================-->
+
+</head>
+<body class="skin-blue sidebar-mini">
+
+<div id="content-wrapper" v-cloak>
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            实体
+            <small>查询</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> 主页</a></li>
+            <li><a href="#" class="active">实体</a></li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="box">
+            <form class="form-inline" @submit.prevent="search()">
+                <div class="box-body no-padding-bottom">
+                    <div class="form-group form-group-sm">
+                        <label>id</label>
+                        <div class="input-group">
+                            <i-input type="text" v-model="searchEntity.id" placeholder="id"></i-input>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-sm">
+                        <label>名称</label>
+                        <div class="input-group">
+                            <i-input type="text" v-model="searchEntity.name" placeholder="名称"></i-input>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer clearfix">
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Default box -->
+        <div class="box box-primary">
+            <div class="box-body">
+
+                <div class="margin-bottom-10">
+                    <button type="button" class="btn btn-primary btn-sm" @click="createEntity()" v-gview-privilege="'entity.add'"><i class="fa fa-edit"></i> 添加</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-condensed table-hover" v-gview-table-order="{changeOrderField: changeOrderField}">
+                        <thead>
+                        <tr>
+                            <th data-order-field="id">id</th>
+                            <th data-order-field="name">名称</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item, index) in entitys">
+                            <td :title="item.id">{{ item.id }}</td>
+                            <td :title="item.name">{{ item.name | cutText(10) }}</td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-xs" @click="updateEntity(item.id)" v-gview-privilege="'entity.edit'"><i class="fa fa-edit"></i> 修改</button>
+                                <button type="button" class="btn btn-danger btn-xs" @click="deleteEntity(item.id)" v-gview-privilege="'entity.delete'"><i class="fa fa-close"></i> 删除</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer">
+                <div class="pull-right">
+                    <Page show-sizer show-total :total="pager.count" :current.sync="pager.pageNo" :page-size.sync="pager.pageSize" @on-change="changePage"
+                          @on-page-size-change="changePageSize"></Page>
+                </div>
+            </div>
+            <!-- /.box-footer-->
+        </div>
+        <!-- /.box -->
+
+    </section>
+    <!-- /.content -->
+
+    <sample-form :entity-form.sync="entityForm" @on-submit-success="onSubmitSuccess"></sample-form>
+
+</div>
+
+
+</body>
+
+<script type="text/javascript" src="../../scripts/components/sample/sample-form.js"></script>
+
+<script>
+
+    (function ($, Vue) {
+        'use strict';
+
+        var gconfig = top.gconfig;
+        var gutils = top.gutils;
+        var gwebapp = top.gwebapp;
+
+        gwebapp.start().done(function () {
+            new Vue(vueOpts());
+        });
+
+        function vueOpts() {
+            // 属性
+            var options = {
+                el: "#content-wrapper",
+                data: {
+                    searchEntity: {},
+                    pager: {
+                        count: 0,
+                        pageNo: 1,
+                        pageSize: 10
+                    },
+                    orderBy: {
+                        orderField: "",
+                        orderDirection: "asc",
+                    },
+                    entitys: [],
+                    entityForm: {
+                        showModal: false,
+                        entity: {}
+                    }
+                },
+                methods: {
+                    search: search,     // 查询
+                    pageSearch: pageSearch, // 分页查询
+                    changePage: changePage, // 当前页修改后，触发
+                    changePageSize: changePageSize, // 每页显示条数修改后，回调触发
+                    changeOrderField: changeOrderField, // 点击排序字段后，回调触发
+                    createEntity: createEntity, // 打开实体表单Model
+                    updateEntity: updateEntity,  // 打开实体表单Model
+                    deleteEntity: deleteEntity,  // 删除实体
+                    onSubmitSuccess: onSubmitSuccess // 实体表单提交成功后，回调触发
+                },
+                created: function () {
+                    getEntitys(this);
+                }
+            };
+            return options;
+
+            function search() {
+                this.pager.pageNo = 1;
+                getEntitys(this);
+            }
+
+            function pageSearch() {
+                getEntitys(this);
+            }
+
+            function changePage(curPage) {
+                this.pager.pageNo = curPage;
+                this.pageSearch();
+            }
+
+            function changePageSize(pageSize) {
+                this.pager.pageSize = pageSize;
+                this.pageSearch();
+            }
+
+            function changeOrderField(orderField, orderDirection) {
+                this.orderBy.orderField = orderField;
+                this.orderBy.orderDirection = orderDirection;
+                this.pageSearch();
+            }
+
+            function createEntity() {
+                this.entityForm.entity = {};
+                this.entityForm.showModal = true;
+            }
+
+            function updateEntity(id) {
+                if (!id) return false;
+                this.entityForm.showModal = true;
+                Vue.set(this.entityForm.entity, "id", id);
+            }
+
+            function deleteEntity(id) {
+                if (!id) return false;
+                var vModel = this;
+                this.$Modal.confirm({
+                    title: '操作确认',
+                    content: '确定删除吗？',
+                    onOk: function () {
+                        vModel.pageSearch();
+                    }
+                });
+            }
+
+            function onSubmitSuccess() {
+                console.log("onSubmitSuccess");
+                this.pageSearch();
+            }
+
+            function getEntitys(vModel) {
+                var param = $.extend({}, vModel.searchEntity, vModel.pager, vModel.orderBy);
+
+                console.log(param);
+
+                // =============== 本地测试使用, 需删除 ==========//
+                vModel.entitys = [
+                    {id: 1, name: "name-1"},
+                    {id: 2, name: "name-2"},
+                    {id: 3, name: "name-3"},
+                    {id: 4, name: "name-444444444"}
+                ];
+                return;
+                // =============== 本地测试使用, 需删除 ==========//
+
+                return gutils.Ajax({
+                    type: "get",
+                    url: "",
+                    data: param
+                }).done(function (jsonData) {
+                    Vue.set(vModel, "entitys", gutils.Attr(jsonData, "data.entitys") || []);
+                });
+            }
+        }
+
+    }(jQuery, Vue));
+</script>
+
+</html>
+
+
+
+

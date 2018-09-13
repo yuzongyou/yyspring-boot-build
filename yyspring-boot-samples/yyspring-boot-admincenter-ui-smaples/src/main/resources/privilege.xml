@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <privilege privilegeId="user" privilegeName="用户管理" showMenu="true">
+        <privilege privilegeId="user.list" privilegeName="用户列表" showMenu="true" id="inner">
+            <url>/views/user/list.html</url>
+            <privilege privilegeId="user.query" privilegeName="查询">
+                <url>/admin/user/list.do</url>
+                <url>/admin/user/get.do</url>
+            </privilege>
+            <privilege privilegeId="user.add" privilegeName="添加">
+                <url>/admin/user/add.do</url>
+            </privilege>
+            <privilege privilegeId="user.delete" privilegeName="删除">
+                <url>/admin/user/delete.do</url>
+            </privilege>
+            <privilege privilegeId="user.edit" privilegeName="编辑">
+                <url>/admin/user/edit.do</url>
+                <url>/admin/user/update.do</url>
+            </privilege>
+        </privilege>
+    </privilege>
+</root>

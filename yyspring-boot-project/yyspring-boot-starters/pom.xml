@@ -30,5 +30,7 @@
         <module>yyspring-boot-starter-ipowner</module>
         <module>yyspring-boot-starter-web</module>
         <module>yyspring-boot-starter-udb-security</module>
+        <module>yyspring-boot-starter-admincenter</module>
+        <module>yyspring-boot-starter-admincenter-ui</module>
     </modules>
 </project>

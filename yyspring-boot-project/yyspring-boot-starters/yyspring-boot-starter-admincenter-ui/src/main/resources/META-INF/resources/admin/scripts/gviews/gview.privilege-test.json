@@ -1,0 +1,22 @@
+{
+  "data": {
+    "product": {
+      "logoutUrl": "",
+      "productId": "",
+      "productName": "后台管理平台"
+    },
+    "user": {
+      "passport": ""
+    },
+    "privileges": [
+      {"privilegeId": 1, "privilegeName": "控制台", "privilegeUrl": "/views/pages/dashboard.html", "showMenu": true},
+      {"privilegeId": 2, "privilegeName": "实体页", "privilegeUrl": "", "showMenu": true},
+      {"privilegeId": 3, "privilegeName": "列表页", "privilegeUrl": "/views/sample/list.html", "showMenu": true, "parentPrivilegeId": 2},
+      {"privilegeId": 5, "privilegeName": "添加", "parentPrivilegeId": 2},
+      {"privilegeId": 6, "privilegeName": "修改", "parentPrivilegeId": 2},
+      {"privilegeId": 7, "privilegeName": "删除", "parentPrivilegeId": 2}
+    ]
+  },
+  "message": "",
+  "status": 200
+}
