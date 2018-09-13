@@ -5,14 +5,12 @@ import com.duowan.common.jdbc.model.JdbcDef;
 import com.duowan.common.jdbc.parser.JdbcDefParser;
 import com.duowan.common.jdbc.provider.dbtype.DBProvider;
 import com.duowan.common.jdbc.provider.pooltype.PoolProvider;
-import com.duowan.common.jdbc.util.JdbcDefHelper;
 import com.duowan.common.jdbc.util.JdbcDefUtil;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator;
@@ -122,7 +120,7 @@ public abstract class JdbcRegisterUtil {
                                                                             Environment environment) {
 
         // 设置属性
-        jdbcDefList = JdbcDefHelper.autoFillProperties(jdbcDefList, environment);
+        jdbcDefList = JdbcDefUtil.autoFillProperties(jdbcDefList, environment);
 
         // 提取所有启用的Jdbc定义列表
         jdbcDefList = JdbcDefUtil.extractEnabledJdbcDefList(enabledIds, jdbcDefList);

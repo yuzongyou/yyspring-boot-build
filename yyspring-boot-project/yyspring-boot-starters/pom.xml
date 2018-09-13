@@ -33,5 +33,6 @@
         <module>yyspring-boot-starter-admincenter</module>
         <module>yyspring-boot-starter-admincenter-ui</module>
         <module>yyspring-boot-starter-jdbc</module>
+        <module>yyspring-boot-starter-redis</module>
     </modules>
 </project>

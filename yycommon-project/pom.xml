@@ -31,6 +31,7 @@
         <module>yycommon-udb-security</module>
         <module>yycommon-admincenter</module>
         <module>yycommon-jdbc</module>
+        <module>yycommon-redis</module>
     </modules>
 
 </project>

@@ -97,10 +97,10 @@
 
 # 定义升龙数据源别名
     前缀：
-        yyspring.jdbc.rise-alias.[instanceName]=aliasInstanceName
+        yyspring.jdbc.rise-riseAlias.[instanceName]=aliasInstanceName
         
         实例：
-        yyspring.jdbc.rise-alias.cloudapp_cloudmysql1218=cloudapp_cloudmysql1219
+        yyspring.jdbc.rise-riseAlias.cloudapp_cloudmysql1218=cloudapp_cloudmysql1219
 
 # 定义升龙Mysql数据源
     基本前缀：

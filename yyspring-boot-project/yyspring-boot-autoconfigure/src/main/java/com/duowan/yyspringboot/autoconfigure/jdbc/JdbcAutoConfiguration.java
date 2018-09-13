@@ -6,7 +6,6 @@ import com.duowan.common.jdbc.model.JdbcDef;
 import com.duowan.common.jdbc.model.RiseJdbcDef;
 import com.duowan.common.jdbc.provider.dbtype.DBProvider;
 import com.duowan.common.jdbc.provider.pooltype.PoolProvider;
-import com.duowan.common.jdbc.util.JdbcDefHelper;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
 import com.duowan.yyspring.boot.AppContext;
@@ -43,10 +42,10 @@ public class JdbcAutoConfiguration {
         this.jdbcProperties = jdbcProperties;
         this.registry = AppContext.getBeanDefinitionRegistry();
 
-        this.doJdbcRegister();
+        this.doJdbcAutoRegister();
     }
 
-    private void doJdbcRegister() {
+    private void doJdbcAutoRegister() {
 
         List<DBProvider> dbProviderList = newInstances(DBProvider.class, jdbcProperties.getDbProviderClasses());
         List<PoolProvider> poolProviderList = newInstances(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
@@ -77,12 +76,13 @@ public class JdbcAutoConfiguration {
 
     private List<JdbcDef> lookupRiseJdbcDefList() {
         Map<String, RiseJdbcDef> riseMap = jdbcProperties.getRises();
-        Map<String, String> aliasMap = jdbcProperties.getRiseAlias();
         List<JdbcDef> resultList = new ArrayList<>();
 
         if (null == riseMap || riseMap.isEmpty()) {
             return resultList;
         }
+
+        Map<String, String> aliasMap = jdbcProperties.getRiseAlias();
 
         for (Map.Entry<String, RiseJdbcDef> entry : riseMap.entrySet()) {
             RiseJdbcDef jdbcDef = entry.getValue();

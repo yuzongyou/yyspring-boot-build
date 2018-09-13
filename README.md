@@ -32,6 +32,8 @@ mvn clean deploy
 | [yyspring-boot-starter-udb-security](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-udb-security)   | UDB 登录鉴权，支持UDB登录验证相关的页面参数。 |
 | [yyspring-boot-starter-admincenter](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-admincenter)   | 接入权限管理中心，不包含UI。 |
 | [yyspring-boot-starter-admincenter-ui](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-admincenter-ui)   | 接入权限管理中心，包含UI。 |
+| [yyspring-boot-starter-jdbc](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-jdbc)   | JDBC 支持(包括升龙的和标准数据源)，支持多数据源。 |
+| [yyspring-boot-starter-redis](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-redis)   | Redis 支持(包括升龙、标准Redis和哨兵redis)，支持多数据源。 |
 
 
 # 其他模块说明

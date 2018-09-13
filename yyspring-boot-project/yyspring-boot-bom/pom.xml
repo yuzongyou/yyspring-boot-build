@@ -195,6 +195,12 @@
                 <version>${yyproject.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-redis</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
             <!-- Jackson start -->
 
             <dependency>
