@@ -86,6 +86,6 @@
 
 # 设置主Redis
     # 主Redis
-    yyspring.jdbc.primary-id=user
+    yyspring.redis.primary-id=user
 
 

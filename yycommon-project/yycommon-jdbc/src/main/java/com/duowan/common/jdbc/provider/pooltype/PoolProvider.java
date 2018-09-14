@@ -1,6 +1,6 @@
 package com.duowan.common.jdbc.provider.pooltype;
 
-import com.duowan.common.jdbc.model.JdbcDef;
+import com.duowan.common.jdbc.model.JdbcDefinition;
 
 import java.util.Map;
 
@@ -14,10 +14,10 @@ public interface PoolProvider {
     /**
      * 是否支持指定 Jdbc定义的数据库配置
      *
-     * @param jdbcDef Jdbc定义
+     * @param jdbcDefinition Jdbc定义
      * @return true 支持，false 不支持
      */
-    boolean support(JdbcDef jdbcDef);
+    boolean support(JdbcDefinition jdbcDefinition);
 
     /**
      * 提供一个连接池类

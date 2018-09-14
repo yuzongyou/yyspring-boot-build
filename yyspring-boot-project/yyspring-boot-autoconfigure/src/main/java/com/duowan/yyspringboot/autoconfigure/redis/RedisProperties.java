@@ -1,9 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.redis;
 
-import com.duowan.common.jdbc.model.JdbcDef;
-import com.duowan.common.redis.model.RiseRedisDef;
-import com.duowan.common.redis.model.SentinelRedisDef;
-import com.duowan.common.redis.model.StdRedisDef;
+import com.duowan.common.redis.model.RiseRedisDefinition;
+import com.duowan.common.redis.model.SentinelRedisDefinition;
+import com.duowan.common.redis.model.StdRedisDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
@@ -35,17 +34,17 @@ public class RedisProperties {
     /**
      * 标准 Redis 定义
      **/
-    private Map<String, StdRedisDef> standards;
+    private Map<String, StdRedisDefinition> standards;
 
     /**
      * 升龙Redis定义
      **/
-    private Map<String, RiseRedisDef> rises;
+    private Map<String, RiseRedisDefinition> rises;
 
     /**
      * 哨兵默认redis定义
      **/
-    private Map<String, SentinelRedisDef> sentinels;
+    private Map<String, SentinelRedisDefinition> sentinels;
 
     /**
      * Redis Bean 注册器类全路径
@@ -53,7 +52,7 @@ public class RedisProperties {
     private Set<String> registerClasses;
 
     /**
-     * RedisDefProvider 定义类全路径
+     * RedisDefinitionProvider 定义类全路径
      **/
     private Set<String> providerClasses;
 
@@ -81,27 +80,27 @@ public class RedisProperties {
         this.riseAlias = riseAlias;
     }
 
-    public Map<String, StdRedisDef> getStandards() {
+    public Map<String, StdRedisDefinition> getStandards() {
         return standards;
     }
 
-    public void setStandards(Map<String, StdRedisDef> standards) {
+    public void setStandards(Map<String, StdRedisDefinition> standards) {
         this.standards = standards;
     }
 
-    public Map<String, RiseRedisDef> getRises() {
+    public Map<String, RiseRedisDefinition> getRises() {
         return rises;
     }
 
-    public void setRises(Map<String, RiseRedisDef> rises) {
+    public void setRises(Map<String, RiseRedisDefinition> rises) {
         this.rises = rises;
     }
 
-    public Map<String, SentinelRedisDef> getSentinels() {
+    public Map<String, SentinelRedisDefinition> getSentinels() {
         return sentinels;
     }
 
-    public void setSentinels(Map<String, SentinelRedisDef> sentinels) {
+    public void setSentinels(Map<String, SentinelRedisDefinition> sentinels) {
         this.sentinels = sentinels;
     }
 

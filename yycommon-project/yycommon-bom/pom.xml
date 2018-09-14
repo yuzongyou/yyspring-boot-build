@@ -163,6 +163,12 @@
                 <version>${yyproject.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-web</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>

@@ -3,7 +3,7 @@ package com.duowan.yyspringboot.autoconfigure.admincenter;
 import com.duowan.common.admincenter.annotations.NoPrivilege;
 import com.duowan.common.admincenter.model.Privilege;
 import com.duowan.common.admincenter.service.AdmincenterService;
-import com.duowan.yyspringboot.autoconfigure.web.view.JsonView;
+import com.duowan.common.web.view.JsonView;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

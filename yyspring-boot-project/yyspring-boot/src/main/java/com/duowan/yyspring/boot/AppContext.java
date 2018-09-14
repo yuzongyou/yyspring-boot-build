@@ -6,10 +6,8 @@ import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.PathUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.system.ApplicationHome;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.env.*;
@@ -645,6 +643,9 @@ public class AppContext {
         if (StringUtils.isBlank(mno)) {
             if (null != applicationAnn) {
                 mno = applicationAnn.moduleNo();
+                if (StringUtils.isNoneBlank(mno)) {
+                    return mno;
+                }
             }
         }
         if (StringUtils.isBlank(mno)) {
@@ -654,6 +655,10 @@ public class AppContext {
         }
         if (StringUtils.isNotBlank(mno)) {
             mno = environment.resolvePlaceholders(mno);
+        }
+        if (StringUtils.isNotBlank(mno) && mno.startsWith(projectNo) && !mno.equals(projectNo)) {
+            mno = mno.replaceFirst(projectNo, "");
+            mno = mno.replaceFirst("^-+", "");
         }
         return mno;
     }

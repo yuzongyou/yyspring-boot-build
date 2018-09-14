@@ -1,6 +1,6 @@
 package com.duowan.common.jdbc.provider.pooltype;
 
-import com.duowan.common.jdbc.model.JdbcDef;
+import com.duowan.common.jdbc.model.JdbcDefinition;
 import com.duowan.common.jdbc.model.PoolType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +18,8 @@ public class DruidPoolProvider implements PoolProvider {
     private static final String DEFAULT_DS_CLASS = "com.alibaba.druid.pool.DruidDataSource";
 
     @Override
-    public boolean support(JdbcDef jdbcDef) {
-        return null != jdbcDef && SUPPORT_POOL_TYPE.equals(jdbcDef.getPoolType());
+    public boolean support(JdbcDefinition jdbcDefinition) {
+        return null != jdbcDefinition && SUPPORT_POOL_TYPE.equals(jdbcDefinition.getPoolType());
     }
 
     @Override

@@ -1,11 +1,11 @@
 package com.duowan.yyspringboot.autoconfigure.jdbc;
 
 import com.duowan.common.jdbc.Jdbc;
-import com.duowan.common.jdbc.auto.JdbcRegisterUtil;
-import com.duowan.common.jdbc.model.JdbcDef;
-import com.duowan.common.jdbc.model.RiseJdbcDef;
+import com.duowan.common.jdbc.model.JdbcDefinition;
+import com.duowan.common.jdbc.model.RiseJdbcDefinition;
 import com.duowan.common.jdbc.provider.dbtype.DBProvider;
 import com.duowan.common.jdbc.provider.pooltype.PoolProvider;
+import com.duowan.common.jdbc.util.JdbcRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
 import com.duowan.yyspring.boot.AppContext;
@@ -50,22 +50,22 @@ public class JdbcAutoConfiguration {
         List<DBProvider> dbProviderList = newInstances(DBProvider.class, jdbcProperties.getDbProviderClasses());
         List<PoolProvider> poolProviderList = newInstances(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
 
-        List<JdbcDef> jdbcDefList = lookupJdbcDefList();
+        List<JdbcDefinition> jdbcDefinitionList = lookupJdbcDefList();
 
         // 注册Bean
-        JdbcRegisterUtil.doJdbcBeanDefinitionsRegister(
+        JdbcRegisterUtil.registerJdbcBeanDefinitions(
                 dbProviderList,
                 poolProviderList,
                 jdbcProperties.getPrimaryId(),
                 jdbcProperties.getEnabledIds(),
-                jdbcDefList,
+                jdbcDefinitionList,
                 registry,
                 environment);
 
     }
 
-    private List<JdbcDef> lookupJdbcDefList() {
-        List<JdbcDef> resultList = new ArrayList<>();
+    private List<JdbcDefinition> lookupJdbcDefList() {
+        List<JdbcDefinition> resultList = new ArrayList<>();
 
         CommonUtil.appendList(resultList, lookupStandardJdbcDefList());
         CommonUtil.appendList(resultList, lookupRiseJdbcDefList());
@@ -74,9 +74,9 @@ public class JdbcAutoConfiguration {
 
     }
 
-    private List<JdbcDef> lookupRiseJdbcDefList() {
-        Map<String, RiseJdbcDef> riseMap = jdbcProperties.getRises();
-        List<JdbcDef> resultList = new ArrayList<>();
+    private List<JdbcDefinition> lookupRiseJdbcDefList() {
+        Map<String, RiseJdbcDefinition> riseMap = jdbcProperties.getRises();
+        List<JdbcDefinition> resultList = new ArrayList<>();
 
         if (null == riseMap || riseMap.isEmpty()) {
             return resultList;
@@ -84,8 +84,8 @@ public class JdbcAutoConfiguration {
 
         Map<String, String> aliasMap = jdbcProperties.getRiseAlias();
 
-        for (Map.Entry<String, RiseJdbcDef> entry : riseMap.entrySet()) {
-            RiseJdbcDef jdbcDef = entry.getValue();
+        for (Map.Entry<String, RiseJdbcDefinition> entry : riseMap.entrySet()) {
+            RiseJdbcDefinition jdbcDef = entry.getValue();
             if (StringUtils.isBlank(jdbcDef.getId())) {
                 jdbcDef.setId(entry.getKey());
             }
@@ -104,21 +104,21 @@ public class JdbcAutoConfiguration {
         return resultList;
     }
 
-    private List<JdbcDef> lookupStandardJdbcDefList() {
+    private List<JdbcDefinition> lookupStandardJdbcDefList() {
 
-        Map<String, JdbcDef> standardMap = jdbcProperties.getStandards();
-        List<JdbcDef> resultList = new ArrayList<>();
+        Map<String, JdbcDefinition> standardMap = jdbcProperties.getStandards();
+        List<JdbcDefinition> resultList = new ArrayList<>();
 
         if (null == standardMap || standardMap.isEmpty()) {
             return resultList;
         }
 
-        for (Map.Entry<String, JdbcDef> entry : standardMap.entrySet()) {
-            JdbcDef jdbcDef = entry.getValue();
-            if (StringUtils.isBlank(jdbcDef.getId())) {
-                jdbcDef.setId(entry.getKey());
+        for (Map.Entry<String, JdbcDefinition> entry : standardMap.entrySet()) {
+            JdbcDefinition jdbcDefinition = entry.getValue();
+            if (StringUtils.isBlank(jdbcDefinition.getId())) {
+                jdbcDefinition.setId(entry.getKey());
             }
-            resultList.add(jdbcDef);
+            resultList.add(jdbcDefinition);
         }
 
         return resultList;

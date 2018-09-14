@@ -1,6 +1,6 @@
 package com.duowan.yyspring.web.controller;
 
-import com.duowan.yyspringboot.autoconfigure.web.view.JsonView;
+import com.duowan.common.web.view.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

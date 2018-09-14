@@ -2,7 +2,7 @@ package com.duowan.common.jdbc.provider.dbtype;
 
 import com.duowan.common.jdbc.MysqlJdbcImpl;
 import com.duowan.common.jdbc.model.DBType;
-import com.duowan.common.jdbc.model.JdbcDef;
+import com.duowan.common.jdbc.model.JdbcDefinition;
 import org.springframework.core.env.Environment;
 
 /**
@@ -17,8 +17,8 @@ public class MysqlProvider implements DBProvider {
     private static final String DEFAULT_DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
     @Override
-    public boolean support(JdbcDef jdbcDef) {
-        return null != jdbcDef && SUPPORT_DB_TYPE.equals(jdbcDef.getDbType());
+    public boolean support(JdbcDefinition jdbcDefinition) {
+        return null != jdbcDefinition && SUPPORT_DB_TYPE.equals(jdbcDefinition.getDbType());
     }
 
     @Override
@@ -28,7 +28,7 @@ public class MysqlProvider implements DBProvider {
     }
 
     @Override
-    public Class<?> lookupJdbcImplClass(JdbcDef jdbcDef, Environment environment) {
+    public Class<?> lookupJdbcImplClass(JdbcDefinition jdbcDefinition, Environment environment) {
         return MysqlJdbcImpl.class;
     }
 }

@@ -1,6 +1,6 @@
 package com.duowan.common.redis.register;
 
-import com.duowan.common.redis.model.RedisDef;
+import com.duowan.common.redis.model.RedisDefinition;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.CommonUtil;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -17,7 +17,7 @@ import java.util.Set;
  * @param <T> Redis 定义注册器
  * @author Arvin
  */
-public abstract class AbstractRedisRegister<T extends RedisDef> implements RedisRegister {
+public abstract class AbstractRedisRegister<T extends RedisDefinition> implements RedisRegister {
 
     protected Class<T> definitionClass;
 
@@ -27,16 +27,16 @@ public abstract class AbstractRedisRegister<T extends RedisDef> implements Redis
     }
 
     @Override
-    public boolean canHandle(RedisDef redisDef) {
-        return definitionClass.isInstance(redisDef);
+    public boolean canHandle(RedisDefinition redisDefinition) {
+        return definitionClass.isInstance(redisDefinition);
     }
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public final void registerRedis(RedisDef redisDef, Environment environment, BeanDefinitionRegistry registry) {
-        AssertUtil.assertTrue(canHandle(redisDef), "[" + getClass().getName() + "] 无法注册[" + redisDef + "]");
+    public final void registerRedis(RedisDefinition redisDefinition, Environment environment, BeanDefinitionRegistry registry) {
+        AssertUtil.assertTrue(canHandle(redisDefinition), "[" + getClass().getName() + "] 无法注册[" + redisDefinition + "]");
         // 注册
-        register((T) redisDef, environment, registry);
+        register((T) redisDefinition, environment, registry);
     }
 
     /**

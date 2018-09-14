@@ -1,18 +1,16 @@
 package com.duowan.yyspringboot.autoconfigure.redis;
 
-import com.duowan.common.jdbc.model.JdbcDef;
 import com.duowan.common.redis.Redis;
-import com.duowan.common.redis.model.RedisDef;
-import com.duowan.common.redis.model.RiseRedisDef;
-import com.duowan.common.redis.model.SentinelRedisDef;
-import com.duowan.common.redis.model.StdRedisDef;
-import com.duowan.common.redis.provider.def.RedisDefProvider;
+import com.duowan.common.redis.model.RedisDefinition;
+import com.duowan.common.redis.model.RiseRedisDefinition;
+import com.duowan.common.redis.model.SentinelRedisDefinition;
+import com.duowan.common.redis.model.StdRedisDefinition;
+import com.duowan.common.redis.provider.def.RedisDefinitionProvider;
 import com.duowan.common.redis.register.RedisRegister;
-import com.duowan.common.redis.register.RedisRegisterUtil;
+import com.duowan.common.redis.util.RedisRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.jdbc.JdbcProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -52,7 +50,7 @@ public class RedisAutoConfiguration {
     private void doRedisAutoRegister() {
 
         List<RedisRegister> registerList = newInstances(RedisRegister.class, redisProperties.getRegisterClasses());
-        List<RedisDefProvider> providerList = newInstances(RedisDefProvider.class, redisProperties.getRegisterClasses());
+        List<RedisDefinitionProvider> providerList = newInstances(RedisDefinitionProvider.class, redisProperties.getRegisterClasses());
 
         RedisRegisterUtil.registerRedisBeanDefinitions(
                 registerList,
@@ -65,9 +63,9 @@ public class RedisAutoConfiguration {
 
     }
 
-    private List<RedisDef> lookupRedisDefList() {
+    private List<RedisDefinition> lookupRedisDefList() {
 
-        List<RedisDef> resultList = new ArrayList<>();
+        List<RedisDefinition> resultList = new ArrayList<>();
 
         CommonUtil.appendList(resultList, lookupStandardRedisDefList());
         CommonUtil.appendList(resultList, lookupRiseRedisDefList());
@@ -76,17 +74,17 @@ public class RedisAutoConfiguration {
         return resultList;
     }
 
-    private List<RedisDef> lookupStandardRedisDefList() {
+    private List<RedisDefinition> lookupStandardRedisDefList() {
 
-        Map<String, StdRedisDef> standardMap = redisProperties.getStandards();
-        List<RedisDef> resultList = new ArrayList<>();
+        Map<String, StdRedisDefinition> standardMap = redisProperties.getStandards();
+        List<RedisDefinition> resultList = new ArrayList<>();
 
         if (null == standardMap || standardMap.isEmpty()) {
             return resultList;
         }
 
-        for (Map.Entry<String, StdRedisDef> entry : standardMap.entrySet()) {
-            StdRedisDef def = entry.getValue();
+        for (Map.Entry<String, StdRedisDefinition> entry : standardMap.entrySet()) {
+            StdRedisDefinition def = entry.getValue();
             if (StringUtils.isBlank(def.getId())) {
                 def.setId(entry.getKey());
             }
@@ -96,17 +94,17 @@ public class RedisAutoConfiguration {
         return resultList;
     }
 
-    private List<RedisDef> lookupSentinelRedisDefList() {
+    private List<RedisDefinition> lookupSentinelRedisDefList() {
 
-        Map<String, SentinelRedisDef> standardMap = redisProperties.getSentinels();
-        List<RedisDef> resultList = new ArrayList<>();
+        Map<String, SentinelRedisDefinition> standardMap = redisProperties.getSentinels();
+        List<RedisDefinition> resultList = new ArrayList<>();
 
         if (null == standardMap || standardMap.isEmpty()) {
             return resultList;
         }
 
-        for (Map.Entry<String, SentinelRedisDef> entry : standardMap.entrySet()) {
-            SentinelRedisDef def = entry.getValue();
+        for (Map.Entry<String, SentinelRedisDefinition> entry : standardMap.entrySet()) {
+            SentinelRedisDefinition def = entry.getValue();
             if (StringUtils.isBlank(def.getId())) {
                 def.setId(entry.getKey());
             }
@@ -116,10 +114,10 @@ public class RedisAutoConfiguration {
         return resultList;
     }
 
-    private List<RedisDef> lookupRiseRedisDefList() {
+    private List<RedisDefinition> lookupRiseRedisDefList() {
 
-        Map<String, RiseRedisDef> standardMap = redisProperties.getRises();
-        List<RedisDef> resultList = new ArrayList<>();
+        Map<String, RiseRedisDefinition> standardMap = redisProperties.getRises();
+        List<RedisDefinition> resultList = new ArrayList<>();
 
         if (null == standardMap || standardMap.isEmpty()) {
             return resultList;
@@ -127,8 +125,8 @@ public class RedisAutoConfiguration {
 
         Map<String, String> aliasMap = redisProperties.getRiseAlias();
 
-        for (Map.Entry<String, RiseRedisDef> entry : standardMap.entrySet()) {
-            RiseRedisDef def = entry.getValue();
+        for (Map.Entry<String, RiseRedisDefinition> entry : standardMap.entrySet()) {
+            RiseRedisDefinition def = entry.getValue();
             if (StringUtils.isBlank(def.getId())) {
                 def.setId(entry.getKey());
             }

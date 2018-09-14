@@ -32,6 +32,7 @@
         <module>yycommon-admincenter</module>
         <module>yycommon-jdbc</module>
         <module>yycommon-redis</module>
+        <module>yycommon-web</module>
     </modules>
 
 </project>

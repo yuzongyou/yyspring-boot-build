@@ -1,7 +1,7 @@
 package com.duowan.common.redis.register;
 
 import com.duowan.common.redis.DefaultRedisImpl;
-import com.duowan.common.redis.model.StdRedisDef;
+import com.duowan.common.redis.model.StdRedisDefinition;
 import com.duowan.common.redis.provider.jedis.DefaultJedisProvider;
 import com.duowan.common.utils.CommonUtil;
 import org.springframework.beans.MutablePropertyValues;
@@ -18,7 +18,7 @@ import java.util.Map;
 /**
  * <pre>
  *
- *     支持简单类型的 StdRedisDef 注册，注册结果包含如下Bean
+ *     支持简单类型的 StdRedisDefinition 注册，注册结果包含如下Bean
  *     {redisId}Redis             DefaultRedisImpl
  *     {redisId}JedisPoolConfig   JedisPoolConfig
  *     {redisId}JedisProvider     DefaultJedisProvider
@@ -28,10 +28,10 @@ import java.util.Map;
  *
  * @author Arvin
  */
-public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDef> {
+public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDefinition> {
 
     @Override
-    protected void register(StdRedisDef redisDef, Environment environment, BeanDefinitionRegistry registry) {
+    protected void register(StdRedisDefinition redisDef, Environment environment, BeanDefinitionRegistry registry) {
 
         if (null == redisDef) {
             return;
@@ -47,7 +47,7 @@ public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDe
 
     }
 
-    private void registerRedisBeanDefinition(StdRedisDef definition, BeanDefinitionRegistry registry, String providerBeanName) {
+    private void registerRedisBeanDefinition(StdRedisDefinition definition, BeanDefinitionRegistry registry, String providerBeanName) {
         String redisBeanName = definition.getId() + "Redis";
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(DefaultRedisImpl.class);
@@ -61,7 +61,7 @@ public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDe
         registry.registerBeanDefinition(redisBeanName, beanDefinition);
     }
 
-    private String registerJedisProviderBeanDefinition(StdRedisDef definition, BeanDefinitionRegistry registry, String jedisPoolBeanName) {
+    private String registerJedisProviderBeanDefinition(StdRedisDefinition definition, BeanDefinitionRegistry registry, String jedisPoolBeanName) {
         String providerBeanName = definition.getId() + "JedisProvider";
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(DefaultJedisProvider.class);
@@ -75,7 +75,7 @@ public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDe
         return providerBeanName;
     }
 
-    private String registerJedisPoolBeanDefinition(StdRedisDef definition, BeanDefinitionRegistry registry, String poolConfigBeanName) {
+    private String registerJedisPoolBeanDefinition(StdRedisDefinition definition, BeanDefinitionRegistry registry, String poolConfigBeanName) {
         String jedisPoolBeanName = definition.getId() + "JedisPool";
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(JedisPool.class);
@@ -96,7 +96,7 @@ public class StdRedisDefinitionRegister extends AbstractRedisRegister<StdRedisDe
         return jedisPoolBeanName;
     }
 
-    private String registerPoolConfigBeanDefinition(StdRedisDef definition, BeanDefinitionRegistry registry) {
+    private String registerPoolConfigBeanDefinition(StdRedisDefinition definition, BeanDefinitionRegistry registry) {
         String poolConfigBeanName = definition.getId() + "JedisPoolConfig";
         Class<?> poolClass = JedisPoolConfig.class;
         // 移除不识别的连接池配置

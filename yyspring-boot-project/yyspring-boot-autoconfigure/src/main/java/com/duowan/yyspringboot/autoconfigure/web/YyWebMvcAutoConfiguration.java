@@ -1,15 +1,17 @@
 package com.duowan.yyspringboot.autoconfigure.web;
 
-import com.duowan.yyspringboot.autoconfigure.web.converter.json.ExtendMappingJackson2HttpMessageConverter;
-import com.duowan.yyspringboot.autoconfigure.web.converter.json.JsonJavascriptAdvice;
-import com.duowan.yyspringboot.autoconfigure.web.converter.json.JsonpAdvice;
-import com.duowan.yyspringboot.autoconfigure.web.converter.json.StringHttpMessageAdvice;
-import com.duowan.yyspringboot.autoconfigure.web.filter.YyRootFilter;
-import com.duowan.yyspringboot.autoconfigure.web.pageparameter.ClientIpPageParameter;
-import com.duowan.yyspringboot.autoconfigure.web.pageparameter.ProtocolPageParameter;
-import com.duowan.yyspringboot.autoconfigure.web.pageparameter.ProtocolTypePageParameter;
-import com.duowan.yyspringboot.autoconfigure.web.pageparameter.RequestUriPageParameter;
-import com.duowan.yyspringboot.autoconfigure.web.view.AjaxView;
+import com.duowan.common.web.WebContext;
+import com.duowan.common.web.YyServletContextInitializer;
+import com.duowan.common.web.converter.json.ExtendMappingJackson2HttpMessageConverter;
+import com.duowan.common.web.converter.json.JsonJavascriptAdvice;
+import com.duowan.common.web.converter.json.JsonpAdvice;
+import com.duowan.common.web.converter.json.StringHttpMessageAdvice;
+import com.duowan.common.web.filter.YyRootFilter;
+import com.duowan.common.web.pageparameter.ClientIpPageParameter;
+import com.duowan.common.web.pageparameter.ProtocolPageParameter;
+import com.duowan.common.web.pageparameter.ProtocolTypePageParameter;
+import com.duowan.common.web.pageparameter.RequestUriPageParameter;
+import com.duowan.common.web.view.AjaxView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +40,7 @@ import java.util.Collections;
  */
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnClass({Servlet.class, DispatcherServlet.class})
+@ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyServletContextInitializer.class})
 @EnableConfigurationProperties({WebMvcProperties.class})
 @Import({JsonpAdvice.class, JsonJavascriptAdvice.class, StringHttpMessageAdvice.class})
 public class YyWebMvcAutoConfiguration {

@@ -1,7 +1,7 @@
 package com.duowan.yyspringboot.autoconfigure.jdbc;
 
-import com.duowan.common.jdbc.model.JdbcDef;
-import com.duowan.common.jdbc.model.RiseJdbcDef;
+import com.duowan.common.jdbc.model.JdbcDefinition;
+import com.duowan.common.jdbc.model.RiseJdbcDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Map;
@@ -33,12 +33,12 @@ public class JdbcProperties {
     /**
      * 标准JDBC定义列表
      **/
-    private Map<String, JdbcDef> standards;
+    private Map<String, JdbcDefinition> standards;
 
     /**
      * 升龙JDBC定义列表
      **/
-    private Map<String, RiseJdbcDef> rises;
+    private Map<String, RiseJdbcDefinition> rises;
 
     /**
      * 扩展的 DBProvider 接口实现类全路径
@@ -74,19 +74,19 @@ public class JdbcProperties {
         this.riseAlias = riseAlias;
     }
 
-    public Map<String, JdbcDef> getStandards() {
+    public Map<String, JdbcDefinition> getStandards() {
         return standards;
     }
 
-    public void setStandards(Map<String, JdbcDef> standards) {
+    public void setStandards(Map<String, JdbcDefinition> standards) {
         this.standards = standards;
     }
 
-    public Map<String, RiseJdbcDef> getRises() {
+    public Map<String, RiseJdbcDefinition> getRises() {
         return rises;
     }
 
-    public void setRises(Map<String, RiseJdbcDef> rises) {
+    public void setRises(Map<String, RiseJdbcDefinition> rises) {
         this.rises = rises;
     }
 
