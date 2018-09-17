@@ -13,7 +13,16 @@ public enum PoolType {
     /**
      * 阿里 Druid
      */
-    DRUID;
+    DRUID,
+
+    HIKARI,
+
+    DBCP2,
+
+    C3P0,
+
+    TOMCAT
+    ;
 
     private static final Map<String, PoolType> MAP = new HashMap<>();
 
