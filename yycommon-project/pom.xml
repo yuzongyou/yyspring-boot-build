@@ -33,6 +33,7 @@
         <module>yycommon-jdbc</module>
         <module>yycommon-redis</module>
         <module>yycommon-web</module>
+        <module>yycommon-thrift-client</module>
     </modules>
 
 </project>

@@ -31,6 +31,8 @@
         <guava.version>18.0</guava.version>
         <zxa.version>1.1.0-SNAPSHOT</zxa.version>
         <apollo.client.version>0.10.3-SNAPSHOT</apollo.client.version>
+        <thrift.version>0.10.0</thrift.version>
+        <commons.pool2.version>2.5.0</commons.pool2.version>
 
         <flatten-maven-plugin.version>1.0.1</flatten-maven-plugin.version>
     </properties>
@@ -60,6 +62,18 @@
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.thrift</groupId>
+                <artifactId>libthrift</artifactId>
+                <version>${thrift.version}</version>
+            </dependency>
+
+            <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>${commons.pool2.version}</version>
+        </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
