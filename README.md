@@ -34,6 +34,7 @@ mvn clean deploy
 | [yyspring-boot-starter-admincenter-ui](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-admincenter-ui)   | 接入权限管理中心，包含UI。 |
 | [yyspring-boot-starter-jdbc](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-jdbc)   | JDBC 支持(包括升龙的和标准数据源)，支持多数据源。 |
 | [yyspring-boot-starter-redis](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-redis)   | Redis 支持(包括升龙、标准Redis和哨兵redis)，支持多数据源。 |
+| [yyspring-boot-starter-thrift-client](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-thrift-client)   | Thrift Client 支持，支持连接池、监控等。 |
 
 
 # 其他模块说明
