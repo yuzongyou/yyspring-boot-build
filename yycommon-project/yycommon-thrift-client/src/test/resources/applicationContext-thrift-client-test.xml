@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fastFramedTransportFactory"
+          class="com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory">
+    </bean>
+
+    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+        <constructor-arg>
+            <list>
+                <bean class="com.duowan.common.thrift.client.config.ThriftServerNode">
+                    <constructor-arg index="0" value="localhost"/>
+                    <constructor-arg index="1" value="25000"/>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="clientConfig" class="com.duowan.common.thrift.client.config.TClientConfig">
+        <constructor-arg index="0" ref="fastFramedTransportFactory"/>
+        <constructor-arg index="1">
+            <list>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.service.TestService"/>
+                    <constructor-arg index="1" value="test1"/>
+                </bean>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.service.TestService2"/>
+                    <constructor-arg value="test2"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2" type="com.duowan.common.thrift.client.servernode.ServerNodeProvider" ref="serverNodeProvider"/>
+        <property name="timeoutMillis" value="1000"/>
+    </bean>
+
+    <bean id="testServiceIface" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="test1"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <bean id="testService2Iface" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="test2"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <bean id="thriftService" class="com.duowan.service.ThriftService" init-method="init"/>
+
+    <bean class="com.duowan.common.thrift.client.ThriftResourceBeanPostProcessor"/>
+
+</beans>

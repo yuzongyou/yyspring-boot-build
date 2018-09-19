@@ -1,6 +1,6 @@
 package com.duowan.common.thrift.client.factory;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
+import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
 import org.apache.thrift.transport.TTransport;
 
@@ -14,10 +14,9 @@ public interface TTransportFactory {
     /**
      * TTransport 工厂接口
      *
-     * @param clientConfig   Thrift 客户端配置
-     * @param serverNode     当前节点
-     * @param connectTimeout 连接超时时间，可以不传，传小于等于0的话表示使用默认值
+     * @param clientConfig Thrift 客户端配置
+     * @param serverNode   当前节点
      * @return 返回TTransport对象
      */
-    TTransport create(ThriftClientConfig clientConfig, ThriftServerNode serverNode, int connectTimeout);
+    TTransport create(TClientConfig clientConfig, ThriftServerNode serverNode);
 }

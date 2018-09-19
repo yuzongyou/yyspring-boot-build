@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @since 2018/9/17 18:12
  */
-public interface LoadBalancer<T extends ThriftServerNode> {
+public interface LoadBalancer {
 
     /**
      * 设置服务节点
@@ -19,7 +19,7 @@ public interface LoadBalancer<T extends ThriftServerNode> {
      * @param serverNodes 要设置的服务节点
      * @param appendMode  追加模式， 如果为 true 则追加，否则进行完全替换
      */
-    void setServerNodes(List<T> serverNodes, boolean appendMode);
+    void setServerNodes(List<ThriftServerNode> serverNodes, boolean appendMode);
 
     /**
      * 选择指定ID的服务节点
@@ -27,14 +27,14 @@ public interface LoadBalancer<T extends ThriftServerNode> {
      * @param nodeId 节点ID
      * @return 返回给定的服务节点，如果不存在这返回 null
      */
-    T chooseServerNode(String nodeId);
+    ThriftServerNode chooseServerNode(String nodeId);
 
     /**
      * 下线给定服务节点
      *
      * @param serverNode 要下线的节点
      */
-    void offline(T serverNode);
+    void offline(ThriftServerNode serverNode);
 
     /**
      * 下线指定ID的服务节点
@@ -49,7 +49,7 @@ public interface LoadBalancer<T extends ThriftServerNode> {
      *
      * @param serverNode 要下线的节点
      */
-    void up(T serverNode);
+    void up(ThriftServerNode serverNode);
 
     /**
      * 上线指定ID的服务节点
@@ -64,20 +64,20 @@ public interface LoadBalancer<T extends ThriftServerNode> {
      *
      * @return 返回可用的节点列表，始终返回非 null
      */
-    List<T> getReachableServerNodes();
+    List<ThriftServerNode> getReachableServerNodes();
 
     /**
      * 获取不可用的服务节点列表
      *
      * @return 返回不可用的节点列表，始终返回非 null
      */
-    List<T> getUnReachableServerNodes();
+    List<ThriftServerNode> getUnReachableServerNodes();
 
     /**
      * 获取所有的服务节点列表
      *
      * @return 返回所有服务节点列表，始终返回非 null
      */
-    List<T> getAllServerNodes();
+    List<ThriftServerNode> getAllServerNodes();
 
 }

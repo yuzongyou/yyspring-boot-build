@@ -1,11 +1,9 @@
 package com.duowan.common.thrift.client.factory;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
-import com.duowan.common.thrift.client.config.ThriftServerNode;
+import com.duowan.common.thrift.client.ClientType;
+import com.duowan.common.thrift.client.config.TClientConfig;
+import com.duowan.common.thrift.client.exception.ThriftInvalidClientTypeException;
 import com.duowan.common.thrift.client.pool.PooledTransport;
-import com.duowan.common.thrift.client.pool.ThriftClientKeyedObjectPoolConfig;
-import com.duowan.common.thrift.client.pool.TransportGenericKeyedObjectPool;
-import com.duowan.common.thrift.client.pool.TransportKeyedPooledObjectFactory;
 import com.duowan.common.thrift.client.util.ThriftUtil;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TProtocol;
@@ -24,38 +22,18 @@ public class TClientFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(TClientFactory.class);
 
-    private final TransportGenericKeyedObjectPool pool;
+    public static Object createClientByClientType(TTransport transport, ClientType clientType, TProtocolFactory protocolFactory, TClientConfig clientConfig) throws Exception {
+        Class<?> serviceClass = protocolFactory.getServiceClass();
+        TProtocol protocol = protocolFactory.create(clientConfig, transport);
 
-    public TClientFactory(TransportKeyedPooledObjectFactory objectFactory) {
-        this.pool = new TransportGenericKeyedObjectPool(objectFactory);
-    }
-
-    public TClientFactory(TransportKeyedPooledObjectFactory objectFactory, ThriftClientKeyedObjectPoolConfig poolConfig) {
-        this.pool = new TransportGenericKeyedObjectPool(objectFactory, poolConfig);
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public <T extends TServiceClient> T createServiceClient(ThriftServerNode serverNode, int connectTimeout, ThriftClientConfig config) throws Exception {
-
-        PooledTransport pooledTransport = pool.borrowObject(serverNode);
-        TTransport transport = pooledTransport.getTransport();
-        TProtocol protocol = config.getProtocolFactory().create(config, transport);
-        Class<?> serviceClass = config.getServiceClass();
-        Class<? extends TServiceClient> clientClass = ThriftUtil.getTServiceClass(serviceClass);
-
-        try {
+        // 创建 Client 对象
+        if (ClientType.IFACE.equals(clientType)) {
+            Class<? extends TServiceClient> clientClass = ThriftUtil.getTServiceClientClass(serviceClass);
             Constructor<? extends TServiceClient> constructor = clientClass.getConstructor(TProtocol.class);
-            T instance = (T) constructor.newInstance(protocol);
-            if (logger.isDebugEnabled()) {
-                logger.debug("创建[" + clientClass + "] 成功, node=" + serverNode + ", connectTimeout=" + connectTimeout);
-            }
-            return instance;
-        } catch (Exception e) {
-            throw new IllegalArgumentException(serviceClass.getName() + " 找不到合法的 TServiceClient 类！");
+            return constructor.newInstance(protocol);
+        } else {
+            throw new ThriftInvalidClientTypeException(String.valueOf(clientType));
         }
     }
 
-    public void destroy() {
-        this.pool.close();
-    }
 }

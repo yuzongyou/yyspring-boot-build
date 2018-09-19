@@ -34,5 +34,6 @@
         <module>yyspring-boot-starter-admincenter-ui</module>
         <module>yyspring-boot-starter-jdbc</module>
         <module>yyspring-boot-starter-redis</module>
+        <module>yyspring-boot-starter-thrift-client</module>
     </modules>
 </project>

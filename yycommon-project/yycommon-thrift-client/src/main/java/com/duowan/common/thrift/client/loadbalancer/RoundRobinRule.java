@@ -27,7 +27,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
         setLoadBalancer(lb);
     }
 
-    public ThriftServerNode choose(LoadBalancer<? extends ThriftServerNode> lb, Object key) {
+    public ThriftServerNode choose(LoadBalancer lb, Object key) {
         if (lb == null) {
             log.warn("no load balancer");
             return null;

@@ -1,5 +1,7 @@
 package com.duowan.common.thrift.client.config;
 
+import java.io.Serializable;
+
 /**
  * Thrift Server Node
  *
@@ -7,19 +9,30 @@ package com.duowan.common.thrift.client.config;
  * @version 1.0
  * @since 2018/9/17 17:11
  */
-public class ThriftServerNode {
+public class ThriftServerNode implements Serializable {
 
-    /** 节点唯一标识 */
+    /**
+     * 节点唯一标识
+     */
     private String id;
 
-    /** 主机地址 */
+    /**
+     * 主机地址
+     */
     private String host;
 
-    /** 服务端口 */
+    /**
+     * 服务端口
+     */
     private int port;
 
-    /** 是否存活 */
-    private boolean alive;
+    /**
+     * 是否存活
+     */
+    private boolean alive = true;
+
+    public ThriftServerNode() {
+    }
 
     public ThriftServerNode(String host, int port) {
         this.host = host;
@@ -63,6 +76,24 @@ public class ThriftServerNode {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ThriftServerNode that = (ThriftServerNode) o;
+
+        if (port != that.port) return false;
+        return host != null ? host.equals(that.host) : that.host == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
     }
 
     @Override

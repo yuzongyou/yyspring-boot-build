@@ -1,11 +1,9 @@
 package com.duowan.common.thrift.client.pool;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
+import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
 import com.duowan.common.thrift.client.exception.ThriftClientConfigException;
 import com.duowan.common.thrift.client.exception.ThriftClientOpenException;
-import com.duowan.common.thrift.client.monitor.MonitorResult;
-import com.duowan.common.thrift.client.monitor.NodeMonitor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
 import org.apache.commons.pool2.PooledObject;
@@ -19,20 +17,21 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  * @since 2018/9/17 20:55
  */
-public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftServerNode, PooledTransport> {
+public class TransportPooledObjectFactory extends BaseKeyedPooledObjectFactory<ThriftServerNode, PooledTransport> {
 
     private static final int MAX_SERVER_PORT = 65535;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ThriftClientConfig clientConfig;
+    private final TClientConfig clientConfig;
 
-    public TransportKeyedPooledObjectFactory(ThriftClientConfig clientConfig) {
+    public TransportPooledObjectFactory(TClientConfig clientConfig) {
         this.clientConfig = clientConfig;
     }
 
     @Override
     public PooledTransport create(ThriftServerNode serverNode) throws Exception {
+
         if (StringUtils.isBlank(serverNode.getHost())) {
             throw new ThriftClientConfigException("Invalid Thrift server, node IP address: " + serverNode.getHost());
         }
@@ -43,16 +42,16 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
 
         TTransport transport = null;
         try {
-            transport = clientConfig.getTransportFactory().create(clientConfig, serverNode, clientConfig.getConnectTimeoutMills());
+            transport = clientConfig.getTransportFactory().create(clientConfig, serverNode);
             transport.open();
             if (logger.isDebugEnabled()) {
-                logger.debug("[{}] Open a new transport {}, {}:{}", clientConfig.getServiceId(), transport, serverNode.getHost(), serverNode.getPort());
+                logger.debug("Open a new transport {}, {}:{}", transport, serverNode.getHost(), serverNode.getPort());
             }
         } catch (Exception e) {
-            throw new ThriftClientOpenException("[" + clientConfig.getServiceId() + "]Connect to " + serverNode.getHost() + ":" + serverNode.getPort() + " failed", e);
+            throw new ThriftClientOpenException("Connect to " + serverNode.getHost() + ":" + serverNode.getPort() + " failed", e);
         }
 
-        return new PooledTransport(serverNode, clientConfig.getServiceClass(), transport);
+        return new PooledTransport(serverNode, clientConfig, transport);
     }
 
     @Override
@@ -83,17 +82,14 @@ public class TransportKeyedPooledObjectFactory extends BaseKeyedPooledObjectFact
         try {
             boolean isOpen = transport.isOpen();
             if (isOpen) {
-                NodeMonitor monitor = clientConfig.getNodeMonitor();
-                if (null != monitor) {
-                    MonitorResult monitorResult = monitor.monitor(serverNode, transport);
-                    if (MonitorResult.Status.UP.equals(monitorResult.getStatus())) {
-                        return true;
-                    }
-                    throw new IllegalMonitorStateException("对象监控失败：" + transport + ", server=" + serverNode);
-                }
+                isOpen = pooledTransport.validateObject();
             }
-            return false;
+            if (!isOpen) {
+                pooledTransport.discard();
+            }
+            return isOpen;
         } catch (Exception e) {
+            pooledTransport.discard();
             logger.error(e.getCause().getMessage());
             return false;
         }

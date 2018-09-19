@@ -201,6 +201,12 @@
                 <version>${yyproject.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-thrift-client</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
             <!-- Jackson start -->
 
             <dependency>

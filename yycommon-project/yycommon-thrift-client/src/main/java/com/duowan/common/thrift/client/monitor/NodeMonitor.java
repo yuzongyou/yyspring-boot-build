@@ -1,5 +1,6 @@
 package com.duowan.common.thrift.client.monitor;
 
+import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
 import org.apache.thrift.transport.TTransport;
 
@@ -15,9 +16,9 @@ public interface NodeMonitor {
     /**
      * 监控Thrift Server 节点
      *
-     * @param serverNode 服务节点
-     * @param transport  transport 对象，可以为空，如果为空的话会自己创建一个
+     * @param clientConfig Thrift Client Config
+     * @param serverNode   服务节点
      * @return 返回监控结果
      */
-    MonitorResult monitor(ThriftServerNode serverNode, TTransport transport);
+    MonitorResult monitor(TClientConfig clientConfig, ThriftServerNode serverNode);
 }

@@ -1,6 +1,10 @@
 package com.duowan.common.thrift.client.util;
 
+import com.duowan.common.thrift.client.ClientType;
+import com.duowan.common.utils.CommonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TServiceClient;
+import org.apache.thrift.async.TAsyncClient;
 
 /**
  * @author Arvin
@@ -9,12 +13,20 @@ import org.apache.thrift.TServiceClient;
  */
 public class ThriftUtil {
 
-    public static Class<? extends TServiceClient> getTServiceClass(String serviceClass) {
+    public static Class<? extends TServiceClient> getTServiceClientClass(String serviceClass) {
         return getServiceInnerClass(getServiceClass(serviceClass), TServiceClient.class, "$Client");
     }
 
-    public static Class<? extends TServiceClient> getTServiceClass(Class<?> serviceClass) {
+    public static Class<? extends TServiceClient> getTServiceClientClass(Class<?> serviceClass) {
         return getServiceInnerClass(serviceClass, TServiceClient.class, "$Client");
+    }
+
+    public static Class<? extends TAsyncClient> getTAsyncClientClass(String serviceClass) {
+        return getServiceInnerClass(getServiceClass(serviceClass), TAsyncClient.class, "$AsyncClient");
+    }
+
+    public static Class<? extends TAsyncClient> getTAsyncClientClass(Class<?> serviceClass) {
+        return getServiceInnerClass(serviceClass, TAsyncClient.class, "$AsyncClient");
     }
 
     public static Class<?> getIfaceClass(String serviceClass) {
@@ -47,4 +59,46 @@ public class ThriftUtil {
         throw new IllegalArgumentException("[" + serviceClass + "] 无法找到[" + targetClass + "] 类");
     }
 
+    public static String fixRouter(String router) {
+        if (StringUtils.isBlank(router)) {
+            return null;
+        }
+        return router.trim().toUpperCase();
+    }
+
+    public static String toNotNullRouter(String router) {
+        router = fixRouter(router);
+        return router == null ? "" : router;
+    }
+
+    public static String argsToString(Object[] args) {
+        StringBuilder builder = new StringBuilder("[");
+
+        if (args == null || args.length < 1) {
+            builder.append("null]");
+        } else {
+            for (Object arg : args) {
+                builder.append(arg).append(",");
+            }
+            builder.setLength(builder.length() - 1);
+            builder.append("]");
+        }
+
+        return builder.toString();
+    }
+
+    public static String buildDefaultThriftClientBeanName(Class<?> serviceClass, String router, ClientType clientType) {
+
+        String clientTypeName = "Iface";
+        if (ClientType.ASYNC_IFACE.equals(clientType)) {
+            clientTypeName = "AsyncIface";
+        }
+
+        if (StringUtils.isBlank(router)) {
+            return CommonUtil.firstLetterToLowerCase(serviceClass.getSimpleName()) + clientTypeName;
+        }
+        return CommonUtil.firstLetterToLowerCase(serviceClass.getSimpleName())
+                + CommonUtil.firstLetterToUpperCase(router.trim())
+                + clientTypeName;
+    }
 }

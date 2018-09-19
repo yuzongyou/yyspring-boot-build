@@ -11,12 +11,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @version 1.0
  * @since 2018/9/17 18:37
  */
-public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implements LoadBalancer<T> {
+public abstract class AbstractLoadBalancer implements LoadBalancer {
 
-    private List<T> serverNodes = new ArrayList<>();
+    private List<ThriftServerNode> serverNodes = new ArrayList<>();
 
     @Override
-    public void setServerNodes(List<T> serverNodes, boolean appendMode) {
+    public void setServerNodes(List<ThriftServerNode> serverNodes, boolean appendMode) {
         if (appendMode) {
             appendServerNodes(serverNodes);
         } else {
@@ -24,8 +24,8 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
         }
     }
 
-    private void appendServerNodes(List<T> serverNodes) {
-        List<T> nodes = new ArrayList<>(serverNodes);
+    private void appendServerNodes(List<ThriftServerNode> serverNodes) {
+        List<ThriftServerNode> nodes = new ArrayList<>(serverNodes);
         if (serverNodes == null || serverNodes.isEmpty()) {
             throw new RuntimeException("None thrift nodes need append!");
         }
@@ -33,16 +33,16 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
         this.serverNodes = new CopyOnWriteArrayList<>(serverNodes);
     }
 
-    private void resetServerNodes(List<T> serverNodes) {
+    private void resetServerNodes(List<ThriftServerNode> serverNodes) {
         this.serverNodes = new CopyOnWriteArrayList<>(serverNodes);
     }
 
-    public T choose() {
+    public ThriftServerNode choose() {
         return chooseServerNode(null);
     }
 
     @Override
-    public void offline(T serverNode) {
+    public void offline(ThriftServerNode serverNode) {
         if (null != serverNode) {
             serverNode.setAlive(false);
         }
@@ -50,7 +50,7 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
 
     @Override
     public boolean offline(String nodeId) {
-        T node = chooseServerNode(nodeId);
+        ThriftServerNode node = chooseServerNode(nodeId);
         if (node != null) {
             offline(node);
             return true;
@@ -59,7 +59,7 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
     }
 
     @Override
-    public void up(T serverNode) {
+    public void up(ThriftServerNode serverNode) {
         if (null != serverNode) {
             serverNode.setAlive(true);
         }
@@ -67,7 +67,7 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
 
     @Override
     public boolean up(String nodeId) {
-        T node = chooseServerNode(nodeId);
+        ThriftServerNode node = chooseServerNode(nodeId);
         if (node != null) {
             up(node);
             return true;
@@ -76,29 +76,34 @@ public abstract class AbstractLoadBalancer<T extends ThriftServerNode> implement
     }
 
     @Override
-    public List<T> getReachableServerNodes() {
-        List<T> nodes = new ArrayList<>();
-        for (T node : nodes) {
+    public List<ThriftServerNode> getReachableServerNodes() {
+        List<ThriftServerNode> nodes = getAllServerNodes();
+        List<ThriftServerNode> reachableServerNodes = new ArrayList<>();
+        for (ThriftServerNode node : nodes) {
             if (node.isAlive()) {
-                nodes.add(node);
+                reachableServerNodes.add(node);
             }
         }
-        return nodes;
+        if (reachableServerNodes.isEmpty()) {
+            return nodes;
+        }
+        return reachableServerNodes;
     }
 
     @Override
-    public List<T> getUnReachableServerNodes() {
-        List<T> nodes = new ArrayList<>();
-        for (T node : nodes) {
+    public List<ThriftServerNode> getUnReachableServerNodes() {
+        List<ThriftServerNode> nodes = getAllServerNodes();
+        List<ThriftServerNode> unReachableServerNodes = new ArrayList<>();
+        for (ThriftServerNode node : nodes) {
             if (!node.isAlive()) {
-                nodes.add(node);
+                unReachableServerNodes.add(node);
             }
         }
-        return nodes;
+        return unReachableServerNodes;
     }
 
     @Override
-    public List<T> getAllServerNodes() {
-        return new ArrayList<>(this.serverNodes);
+    public List<ThriftServerNode> getAllServerNodes() {
+        return this.serverNodes;
     }
 }

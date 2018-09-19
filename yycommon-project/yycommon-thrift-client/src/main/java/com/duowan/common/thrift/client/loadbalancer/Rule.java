@@ -14,14 +14,14 @@ public interface Rule {
      *
      * @param lb loadBalancer
      */
-    void setLoadBalancer(LoadBalancer<? extends ThriftServerNode> lb);
+    void setLoadBalancer(LoadBalancer lb);
 
     /**
      * 返回 LoadBalancer
      *
      * @return 返回 LoadBalancer
      */
-    LoadBalancer<? extends ThriftServerNode> getLoadBalancer();
+    LoadBalancer getLoadBalancer();
 
     /**
      * 选择一个节点

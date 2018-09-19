@@ -1,11 +1,15 @@
 package com.duowan.service;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
+import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
-import com.duowan.common.thrift.client.factory.TClientFactory;
 import com.duowan.common.thrift.client.factory.TProtocolFactory;
 import com.duowan.common.thrift.client.factory.TTransportFactory;
-import com.duowan.common.thrift.client.pool.TransportKeyedPooledObjectFactory;
+import com.duowan.common.thrift.client.pool.PooledTransport;
+import com.duowan.common.thrift.client.pool.TransportPool;
+import com.duowan.common.thrift.client.servernode.FixedServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.util.ThriftUtil;
+import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -14,6 +18,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 
 /**
@@ -28,9 +33,12 @@ public class TestServiceTest {
 
         ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
 
+        final String router = "test";
+        //final String router = "test-thrift$com.icekredit.rpc.thrift.server.TestService$1.0";
+
         TTransportFactory transportFactory = new TTransportFactory() {
             @Override
-            public TTransport create(ThriftClientConfig clientConfig, ThriftServerNode serverNode, int connectTimeout) {
+            public TTransport create(TClientConfig clientConfig, ThriftServerNode serverNode) {
                 return new TFastFramedTransport(new TSocket(serverNode.getHost(), serverNode.getPort()));
                 //return new TSocket(serverNode.getHost(), serverNode.getPort());
             }
@@ -38,30 +46,53 @@ public class TestServiceTest {
 
         TProtocolFactory protocolFactory = new TProtocolFactory() {
             @Override
-            public TProtocol create(ThriftClientConfig clientConfig, TTransport transport) {
-                //return new TMultiplexedProtocol(new TCompactProtocol(transport), "test-thrift$com.icekredit.rpc.thrift.server.TestService$1.0");
-                return new TMultiplexedProtocol(new TCompactProtocol(transport), "test");
+            public TProtocol create(TClientConfig clientConfig, TTransport transport) {
+                return new TMultiplexedProtocol(new TCompactProtocol(transport), router());
                 //return new TBinaryProtocol(transport);
+                //return new TCompactProtocol(transport);
+            }
+
+            @Override
+            public Class<?> getServiceClass() {
+                return TestService.class;
+            }
+
+            @Override
+            public String router() {
+                return router;
             }
         };
 
-        ThriftClientConfig clientConfig = new ThriftClientConfig();
-        clientConfig.setServiceId("test");
-        clientConfig.setTransportFactory(transportFactory);
-        clientConfig.setProtocolFactory(protocolFactory);
-        clientConfig.setServerNodes(Collections.singletonList(serverNode));
-        clientConfig.setServiceClass(TestService.class);
+        ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
 
-        TransportKeyedPooledObjectFactory pooledObjectFactory = new TransportKeyedPooledObjectFactory(clientConfig);
-        TClientFactory factory = new TClientFactory(pooledObjectFactory);
+        TClientConfig clientConfig = new TClientConfig(transportFactory, protocolFactory, serverNodeProvider);
+        clientConfig.setEnabledLogging(true);
+        TransportPool pool = clientConfig.getPool();
 
-        TestService.Iface testService = factory.createServiceClient(serverNode, clientConfig.getConnectTimeoutMills(), clientConfig);
+        TestService.Iface testService = createServiceClient(pool, serverNode,
+                clientConfig.getTimeoutMillis(), clientConfig, protocolFactory);
 
         String info = testService.test(1000);
 
         System.out.println("GetInfo: " + info);
 
-        factory.destroy();
+    }
 
+    public <T extends TServiceClient> T createServiceClient(TransportPool pool, ThriftServerNode serverNode, int connectTimeout, TClientConfig config, TProtocolFactory protocolFactory) throws Exception {
+
+        PooledTransport pooledTransport = pool.borrowObject(serverNode);
+        TTransport transport = pooledTransport.getTransport();
+        TProtocol protocol = protocolFactory.create(config, transport);
+        Class<?> serviceClass = protocolFactory.getServiceClass();
+        Class<? extends TServiceClient> clientClass = ThriftUtil.getTServiceClientClass(serviceClass);
+
+        try {
+            Constructor<? extends TServiceClient> constructor = clientClass.getConstructor(TProtocol.class);
+            T instance = (T) constructor.newInstance(protocol);
+            System.err.println("创建[" + clientClass + "] 成功, node=" + serverNode + ", connectTimeout=" + connectTimeout);
+            return instance;
+        } catch (Exception e) {
+            throw new IllegalArgumentException(serviceClass.getName() + " 找不到合法的 TServiceClient 类！");
+        }
     }
 }

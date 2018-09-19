@@ -15,7 +15,7 @@ public class ThriftUtilTest {
     @Test
     public void getTServiceClass() throws Exception {
 
-        Class<? extends TServiceClient> clazz = ThriftUtil.getTServiceClass(TestService.class);
+        Class<? extends TServiceClient> clazz = ThriftUtil.getTServiceClientClass(TestService.class);
 
         System.out.println(clazz);
 
@@ -27,6 +27,8 @@ public class ThriftUtilTest {
     public void getIfaceClass() throws Exception {
 
         assertEquals(TestService.Iface.class, ThriftUtil.getIfaceClass(TestService.class));
+
+
     }
 
 }

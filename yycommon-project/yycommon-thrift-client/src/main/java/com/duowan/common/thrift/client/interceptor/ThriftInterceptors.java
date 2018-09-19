@@ -1,9 +1,5 @@
 package com.duowan.common.thrift.client.interceptor;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
-import com.duowan.common.thrift.client.config.ThriftServerNode;
-
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -37,32 +33,36 @@ public class ThriftInterceptors implements ThriftInterceptor {
     }
 
     @Override
-    public void before(Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode) throws Throwable {
+    public Object before(ThriftInvokeContext invokeContext) throws Exception {
+        if (!needInterceptor) {
+            return null;
+        }
+        for (ThriftInterceptor interceptor : interceptors) {
+            Object returnValue = interceptor.before(invokeContext);
+            if (null != returnValue) {
+                return returnValue;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception {
         if (!needInterceptor) {
             return;
         }
         for (ThriftInterceptor interceptor : interceptors) {
-            interceptor.before(method, args, target, clientConfig, serverNode);
+            interceptor.afterReturning(returnValue, invokeContext);
         }
     }
 
     @Override
-    public void afterReturning(Object returnValue, Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode) throws Throwable {
+    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) throws Exception {
         if (!needInterceptor) {
             return;
         }
         for (ThriftInterceptor interceptor : interceptors) {
-            interceptor.afterReturning(returnValue, method, args, target, clientConfig, serverNode);
-        }
-    }
-
-    @Override
-    public void afterThrowing(Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode, Exception e) throws Throwable {
-        if (!needInterceptor) {
-            return;
-        }
-        for (ThriftInterceptor interceptor : interceptors) {
-            interceptor.afterThrowing(method, args, target, clientConfig, serverNode, e);
+            interceptor.afterThrowing(exception, invokeContext);
         }
     }
 

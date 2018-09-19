@@ -1,7 +1,5 @@
 package com.duowan.common.thrift.client.loadbalancer;
 
-import com.duowan.common.thrift.client.config.ThriftServerNode;
-
 /**
  * @author Arvin
  * @version 1.0
@@ -9,15 +7,15 @@ import com.duowan.common.thrift.client.config.ThriftServerNode;
  */
 public abstract class AbstractLoadBalancerRule implements Rule {
 
-    protected LoadBalancer<? extends ThriftServerNode> lb;
+    protected LoadBalancer lb;
 
     @Override
-    public void setLoadBalancer(LoadBalancer<? extends ThriftServerNode> lb) {
+    public void setLoadBalancer(LoadBalancer lb) {
         this.lb = lb;
     }
 
     @Override
-    public LoadBalancer<? extends ThriftServerNode> getLoadBalancer() {
+    public LoadBalancer getLoadBalancer() {
         return this.lb;
     }
 }

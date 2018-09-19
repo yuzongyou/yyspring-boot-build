@@ -1,10 +1,5 @@
 package com.duowan.common.thrift.client.interceptor;
 
-import com.duowan.common.thrift.client.config.ThriftClientConfig;
-import com.duowan.common.thrift.client.config.ThriftServerNode;
-
-import java.lang.reflect.Method;
-
 /**
  * @author Arvin
  * @version 1.0
@@ -13,17 +8,17 @@ import java.lang.reflect.Method;
 public abstract class ThriftInterceptorAdapter implements ThriftInterceptor {
 
     @Override
-    public void before(Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode) throws Throwable {
+    public Object before(ThriftInvokeContext invokeContext) throws Exception {
+        return null;
+    }
+
+    @Override
+    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception {
 
     }
 
     @Override
-    public void afterReturning(Object returnValue, Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode) throws Throwable {
-
-    }
-
-    @Override
-    public void afterThrowing(Method method, Object[] args, Object target, ThriftClientConfig clientConfig, ThriftServerNode serverNode, Exception e) throws Throwable {
+    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) throws Exception {
 
     }
 

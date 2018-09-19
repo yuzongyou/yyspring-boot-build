@@ -15,4 +15,5 @@ com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.udb.UdbAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.jdbc.JdbcAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.timer.TimerScheduleAutoConfiguration
+com.duowan.yyspringboot.autoconfigure.timer.TimerScheduleAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.thriftclient.ThriftClientAutoConfiguration
