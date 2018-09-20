@@ -2,7 +2,7 @@
 <font color=#0099ff size="8" face="黑体">**阅读本文档前，可以前往以下地址查看非 SpringBoot 环境下使用 Thrift 客户端的说明：**[yycommon-thrift-client](../../../yycommon-project/yycommon-thrift-client)</font>
 
 
-本模块主要是集成到 SpringBoot 中使用，实现自动配置<code>Bean</code>和<code>@ThriftResource</code>支持:
+本模块主要是集成到 <code>SpringBoot</code> 中使用，实现自动配置<code>Bean</code>和<code>@ThriftResource</code>支持:
 1. 开发者通过配置 <code>TClientConfig</code> Bean 到 Spring 容器
 2. <code>ThriftClientAutoConfiguration</code> 进行自动配置 <code>ThriftClientFactoryBean</code>
 3. 业务代码中使用 <code>@ThriftResource</code> 进行对应Thrift接口的Bean注入
@@ -44,7 +44,8 @@ public class ThriftClientConfigurationExample {
 @Component
 public class ThriftServiceConsumer {
     
-    @ThriftResource("hiService")
+    @ThriftResource("hiService") // 整个容器中只有一个这类型的，可以不用写路由名称 
+    //@Autowired // 这里其实也可以用这个注解，因为整个 SpringIOC 中只有一个这个类型的 Bean，其他的类似
     private HiService.Iface hiService;
     
     @ThriftResource("helloService")
