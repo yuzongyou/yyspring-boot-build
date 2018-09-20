@@ -9,5 +9,8 @@ package com.duowan.common.thrift.server.exporter;
  */
 public interface ThriftExporter {
 
-
+    /**
+     * 导出服务
+     */
+    void export();
 }
