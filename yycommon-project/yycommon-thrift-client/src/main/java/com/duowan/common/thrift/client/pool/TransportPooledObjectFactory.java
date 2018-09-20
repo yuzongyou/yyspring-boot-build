@@ -44,8 +44,8 @@ public class TransportPooledObjectFactory extends BaseKeyedPooledObjectFactory<T
         try {
             transport = clientConfig.getTransportFactory().create(clientConfig, serverNode);
             transport.open();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Open a new transport {}, {}:{}", transport, serverNode.getHost(), serverNode.getPort());
+            if (logger.isInfoEnabled()) {
+                logger.info("Open a new transport {}, {}:{}", transport, serverNode.getHost(), serverNode.getPort());
             }
         } catch (Exception e) {
             throw new ThriftClientOpenException("Connect to " + serverNode.getHost() + ":" + serverNode.getPort() + " failed", e);
@@ -104,8 +104,8 @@ public class TransportPooledObjectFactory extends BaseKeyedPooledObjectFactory<T
                 if (null != transport) {
                     transport.close();
                 }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Destroy Thrift Client : {}, node:{}", pooledTransport, serverNode);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Destroy Thrift Client : {}, node:{}", pooledTransport, serverNode);
                 }
                 pooledTransport.discard();
             }
