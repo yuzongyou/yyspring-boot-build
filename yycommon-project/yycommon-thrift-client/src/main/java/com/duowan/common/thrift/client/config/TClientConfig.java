@@ -12,7 +12,7 @@ import com.duowan.common.thrift.client.monitor.*;
 import com.duowan.common.thrift.client.pool.TClientPoolConfig;
 import com.duowan.common.thrift.client.pool.TransportPool;
 import com.duowan.common.thrift.client.pool.TransportPooledObjectFactory;
-import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.common.thrift.client.util.ThriftUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,7 +44,7 @@ public class TClientConfig {
     private final List<TProtocolFactory> protocolFactories;
 
     /**
-     * REQUIRED, 负载均衡器，如果没有自定义则使用默认的负载均衡器，如果没有自定义，那么 ServerNodeProvider 不允许为空
+     * REQUIRED, 负载均衡器，如果没有自定义则使用默认的负载均衡器，如果没有自定义，那么 ServerNodeDiscovery 不允许为空
      **/
     private final LoadBalancer loadBalancer;
 
@@ -98,19 +98,19 @@ public class TClientConfig {
         this(transportFactory, Collections.singletonList(protocolFactory), loadBalancer);
     }
 
-    public TClientConfig(TTransportFactory transportFactory, TProtocolFactory protocolFactory, ServerNodeProvider serverNodeProvider) {
-        this(transportFactory, Collections.singletonList(protocolFactory), serverNodeProvider);
+    public TClientConfig(TTransportFactory transportFactory, TProtocolFactory protocolFactory, ServerNodeDiscovery serverNodeDiscovery) {
+        this(transportFactory, Collections.singletonList(protocolFactory), serverNodeDiscovery);
     }
 
     public TClientConfig(TTransportFactory transportFactory, List<TProtocolFactory> protocolFactories, LoadBalancer loadBalancer) {
         this(transportFactory, protocolFactories, null, loadBalancer);
     }
 
-    public TClientConfig(TTransportFactory transportFactory, List<TProtocolFactory> protocolFactories, ServerNodeProvider serverNodeProvider) {
-        this(transportFactory, protocolFactories, serverNodeProvider, null);
+    public TClientConfig(TTransportFactory transportFactory, List<TProtocolFactory> protocolFactories, ServerNodeDiscovery serverNodeDiscovery) {
+        this(transportFactory, protocolFactories, serverNodeDiscovery, null);
     }
 
-    private TClientConfig(TTransportFactory transportFactory, List<TProtocolFactory> protocolFactories, ServerNodeProvider nodeProvider, LoadBalancer loadBalancer) {
+    private TClientConfig(TTransportFactory transportFactory, List<TProtocolFactory> protocolFactories, ServerNodeDiscovery nodeDiscovery, LoadBalancer loadBalancer) {
         this.transportFactory = transportFactory;
         this.protocolFactories = protocolFactories;
         this.protocolFactoryMap = checkAndResolveProtocolFactories(protocolFactories);
@@ -119,24 +119,24 @@ public class TClientConfig {
             throw new TTransportFactoryNotFoundException();
         }
 
-        if (loadBalancer == null && nodeProvider == null) {
-            throw new ThriftClientConfigException("LoadBalancer and ServerNodeProvider should be provide one!");
+        if (loadBalancer == null && nodeDiscovery == null) {
+            throw new ThriftClientConfigException("LoadBalancer and ServerNodeDiscovery should be provide one!");
         }
         if (loadBalancer != null) {
             this.loadBalancer = loadBalancer;
         } else {
-            this.loadBalancer = createDefaultLoadBalancer(nodeProvider);
+            this.loadBalancer = createDefaultLoadBalancer(nodeDiscovery);
         }
     }
 
     /**
      * 创建默认的 LoadBalancer
      *
-     * @param serverNodeProvider 返回服务节点提供者
+     * @param serverNodeDiscovery 返回服务节点提供者
      * @return 返回LoadBalancer
      */
-    private LoadBalancer createDefaultLoadBalancer(ServerNodeProvider serverNodeProvider) {
-        return new DefaultLoadBalancer(serverNodeProvider);
+    private LoadBalancer createDefaultLoadBalancer(ServerNodeDiscovery serverNodeDiscovery) {
+        return new DefaultLoadBalancer(serverNodeDiscovery);
     }
 
     /**

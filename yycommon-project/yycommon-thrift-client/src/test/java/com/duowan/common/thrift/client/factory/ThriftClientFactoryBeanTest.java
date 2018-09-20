@@ -3,8 +3,8 @@ package com.duowan.common.thrift.client.factory;
 import com.duowan.common.thrift.client.ClientType;
 import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
-import com.duowan.common.thrift.client.servernode.FixedServerNodeProvider;
-import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
+import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.service.TestService;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
@@ -58,9 +58,9 @@ public class ThriftClientFactoryBeanTest {
 
         ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
 
-        ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+        ServerNodeDiscovery serverNodeDiscovery = new FixedServerNodeDiscovery(Collections.singletonList(serverNode));
 
-        TClientConfig clientConfig = new TClientConfig(transportFactory, protocolFactory, serverNodeProvider);
+        TClientConfig clientConfig = new TClientConfig(transportFactory, protocolFactory, serverNodeDiscovery);
         clientConfig.setEnabledLogging(true);
 
         ThriftClientFactoryBean factoryBean = new ThriftClientFactoryBean(clientConfig, protocolFactory.router(), ClientType.IFACE);

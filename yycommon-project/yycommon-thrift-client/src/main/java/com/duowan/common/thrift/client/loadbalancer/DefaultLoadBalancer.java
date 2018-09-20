@@ -1,8 +1,8 @@
 package com.duowan.common.thrift.client.loadbalancer;
 
 import com.duowan.common.thrift.client.config.ThriftServerNode;
-import com.duowan.common.thrift.client.exception.ServerNodeProviderNotFoundException;
-import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.exception.ServerNodeDiscoveryNotFoundException;
+import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,22 +19,22 @@ public class DefaultLoadBalancer extends AbstractLoadBalancer {
 
     private Rule rule;
 
-    private ServerNodeProvider serverNodeProvider;
+    private ServerNodeDiscovery serverNodeDiscovery;
 
-    public DefaultLoadBalancer(ServerNodeProvider serverNodeProvider) {
-        this(serverNodeProvider, null);
+    public DefaultLoadBalancer(ServerNodeDiscovery serverNodeDiscovery) {
+        this(serverNodeDiscovery, null);
     }
 
-    public DefaultLoadBalancer(ServerNodeProvider serverNodeProvider, Rule rule) {
+    public DefaultLoadBalancer(ServerNodeDiscovery serverNodeDiscovery, Rule rule) {
         this.rule = rule;
         if (rule == null) {
             this.rule = new RoundRobinRule();
         }
         this.rule.setLoadBalancer(this);
-        if (null == serverNodeProvider) {
-            throw new ServerNodeProviderNotFoundException();
+        if (null == serverNodeDiscovery) {
+            throw new ServerNodeDiscoveryNotFoundException();
         }
-        this.serverNodeProvider = serverNodeProvider;
+        this.serverNodeDiscovery = serverNodeDiscovery;
     }
 
     @Override
@@ -47,9 +47,9 @@ public class DefaultLoadBalancer extends AbstractLoadBalancer {
         List<ThriftServerNode> nodeList = super.getAllServerNodes();
         if (nodeList == null || nodeList.isEmpty()) {
             try {
-                return serverNodeProvider.getServerNodes();
+                return serverNodeDiscovery.getServerNodes();
             } catch (Exception e) {
-                logger.warn("从ServerNodeProvider获取Thrift服务节点失败: " + e.getMessage(), e);
+                logger.warn("从ServerNodeDiscovery获取Thrift服务节点失败: " + e.getMessage(), e);
             }
         }
         return nodeList;

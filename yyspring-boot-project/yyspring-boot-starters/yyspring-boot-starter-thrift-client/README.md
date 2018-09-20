@@ -22,7 +22,7 @@ public class ThriftClientConfigurationExample {
                         new TMultiplexedCompactProtocolFactory(HiService.class, "hiService"),
                         new TMultiplexedCompactProtocolFactory(HelloService.class, "helloService")
                 ),
-                new FixedServerNodeProvider("127.0.0.1", 25000)
+                new FixedServerNodeDiscovery("127.0.0.1", 25000)
         );
     }
 
@@ -32,7 +32,7 @@ public class ThriftClientConfigurationExample {
         return new TClientConfig(
                 new TSocketTransportFactory(),
                 new TBinaryProtocolFactory(HiService.class),
-                new FixedServerNodeProvider("127.0.0.1", 25001)
+                new FixedServerNodeDiscovery("127.0.0.1", 25001)
         );
     }
 }

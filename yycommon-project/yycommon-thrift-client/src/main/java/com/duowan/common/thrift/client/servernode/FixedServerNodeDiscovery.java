@@ -11,15 +11,15 @@ import java.util.List;
  * @version 1.0
  * @since 2018/9/18 15:47
  */
-public class FixedServerNodeProvider implements ServerNodeProvider {
+public class FixedServerNodeDiscovery implements ServerNodeDiscovery {
 
     private final List<ThriftServerNode> serverNodeList;
 
-    public FixedServerNodeProvider(String host, int port) {
+    public FixedServerNodeDiscovery(String host, int port) {
         this.serverNodeList = new ArrayList<>(Collections.singletonList(new ThriftServerNode(host, port)));
     }
 
-    public FixedServerNodeProvider(List<ThriftServerNode> serverNodeList) {
+    public FixedServerNodeDiscovery(List<ThriftServerNode> serverNodeList) {
         this.serverNodeList = serverNodeList;
     }
 

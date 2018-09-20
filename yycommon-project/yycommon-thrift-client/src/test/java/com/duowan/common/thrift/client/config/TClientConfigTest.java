@@ -2,8 +2,8 @@ package com.duowan.common.thrift.client.config;
 
 import com.duowan.common.thrift.client.factory.TProtocolFactory;
 import com.duowan.common.thrift.client.factory.TTransportFactory;
-import com.duowan.common.thrift.client.servernode.FixedServerNodeProvider;
-import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
+import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.service.TestService;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
@@ -57,9 +57,9 @@ public class TClientConfigTest {
 
         ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
 
-        ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+        ServerNodeDiscovery serverNodeDiscovery = new FixedServerNodeDiscovery(Collections.singletonList(serverNode));
 
-        TClientConfig clientConfig = new TClientConfig(TRANSPORT_FACTORY, PROTOCOL_FACTORY, serverNodeProvider);
+        TClientConfig clientConfig = new TClientConfig(TRANSPORT_FACTORY, PROTOCOL_FACTORY, serverNodeDiscovery);
         clientConfig.setEnabledLogging(true);
 
         TProtocolFactory protocolFactory = clientConfig.getProtocolFactoryByRouter("test");

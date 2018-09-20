@@ -15,14 +15,14 @@ Thrift 方法调用拦截器，允许你进行扩展，提供三个方法，包�
 - 方法耗时拦截
 - 其他方面的拦截
 
-## ServerNodeProvider
-Thrift 服务节点提供者，充当服务节点发现的功能，你可以自由实现，比如集成到 Eureka，Consul，或者自己定义，本模块提供的是固定节点的提供者实现： <code>FixServerNodeProvider</code>  
+## ServerNodeDiscovery
+Thrift 服务节点提供者，充当服务节点发现的功能，你可以自由实现，比如集成到 Eureka，Consul，或者自己定义，本模块提供的是固定节点的提供者实现： <code>FixServerNodeDiscovery</code>  
 这个类适用于服务节点不变化或者几乎不会发生变化的场景，亦或者是使用域名 + 端口的形式
 
 ## LoadBalancer
 客户端负载均衡器，默认是使用轮询的方式，通过这个接口来获取 <code>*ThriftServerNode*</code> 对象，然后将这个节点交给连接池进行<code>TTransport</code>的创建以及相关<code>Client</code>对象的创建  
 
-默认的实现是 <code>*DefaultLoadBalancer*</code> 类，该类需要一个 <code>*ServerNodeProvider*</code> 接口实现类来提供全量的服务节点
+默认的实现是 <code>*DefaultLoadBalancer*</code> 类，该类需要一个 <code>*ServerNodeDiscovery*</code> 接口实现类来提供全量的服务节点
 
 ## ClientValidator
 客户端对象有效性验证，提供给连接池使用，连接池会有一个空闲检查功能，当池中对象空闲一定时间（默认 30 秒就会调用这个方法来检测这个客户端连接对象的有效性）
@@ -195,10 +195,10 @@ public static void singlePublishBySingle(int port) throws Exception {
 ```java
 public static void main(String[] args) {
     ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
-    ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+    ServerNodeDiscovery serverNodeDiscovery = new FixedServerNodeDiscovery(Collections.singletonList(serverNode));
     
     // 上述这种发布形式，应该使用 TSocketTransportFactory 和 TBinaryProtocolFactory
-    TClientConfig clientConfig = new TClientConfig(new TSocketTransportFactory(), new TBinaryProtocolFactory(), serverNodeProvider);
+    TClientConfig clientConfig = new TClientConfig(new TSocketTransportFactory(), new TBinaryProtocolFactory(), serverNodeDiscovery);
     
     ThriftClientFactoryBean factoryBean = new ThriftClientFactoryBean(clientConfig, null, ClientType.IFACE);
     // 注意这里只能使用 接口
@@ -218,7 +218,7 @@ public static void main(String[] args) {
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="transportFactory" class="com.duowan.common.thrift.client.factory.transport.TSocketTransportFactory"/>
-    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+    <bean id="serverNodeDiscovery" class="com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery">
         <constructor-arg>
             <list>
                 <bean class="com.duowan.common.thrift.client.config.ThriftServerNode">
@@ -238,7 +238,7 @@ public static void main(String[] args) {
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg index="2" ref="serverNodeProvider"/>
+        <constructor-arg index="2" ref="serverNodeDiscovery"/>
     </bean>
 
     <bean id="hiServiceIface" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
@@ -296,7 +296,7 @@ public static void singlePublishByRouter(int port, String hiServiceRouter, Strin
 ```java
 public static void main(String[] args) {
     ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
-    ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+    ServerNodeDiscovery serverNodeDiscovery = new FixedServerNodeDiscovery(Collections.singletonList(serverNode));
     
     // 上述这种发布形式，应该使用 TFastFramedTransportFactory 和 TMultiplexedCompactProtocolFactory
     TClientConfig clientConfig = new TClientConfig(
@@ -305,7 +305,7 @@ public static void main(String[] args) {
                     new TMultiplexedCompactProtocolFactory(HiService.class, "hiService"),
                     new TMultiplexedCompactProtocolFactory(HelloService.class, "helloService")
             ),
-            serverNodeProvider);
+            serverNodeDiscovery);
     
     ThriftClientFactoryBean hiServiceFactoryBean = new ThriftClientFactoryBean(clientConfig, "hiService", ClientType.IFACE);
     ThriftClientFactoryBean helloServiceFactoryBean = new ThriftClientFactoryBean(clientConfig, "helloService", ClientType.IFACE);
@@ -331,7 +331,7 @@ public static void main(String[] args) {
 
     <bean id="fastFramedTransportFactory" class="com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory"/>
 
-    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+    <bean id="serverNodeDiscovery" class="com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery">
         <constructor-arg index="0" value="127.0.0.1"/>
         <constructor-arg index="1" value="25000"/>
     </bean>
@@ -350,7 +350,7 @@ public static void main(String[] args) {
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg index="2" ref="serverNodeProvider"/>
+        <constructor-arg index="2" ref="serverNodeDiscovery"/>
     </bean>
 
     <bean id="hiService" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">

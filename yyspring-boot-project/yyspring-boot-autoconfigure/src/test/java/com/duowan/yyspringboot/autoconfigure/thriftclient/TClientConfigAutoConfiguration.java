@@ -5,11 +5,10 @@ import com.duowan.common.thrift.client.factory.protocol.TBinaryProtocolFactory;
 import com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory;
 import com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory;
 import com.duowan.common.thrift.client.factory.transport.TSocketTransportFactory;
-import com.duowan.common.thrift.client.servernode.FixedServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -28,7 +27,7 @@ public class TClientConfigAutoConfiguration {
                         new TMultiplexedCompactProtocolFactory(TestService.class, "test1"),
                         new TMultiplexedCompactProtocolFactory(TestService2.class, "test2")
                 ),
-                new FixedServerNodeProvider("127.0.0.1", 25000)
+                new FixedServerNodeDiscovery("127.0.0.1", 25000)
         );
 
         return clientConfig;
@@ -39,7 +38,7 @@ public class TClientConfigAutoConfiguration {
         TClientConfig clientConfig = new TClientConfig(
                 new TSocketTransportFactory(),
                 new TBinaryProtocolFactory(TestService.class),
-                new FixedServerNodeProvider("127.0.0.1", 25001)
+                new FixedServerNodeDiscovery("127.0.0.1", 25001)
         );
         return clientConfig;
     }

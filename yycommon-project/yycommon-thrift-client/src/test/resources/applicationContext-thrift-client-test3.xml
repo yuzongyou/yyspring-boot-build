@@ -5,7 +5,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="transportFactory" class="com.duowan.common.thrift.client.factory.transport.TSocketTransportFactory"/>
-    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+    <bean id="serverNodeDiscovery" class="com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery">
         <constructor-arg>
             <list>
                 <bean class="com.duowan.common.thrift.client.config.ThriftServerNode">
@@ -25,7 +25,7 @@
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg index="2" ref="serverNodeProvider"/>
+        <constructor-arg index="2" ref="serverNodeDiscovery"/>
     </bean>
 
     <bean id="hiServiceIface" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">

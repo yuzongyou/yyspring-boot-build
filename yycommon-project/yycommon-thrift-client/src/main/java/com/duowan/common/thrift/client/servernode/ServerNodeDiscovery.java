@@ -9,7 +9,7 @@ import java.util.List;
  * @version 1.0
  * @since 2018/9/18 15:45
  */
-public interface ServerNodeProvider {
+public interface ServerNodeDiscovery {
 
     /**
      * 获取Thrift 服务节点列表

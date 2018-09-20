@@ -7,7 +7,7 @@
     <bean id="fastFramedTransportFactory" class="com.duowan.common.thrift.client.factory.transport.TSocketTransportFactory">
     </bean>
 
-    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+    <bean id="serverNodeDiscovery" class="com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery">
         <constructor-arg>
             <list>
                 <bean class="com.duowan.common.thrift.client.config.ThriftServerNode">
@@ -27,7 +27,7 @@
                 </bean>
             </list>
         </constructor-arg>
-        <constructor-arg index="2" type="com.duowan.common.thrift.client.servernode.ServerNodeProvider" ref="serverNodeProvider"/>
+        <constructor-arg index="2" type="com.duowan.common.thrift.client.servernode.ServerNodeDiscovery" ref="serverNodeDiscovery"/>
         <property name="timeoutMillis" value="1000"/>
     </bean>
 

@@ -6,8 +6,8 @@ import com.duowan.common.thrift.client.factory.TProtocolFactory;
 import com.duowan.common.thrift.client.factory.TTransportFactory;
 import com.duowan.common.thrift.client.pool.PooledTransport;
 import com.duowan.common.thrift.client.pool.TransportPool;
-import com.duowan.common.thrift.client.servernode.FixedServerNodeProvider;
-import com.duowan.common.thrift.client.servernode.ServerNodeProvider;
+import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
+import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.common.thrift.client.util.ThriftUtil;
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TCompactProtocol;
@@ -63,9 +63,9 @@ public class TestServiceTest {
             }
         };
 
-        ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+        ServerNodeDiscovery serverNodeDiscovery = new FixedServerNodeDiscovery(Collections.singletonList(serverNode));
 
-        TClientConfig clientConfig = new TClientConfig(transportFactory, protocolFactory, serverNodeProvider);
+        TClientConfig clientConfig = new TClientConfig(transportFactory, protocolFactory, serverNodeDiscovery);
         clientConfig.setEnabledLogging(true);
         TransportPool pool = clientConfig.getPool();
 
