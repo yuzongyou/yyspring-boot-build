@@ -34,6 +34,7 @@
         <module>yycommon-redis</module>
         <module>yycommon-web</module>
         <module>yycommon-thrift-client</module>
+        <module>yycommon-thrift-server</module>
     </modules>
 
 </project>
