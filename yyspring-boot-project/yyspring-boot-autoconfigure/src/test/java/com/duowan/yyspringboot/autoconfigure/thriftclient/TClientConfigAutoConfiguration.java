@@ -19,19 +19,19 @@ import java.util.Arrays;
 @Configuration
 public class TClientConfigAutoConfiguration {
 
-    @Bean
-    public TClientConfig testServiceThriftClientConfig() {
-        TClientConfig clientConfig = new TClientConfig(
-                new TFastFramedTransportFactory(),
-                Arrays.asList(
-                        new TMultiplexedCompactProtocolFactory(TestService.class, "test1"),
-                        new TMultiplexedCompactProtocolFactory(TestService2.class, "test2")
-                ),
-                new FixedServerNodeDiscovery("127.0.0.1", 25000)
-        );
-
-        return clientConfig;
-    }
+//    @Bean
+//    public TClientConfig testServiceThriftClientConfig() {
+//        TClientConfig clientConfig = new TClientConfig(
+//                new TFastFramedTransportFactory(),
+//                Arrays.asList(
+//                        new TMultiplexedCompactProtocolFactory(TestService.class, "test1"),
+//                        new TMultiplexedCompactProtocolFactory(TestService2.class, "test2")
+//                ),
+//                new FixedServerNodeDiscovery("127.0.0.1", 25000)
+//        );
+//
+//        return clientConfig;
+//    }
 
     @Bean
     public TClientConfig testServiceThriftClientConfig2() {

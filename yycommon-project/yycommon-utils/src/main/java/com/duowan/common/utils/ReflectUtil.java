@@ -454,4 +454,22 @@ public abstract class ReflectUtil {
             return false;
         }
     }
+
+    public static <T> List<T> newInstancesByDefaultConstructor(Class<T> requireType, Set<String> classes) {
+
+        if (null == classes || classes.isEmpty()) {
+            return new ArrayList<>(0);
+        }
+
+        List<T> instanceList = new ArrayList<>();
+        for (String className : classes) {
+            if (StringUtils.isNotBlank(className)) {
+                T instance = ReflectUtil.newInstanceByDefaultConstructor(requireType, className.trim());
+                if (null != instance) {
+                    instanceList.add(instance);
+                }
+            }
+        }
+        return instanceList;
+    }
 }

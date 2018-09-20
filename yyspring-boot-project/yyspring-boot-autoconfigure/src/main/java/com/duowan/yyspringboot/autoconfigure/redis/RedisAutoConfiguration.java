@@ -10,18 +10,18 @@ import com.duowan.common.redis.register.RedisRegister;
 import com.duowan.common.redis.util.RedisRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
-import com.duowan.yyspring.boot.AppContext;
+import com.duowan.yyspringboot.autoconfigure.AbstractAutoConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Arvin
@@ -31,26 +31,18 @@ import java.util.Set;
 @Configuration
 @ConditionalOnClass({Redis.class})
 @EnableConfigurationProperties(RedisProperties.class)
-public class RedisAutoConfiguration {
-
-    private Environment environment;
+public class RedisAutoConfiguration extends AbstractAutoConfiguration {
 
     private RedisProperties redisProperties;
 
-    private BeanDefinitionRegistry registry;
-
-    public RedisAutoConfiguration(Environment environment, RedisProperties redisProperties) {
-        this.environment = environment;
+    public RedisAutoConfiguration(RedisProperties redisProperties) {
         this.redisProperties = redisProperties;
-        this.registry = AppContext.getBeanDefinitionRegistry();
-
-        this.doRedisAutoRegister();
     }
 
-    private void doRedisAutoRegister() {
-
-        List<RedisRegister> registerList = newInstances(RedisRegister.class, redisProperties.getRegisterClasses());
-        List<RedisDefinitionProvider> providerList = newInstances(RedisDefinitionProvider.class, redisProperties.getRegisterClasses());
+    @Override
+    protected void doAutoConfiguration(ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
+        List<RedisRegister> registerList = ReflectUtil.newInstancesByDefaultConstructor(RedisRegister.class, redisProperties.getRegisterClasses());
+        List<RedisDefinitionProvider> providerList = ReflectUtil.newInstancesByDefaultConstructor(RedisDefinitionProvider.class, redisProperties.getRegisterClasses());
 
         RedisRegisterUtil.registerRedisBeanDefinitions(
                 registerList,
@@ -60,7 +52,6 @@ public class RedisAutoConfiguration {
                 redisProperties.getPrimaryId(),
                 registry,
                 environment);
-
     }
 
     private List<RedisDefinition> lookupRedisDefList() {
@@ -143,21 +134,4 @@ public class RedisAutoConfiguration {
         return resultList;
     }
 
-    private <T> List<T> newInstances(Class<T> requireType, Set<String> classes) {
-
-        if (null == classes || classes.isEmpty()) {
-            return new ArrayList<>(0);
-        }
-
-        List<T> instanceList = new ArrayList<>();
-        for (String className : classes) {
-            if (StringUtils.isNotBlank(className)) {
-                T instance = ReflectUtil.newInstanceByDefaultConstructor(requireType, className.trim());
-                if (null != instance) {
-                    instanceList.add(instance);
-                }
-            }
-        }
-        return instanceList;
-    }
 }

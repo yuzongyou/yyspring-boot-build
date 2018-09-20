@@ -8,18 +8,18 @@ import com.duowan.common.jdbc.provider.pooltype.PoolProvider;
 import com.duowan.common.jdbc.util.JdbcRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
-import com.duowan.yyspring.boot.AppContext;
+import com.duowan.yyspringboot.autoconfigure.AbstractAutoConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Arvin
@@ -29,26 +29,18 @@ import java.util.Set;
 @Configuration
 @ConditionalOnClass({Jdbc.class})
 @EnableConfigurationProperties(JdbcProperties.class)
-public class JdbcAutoConfiguration {
-
-    private Environment environment;
+public class JdbcAutoConfiguration extends AbstractAutoConfiguration {
 
     private JdbcProperties jdbcProperties;
 
-    private BeanDefinitionRegistry registry;
-
-    public JdbcAutoConfiguration(Environment environment, JdbcProperties jdbcProperties) {
-        this.environment = environment;
+    public JdbcAutoConfiguration(JdbcProperties jdbcProperties) {
         this.jdbcProperties = jdbcProperties;
-        this.registry = AppContext.getBeanDefinitionRegistry();
-
-        this.doJdbcAutoRegister();
     }
 
-    private void doJdbcAutoRegister() {
-
-        List<DBProvider> dbProviderList = newInstances(DBProvider.class, jdbcProperties.getDbProviderClasses());
-        List<PoolProvider> poolProviderList = newInstances(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
+    @Override
+    protected void doAutoConfiguration(ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
+        List<DBProvider> dbProviderList = ReflectUtil.newInstancesByDefaultConstructor(DBProvider.class, jdbcProperties.getDbProviderClasses());
+        List<PoolProvider> poolProviderList = ReflectUtil.newInstancesByDefaultConstructor(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
 
         List<JdbcDefinition> jdbcDefinitionList = lookupJdbcDefList();
 
@@ -61,7 +53,6 @@ public class JdbcAutoConfiguration {
                 jdbcDefinitionList,
                 registry,
                 environment);
-
     }
 
     private List<JdbcDefinition> lookupJdbcDefList() {
@@ -125,21 +116,4 @@ public class JdbcAutoConfiguration {
 
     }
 
-    private <T> List<T> newInstances(Class<T> requireType, Set<String> classes) {
-
-        if (null == classes || classes.isEmpty()) {
-            return new ArrayList<>(0);
-        }
-
-        List<T> instanceList = new ArrayList<>();
-        for (String className : classes) {
-            if (StringUtils.isNotBlank(className)) {
-                T instance = ReflectUtil.newInstanceByDefaultConstructor(requireType, className.trim());
-                if (null != instance) {
-                    instanceList.add(instance);
-                }
-            }
-        }
-        return instanceList;
-    }
 }
