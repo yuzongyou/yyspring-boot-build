@@ -16,7 +16,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
 
     private AtomicInteger nextServerCyclicCounter;
 
-    private static Logger log = LoggerFactory.getLogger(com.netflix.loadbalancer.RoundRobinRule.class);
+    private static Logger log = LoggerFactory.getLogger(RoundRobinRule.class);
 
     public RoundRobinRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
