@@ -1,6 +1,5 @@
 # Thrift 客户端自动配置支持
-阅读本文档前，可以前往以下地址查看非 SpringBoot 环境下使用 Thrift 客户端的说明：  
-[yycommon-thrift-client](../../../yycommon-project/yycommon-thrift-client)
+<font color=#0099ff size="8" face="黑体">**阅读本文档前，可以前往以下地址查看非 SpringBoot 环境下使用 Thrift 客户端的说明：**[yycommon-thrift-client](../../../yycommon-project/yycommon-thrift-client)</font>
 
 
 本模块主要是集成到 SpringBoot 中使用，实现自动配置<code>Bean</code>和<code>@ThriftResource</code>支持:

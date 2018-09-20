@@ -3,74 +3,74 @@ Thrift Client 支持，连接池实现，自定义连接池对象验证，调用
 
 # 基本概念说明
 ## serviceClass
-serviceClass 指的是通过 Thrift IDL 文件生成的 Java 类，该类内部又定义了很多 Iface，AsyncIface，Client，AsyncClient 内部类，通常我们使用的时候就是创建了 Client， AsyncClient 对象；  
-本模块主要实现了 Client、Iface 接口类的实现并*按照*接口进行注入，AsyncIface、AsyncClient 后续会增加支持。
+<code>serviceClass</code> 指的是通过 Thrift IDL 文件生成的 Java 类，该类内部又定义了很多 <code>Iface</code>，<code>AsyncIface</code>，<code>Client</code>，<code>AsyncClient</code> 内部类，通常我们使用的时候就是创建了 Client， AsyncClient 对象；  
+本模块主要实现了 <code>Client</code>、<code>Iface</code> 接口类的实现并*按照*接口进行注入，<code>AsyncIface</code>、<code>AsyncClient</code> 后续会增加支持。
 
 ## ThriftServerNode
 Thrift 服务端节点抽象，包含节点主机地址、端口，通常提供一个IP:PORT
 
 ## ThriftInterceptor
 Thrift 方法调用拦截器，允许你进行扩展，提供三个方法，包括 *before()*, *afterReturning()*, *afterThrowing()*, 开发者可以选择合适的业务进行自己定制，比如：  
-- 拦截日志，默认有 ThriftLogginInterceptor， 如果你不喜欢这个实现可以自己设置
+- 拦截日志，默认有 <code>ThriftLoggingInterceptor</code>， 如果你不喜欢这个实现可以自己设置
 - 方法耗时拦截
 - 其他方面的拦截
 
 ## ServerNodeProvider
-Thrift 服务节点提供者，充当服务节点发现的功能，你可以自由实现，比如集成到 Eureka，Consul，或者自己定义，本模块提供的是固定节点的提供者实现： FixServerNodeProvider  
+Thrift 服务节点提供者，充当服务节点发现的功能，你可以自由实现，比如集成到 Eureka，Consul，或者自己定义，本模块提供的是固定节点的提供者实现： <code>FixServerNodeProvider</code>  
 这个类适用于服务节点不变化或者几乎不会发生变化的场景，亦或者是使用域名 + 端口的形式
 
 ## LoadBalancer
-客户端负载均衡器，默认是使用轮询的方式，通过这个接口来获取 *ThriftServerNode* 对象，然后将这个节点交给连接池进行TTransport的创建以及相关Client对象的创建  
+客户端负载均衡器，默认是使用轮询的方式，通过这个接口来获取 <code>*ThriftServerNode*</code> 对象，然后将这个节点交给连接池进行<code>TTransport</code>的创建以及相关<code>Client</code>对象的创建  
 
-默认的实现是 *DefaultLoadBalancer* 类，该类需要一个 *ServerNodeProvider* 接口实现类来提供全量的服务节点
+默认的实现是 <code>*DefaultLoadBalancer*</code> 类，该类需要一个 <code>*ServerNodeProvider*</code> 接口实现类来提供全量的服务节点
 
 ## ClientValidator
 客户端对象有效性验证，提供给连接池使用，连接池会有一个空闲检查功能，当池中对象空闲一定时间（默认 30 秒就会调用这个方法来检测这个客户端连接对象的有效性）
 
 ## ClientType
-客户端对象类型，有两种： Iface（同步）， AsyncIface（异步），目前仅仅支持 Iface 的同步类型
+客户端对象类型，有两种： <code>Iface（同步）</code>， <code>AsyncIface（异步）</code>，目前仅仅支持 <code>Iface</code> 的同步类型
 
 ## TClientPoolConfig
-Thrift 客户端连接池配置对象，继承于 commons2-pool
+Thrift 客户端连接池配置对象，继承于 <code>commons2-pool</code>
 
 ## TProtocolFactory
-TProtocol 工厂接口，这个非常重要，在接入 Thrift 服务的时候，首先需要了解服务端的发布形式，要了解服务端采用的是什么协议方式发布的，比如服务端可能直接使用TBinaryProtocol 协议发布，那么客户端也应该使用对应的协议，否则调用不到具体接口  
+<code>TProtocol</code> 工厂接口，这个非常重要，在接入 Thrift 服务的时候，首先需要了解服务端的发布形式，要了解服务端采用的是什么协议方式发布的，比如服务端可能直接使用 <code>TBinaryProtocol</code> 协议发布，那么客户端也应该使用对应的协议，否则调用不到具体接口  
 
 在本模块中提供了几个工厂方法：
 
 | **TProtocolFactory** | **说明** |
 | :--- | :------ |
-| TBinaryProtocolFactory | 主要针对服务端以 TBinaryProtocol 协议发布的服务 |
-| TCompactProtocolFactory | 主要针对服务端以 TCompactProtocol 协议发布的服务 |
-| TMultiplexedBinaryProtocolFactory | 主要针对服务端采用 TMultiplexed + TBinaryProtocol 方式发布的服务 |
-| TMultiplexedCompactProtocolFactory | 主要针对服务端采用 TMultiplexed + TCompactProtocol 方式发布的服务 |
+| <code>TBinaryProtocolFactory</code> | 主要针对服务端以 <code>TBinaryProtocol</code> 协议发布的服务 |
+| <code>TCompactProtocolFactory</code> | 主要针对服务端以 <code>TCompactProtocol</code> 协议发布的服务 |
+| <code>TMultiplexedBinaryProtocolFactory</code> | 主要针对服务端采用 <code>TMultiplexed + TBinaryProtocol</code> 方式发布的服务 |
+| <code>TMultiplexedCompactProtocolFactory</code> | 主要针对服务端采用 <code>TMultiplexed + TCompactProtocol</code> 方式发布的服务 |
 
 ## TTransportFactory
-TTransport 工厂接口，这个也很重要，在接入 Thrift 服务的时候，首先需要了解服务端的发布形式，要了解服务端采用的是什么工厂方式创建的 TTransport，客户端采用对应的方式创建才行。  
+<code>TTransport</code> 工厂接口，这个也很重要，在接入 Thrift 服务的时候，首先需要了解服务端的发布形式，要了解服务端采用的是什么工厂方式创建的 <code>TTransport</code>，客户端采用对应的方式创建才行。  
 
 在本模块中提供了几个工厂方法：
 
 | **TTransportFactory** | **说明** |
 | :--- | :------ |
-| TSocketTransportFactory | 对应服务端以默认 org.apache.thrift.transport.TTransportFactory 方式发布的服务 |
-| TFramedTransportFactory | 对应服务端以默认 org.apache.thrift.transport.TFastFramedTransport.Factory 方式发布的服务 |
-| TFastFramedTransportFactory | 对应服务端以默认 org.apache.thrift.transport.TFramedTransport.Factory 方式发布的服务 |
+| <code>TSocketTransportFactory</code> | 对应服务端以默认 <code>org.apache.thrift.transport.TTransportFactory</code> 方式发布的服务 |
+| <code>TFramedTransportFactory</code> | 对应服务端以默认 <code>org.apache.thrift.transport.TFastFramedTransport.Factory</code> 方式发布的服务 |
+| <code>TFastFramedTransportFactory</code> | 对应服务端以默认 <code>org.apache.thrift.transport.TFramedTransport.Factory</code> 方式发布的服务 |
 
 # How To Use
 本小节主要讲解如何使用的问题，流程基本都是一样的，要接入 Thrift 服务的一般流程是：
-1. 从 Thrift 服务提供方获取 Thrift 定义文件
-2. 咨询或阅读 Thrift 服务提供方，了解 Thrift 服务发布的形式，主要是了解服务端 TTransportFactory 和 TProtocol 是什么
-3. 根据 Thrift 服务端的发布协议，定制客户端的连接协议
+1. 从 <code>Thrift</code> 服务提供方获取 <code>Thrift</code> 定义文件
+2. 咨询或阅读 <code>Thrift</code> 服务提供方，了解 <code>Thrift</code> 服务发布的形式，主要是了解服务端 <code>TTransportFactory</code> 和 <code>TProtocol</code> 是什么
+3. 根据 <code>Thrift</code> 服务端的发布协议，定制客户端的连接协议
 4. 确定本服务的业务需求，比如监控、调用拦截等等
-5. 配置 TClientConfig Bean 对象
-6. 配置Bean com.duowan.common.thrift.client.ThriftResourceBeanPostProcessor， 用于实现 @ThriftResource 自动注入 Thrift 服务
+5. 配置 <code>TClientConfig</code> Bean 对象
+6. 配置Bean <code>com.duowan.common.thrift.client.ThriftResourceBeanPostProcessor</code>， 用于实现 <code>@ThriftResource</code> 自动注入 <code>Thrift</code> 服务
 7. 测试
 
 大体是上面的流程，下面将举例子来实际说明这个过程， 包含各种形式的Thrift服务发布和客户端配置
 
 ## TestService.thrift IDL 服务定义
 为了方便演示，我们从 编写 Thrift 协议文件开始，假设我们有如下协议文件：  
-HiService.thrift:
+<code>HiService.thrift</code>:
 ```thrift
 /**
 * 定义包名
@@ -94,7 +94,7 @@ service HiService {
 }
 ```
 
-HelloService.thrift:
+<code>HelloService.thrift</code>:
 ```thrift
 /**
 * 定义包名
@@ -143,8 +143,8 @@ thrift-0.10.0.exe -gen java HelloService.thrift
 然后你需要把这个生成的文件拷贝到执行的包路径下，如上图所示，应该把 *HiService.java*,*HelloService.java* 拷贝到 *com.duowan.thrift.service* 包下。
 
 ## 编写实现类
-实现接口 *HiService.Iface* 和 *HelloService.Iface*, 如下两个类：  
-**HiServiceImpl**:
+实现接口 <code>*HiService.Iface*</code> 和 <code>*HelloService.Iface*</code>, 如下两个类：  
+<code>**HiServiceImpl**:</code>
 ```java
 public class HiServiceImpl implements HiService.Iface {
     @Override
@@ -156,7 +156,7 @@ public class HiServiceImpl implements HiService.Iface {
     }
 }
 ```
-**HelloServiceImpl**:
+<code>**HelloServiceImpl**:</code>
 ```java
 public class HelloServiceImpl implements HelloService.Iface {
     @Override
@@ -169,9 +169,9 @@ public class HelloServiceImpl implements HelloService.Iface {
 }
 ```
 
-## 发布 Thrift 服务与客户端配置对照说明
+## 发布 <code>Thrift</code> 服务与客户端配置对照说明
 
-### 线程池 + 单个服务 + 默认TTransportFactory
+### 线程池 + 单个服务 + 默认<code>TTransportFactory</code>
 服务发布代码如下：  
 
 ```java
@@ -208,8 +208,8 @@ public static void main(String[] args) {
 }
 ```
 **对应客户端代码使用方式二：**
-直接使用 Spring XML 来描述，这个可能显得更加复杂一点：
-applicationContext.xml:
+直接使用 <code>Spring XML</code> 来描述，这个可能显得更加复杂一点：
+<code>applicationContext.xml:</code>
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -320,8 +320,8 @@ public static void main(String[] args) {
 ```
 
 **对应客户端代码使用方式二：**
-直接使用 Spring XML 来描述，这个可能显得更加复杂一点：
-applicationContext.xml:
+直接使用 <code>Spring XML</code> 来描述，这个可能显得更加复杂一点：
+<code>applicationContext.xml:</code>
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
