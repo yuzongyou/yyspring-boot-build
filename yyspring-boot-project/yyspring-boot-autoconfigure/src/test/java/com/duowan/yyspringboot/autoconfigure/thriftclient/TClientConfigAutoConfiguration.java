@@ -20,42 +20,27 @@ import java.util.Arrays;
 @Configuration
 public class TClientConfigAutoConfiguration {
 
-//    @Bean
-//    public TClientConfig testServiceThriftClientConfig() {
-//        TClientConfig clientConfig = new TClientConfig(
-//                new TFastFramedTransportFactory(),
-//                Arrays.asList(
-//                        new TMultiplexedCompactProtocolFactory(TestService.class, "test1"),
-//                        new TMultiplexedCompactProtocolFactory(TestService2.class, "test2")
-//                ),
-//                new FixedServerNodeProvider("127.0.0.1", 25000)
-//        );
-//
-//        return clientConfig;
-//    }
+    @Bean
+    public TClientConfig testServiceThriftClientConfig() {
+        TClientConfig clientConfig = new TClientConfig(
+                new TFastFramedTransportFactory(),
+                Arrays.asList(
+                        new TMultiplexedCompactProtocolFactory(TestService.class, "test1"),
+                        new TMultiplexedCompactProtocolFactory(TestService2.class, "test2")
+                ),
+                new FixedServerNodeProvider("127.0.0.1", 25000)
+        );
 
-//    @Bean(initMethod = "init")
-//    public ThriftService thriftService() {
-//        return new ThriftService();
-//    }
-
+        return clientConfig;
+    }
 
     @Bean
     public TClientConfig testServiceThriftClientConfig2() {
         TClientConfig clientConfig = new TClientConfig(
                 new TSocketTransportFactory(),
-                Arrays.asList(
-                        new TBinaryProtocolFactory(TestService.class)),
+                new TBinaryProtocolFactory(TestService.class),
                 new FixedServerNodeProvider("127.0.0.1", 25001)
         );
-
-        clientConfig.setEnabledLogging(true);
-
         return clientConfig;
-    }
-
-    @Bean(initMethod = "init")
-    public ThriftService3 thriftService3() {
-        return new ThriftService3();
     }
 }

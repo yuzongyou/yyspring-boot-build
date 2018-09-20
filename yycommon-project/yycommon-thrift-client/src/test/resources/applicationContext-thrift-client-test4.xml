@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fastFramedTransportFactory" class="com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory"/>
+
+    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+        <constructor-arg index="0" value="127.0.0.1"/>
+        <constructor-arg index="1" value="25000"/>
+    </bean>
+
+    <bean id="clientConfig" class="com.duowan.common.thrift.client.config.TClientConfig">
+        <constructor-arg index="0" ref="fastFramedTransportFactory"/>
+        <constructor-arg index="1">
+            <list>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.thrift.service.HiService"/>
+                    <constructor-arg index="1" value="hiService"/>
+                </bean>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.thrift.service.HelloService"/>
+                    <constructor-arg index="1" value="helloService"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2" ref="serverNodeProvider"/>
+    </bean>
+
+    <bean id="hiService" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="hiService"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <bean id="helloService" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="helloService"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <!-- @ThriftResource 处理类，这个Bean可以不需要，如果你不需要使用 @ThriftResource 的话 -->
+    <bean class="com.duowan.common.thrift.client.ThriftResourceBeanPostProcessor"/>
+
+</beans>

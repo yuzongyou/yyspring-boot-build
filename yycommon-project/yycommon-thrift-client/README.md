@@ -171,7 +171,7 @@ public class HelloServiceImpl implements HelloService.Iface {
 
 ## 发布 Thrift 服务与客户端配置对照说明
 
-### 单线程阻塞式 + 单个服务 + 默认TTransportFactory
+### 线程池 + 单个服务 + 默认TTransportFactory
 服务发布代码如下：  
 
 ```java
@@ -200,11 +200,11 @@ public static void main(String[] args) {
     // 上述这种发布形式，应该使用 TSocketTransportFactory 和 TBinaryProtocolFactory
     TClientConfig clientConfig = new TClientConfig(new TSocketTransportFactory(), new TBinaryProtocolFactory(), serverNodeProvider);
     
-    ThriftClientFactoryBean factoryBean = new ThriftClientFactoryBean(clientConfig, protocolFactory.router(), ClientType.IFACE);
+    ThriftClientFactoryBean factoryBean = new ThriftClientFactoryBean(clientConfig, null, ClientType.IFACE);
     // 注意这里只能使用 接口
-    HiService.Iface client = (HiService.Iface) factoryBean.getObject();
+    HiService.Iface hiService = (HiService.Iface) factoryBean.getObject();
     
-    System.out.println(client.sayHi("Arvin")); // 输出结果 "Hi, Arvin"
+    assertEquals(hiService.sayHi("Arvin"), "Hi, Arvin");
 }
 ```
 **对应客户端代码使用方式二：**
@@ -258,13 +258,155 @@ public void testInitByApplicationContext2() throws TException, InterruptedExcept
     HiService.Iface hiService = acx.getBean(HiService.Iface.class);
     //HiService.Iface hiService = acx.getBean("hiServiceIface", HiService.Iface.class);
 
-    assertEquals(client.sayHi("Arvin"), "Hi, Arvin");
+    assertEquals(hiService.sayHi("Arvin"), "Hi, Arvin");
 }
 ```
 
+### 线程池 + 一个端口同时发布多个服务
+服务发布代码如下：  
 
+```java
+public static void main(String[] args) throws Exception {
+    singlePublishByRouter(25000, "hiService", "helloService");
+}
+public static void singlePublishByRouter(int port, String hiServiceRouter, String helloServiceRouter) throws Exception {
+    TServerSocket serverTransport = new TServerSocket(port);
+    TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport);
+    
+    // 为了演示，这里采用不同的 Transport 和 TProtocol 工厂对象， 这一这里的不同会导致客户端的使用方式也不同
+    args.transportFactory(new TFastFramedTransport.Factory());
+    args.protocolFactory(new TCompactProtocol.Factory());
+    
+    // 同一个端口上发布两个服务，需要使用到 TMul
+    HiService.Processor<HiService.Iface> hiProcessor = new TestService.Processor<HiService.Iface>(new HiServiceImpl());
+    HelloService.Processor<HelloService.Iface> helloProcessor = new HelloService.Processor<HelloService.Iface>(new HelloServiceImpl());
+    
+    TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();
+    multiplexedProcessor.registerProcessor(hiServiceRouter, hiProcessor);
+    multiplexedProcessor.registerProcessor(helloServiceRouter, helloProcessor);
 
+    args.processor(multiplexedProcessor);
+    
+    TServer server = new TThreadPoolServer(args);
+    server.serve();
+}
+```
 
+**对应客户端代码使用方式一：**  
+```java
+public static void main(String[] args) {
+    ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);
+    ServerNodeProvider serverNodeProvider = new FixedServerNodeProvider(Collections.singletonList(serverNode));
+    
+    // 上述这种发布形式，应该使用 TFastFramedTransportFactory 和 TMultiplexedCompactProtocolFactory
+    TClientConfig clientConfig = new TClientConfig(
+            new TFastFramedTransportFactory(),  // 因为服务端使用的是 TFastFramedTransport.Factory
+            Arrays.asList( // 因为服务端采用了 TMultiplexedProcessor 来包装 TCompactProtocol
+                    new TMultiplexedCompactProtocolFactory(HiService.class, "hiService"),
+                    new TMultiplexedCompactProtocolFactory(HelloService.class, "helloService")
+            ),
+            serverNodeProvider);
+    
+    ThriftClientFactoryBean hiServiceFactoryBean = new ThriftClientFactoryBean(clientConfig, "hiService", ClientType.IFACE);
+    ThriftClientFactoryBean helloServiceFactoryBean = new ThriftClientFactoryBean(clientConfig, "helloService", ClientType.IFACE);
+    
+    // 注意这里只能使用 接口
+    HiService.Iface hiService = (HiService.Iface) hiServiceFactoryBean.getObject();
+    HelloService.Iface helloService = (HelloService.Iface) helloServiceFactoryBean.getObject();
+    
+    assertEquals(hiService.sayHi("Arvin"), "Hi, Arvin");
+    assertEquals(helloService.sayHello("Arvin"), "Hello, Arvin");
+}
+```
+
+**对应客户端代码使用方式二：**
+直接使用 Spring XML 来描述，这个可能显得更加复杂一点：
+applicationContext.xml:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fastFramedTransportFactory" class="com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory"/>
+
+    <bean id="serverNodeProvider" class="com.duowan.common.thrift.client.servernode.FixedServerNodeProvider">
+        <constructor-arg index="0" value="127.0.0.1"/>
+        <constructor-arg index="1" value="25000"/>
+    </bean>
+
+    <bean id="clientConfig" class="com.duowan.common.thrift.client.config.TClientConfig">
+        <constructor-arg index="0" ref="fastFramedTransportFactory"/>
+        <constructor-arg index="1">
+            <list>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.thrift.service.HiService"/>
+                    <constructor-arg index="1" value="hiService"/>
+                </bean>
+                <bean class="com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory">
+                    <constructor-arg index="0" value="com.duowan.thrift.service.HelloService"/>
+                    <constructor-arg index="1" value="helloService"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2" ref="serverNodeProvider"/>
+    </bean>
+
+    <bean id="hiService" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="hiService"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <bean id="helloService" class="com.duowan.common.thrift.client.factory.ThriftClientFactoryBean">
+        <constructor-arg index="0" ref="clientConfig"/>
+        <constructor-arg index="1" value="helloService"/>
+        <constructor-arg index="2" value="IFACE"/>
+    </bean>
+
+    <!-- @ThriftResource 处理类，这个Bean可以不需要，如果你不需要使用 @ThriftResource 的话 -->
+    <bean class="com.duowan.common.thrift.client.ThriftResourceBeanPostProcessor"/>
+
+</beans>
+```
+
+对应的 Java 测试代码如下：  
+```java
+@Test
+public void testInitByApplicationContext2() throws TException, InterruptedException {
+    ApplicationContext acx = new ClassPathXmlApplicationContext("classpath:/applicationContext.xml");
+
+    HiService.Iface hiService = acx.getBean(HiService.Iface.class);
+    //HiService.Iface hiService = acx.getBean("hiServiceIface", HiService.Iface.class);
+
+    assertEquals(hiService.sayHi("Arvin"), "Hi, Arvin");
+    
+    HelloService.Iface hiService = acx.getBean(HelloService.Iface.class);
+    //HelloService.Iface helloService = acx.getBean("helloService", HelloService.Iface.class);
+    
+    assertEquals(helloService.sayHello("Arvin"), "Hello, Arvin");
+}
+```
+或者使用 JUnit 测试：
+```java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration({"classpath:/applicationContext.xml"})
+public class ThriftXmlTest2 {
+
+    @ThriftResource("hiService")
+    private HiService.Iface hiService;
+
+    @ThriftResource("helloService")
+    private HelloService.Iface helloService;
+
+    @Test
+    public void test() throws TException {
+        assertEquals(helloService.sayHello("Arvin"), "Hello, Arvin");
+        assertEquals(hiService.sayHi("Arvin"), "Hi, Arvin");
+    }
+}
+```
 
 
 
