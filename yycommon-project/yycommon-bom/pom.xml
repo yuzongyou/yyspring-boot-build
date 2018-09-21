@@ -173,6 +173,12 @@
 
             <dependency>
                 <groupId>com.duowan</groupId>
+                <artifactId>yycommon-thrift-server</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
                 <artifactId>yycommon-jdbc</artifactId>
                 <version>${yyproject.version}</version>
             </dependency>

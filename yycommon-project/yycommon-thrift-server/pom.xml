@@ -22,13 +22,14 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-thrift-client</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.duowan</groupId>
-            <artifactId>yycommon-utils</artifactId>
+            <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
         </dependency>
 
         <dependency>

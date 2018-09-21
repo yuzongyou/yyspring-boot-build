@@ -106,6 +106,12 @@
 
         <dependency>
             <groupId>com.duowan</groupId>
+            <artifactId>yycommon-thrift-server</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
             <artifactId>yycommon-jdbc</artifactId>
             <optional>true</optional>
         </dependency>

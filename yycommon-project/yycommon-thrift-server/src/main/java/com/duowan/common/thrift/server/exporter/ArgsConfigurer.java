@@ -1,4 +1,4 @@
-package com.duowan.common.thrift.server.config;
+package com.duowan.common.thrift.server.exporter;
 
 import org.apache.thrift.server.TServer;
 

@@ -15,6 +15,11 @@
       "type": "java.lang.Boolean",
       "description": "log.error() 是否使用告警用的Appender，默认是.",
       "defaultValue": true
+    },
+    {
+      "name": "yyspring.thrift.exporter.type",
+      "type": "com.duowan.yyspringboot.autoconfigure.thriftserver.ExporterType",
+      "description": "Thrift Export Type, Default is null."
     }
   ]
 }

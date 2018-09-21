@@ -84,8 +84,11 @@ public abstract class RequestUtil {
                 return protocol;
             }
         }
-        String requestUrl = request.getRequestURL().toString();
-        return requestUrl.replaceFirst("(?i)^(https?)://.*", "$1");
+        String protocol = request.getScheme();
+        if (StringUtils.isBlank(protocol)) {
+            protocol = "http";
+        }
+        return protocol;
     }
 
     /**

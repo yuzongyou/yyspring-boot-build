@@ -1,5 +1,6 @@
 package com.duowan.common.thrift.server.annotation;
 
+import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
@@ -23,6 +24,10 @@ public @interface ThriftService {
      *
      * @return 返回路由路径
      */
+    @AliasFor("value")
     String router() default "";
+
+    @AliasFor("router")
+    String value() default "";
 
 }

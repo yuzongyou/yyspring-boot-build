@@ -6,6 +6,7 @@ import com.duowan.common.thrift.client.config.ThriftServerNode;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.service.TestService;
+import com.duowan.thrift.service.HiService;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
@@ -25,7 +26,7 @@ public class ThriftClientFactoryBeanTest {
     @Test
     public void getObject() throws Exception {
 
-        final String router = "test";
+        final String router = "HiService";
         //final String router = "test-thrift$com.icekredit.rpc.thrift.server.TestService$1.0";
 
         TTransportFactory transportFactory = new TTransportFactory() {
@@ -47,7 +48,7 @@ public class ThriftClientFactoryBeanTest {
 
             @Override
             public Class<?> getServiceClass() {
-                return TestService.class;
+                return HiService.class;
             }
 
             @Override
@@ -65,9 +66,9 @@ public class ThriftClientFactoryBeanTest {
 
         ThriftClientFactoryBean factoryBean = new ThriftClientFactoryBean(clientConfig, protocolFactory.router(), ClientType.IFACE);
 
-        TestService.Iface client = (TestService.Iface) factoryBean.getObject();
+        HiService.Iface client = (HiService.Iface) factoryBean.getObject();
 
-        String info = client.test(1000);
+        String info = client.sayHi("Arvin");
 
         System.out.println("GetInfo: " + info);
 
