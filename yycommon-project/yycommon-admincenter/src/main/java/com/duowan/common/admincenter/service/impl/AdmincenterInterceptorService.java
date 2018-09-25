@@ -108,7 +108,10 @@ public class AdmincenterInterceptorService extends HandlerInterceptorAdapter imp
 
         context.setPrivileges(privilegeContext.getPrivilegesByIds(admincenterDao.getPrivilegeIds(username)));
 
-        SessionUtil.set(request, key, context);
+        if (!context.getPrivileges().isEmpty()) {
+            // 有权限的时候才放到 session 中去
+            SessionUtil.set(request, key, context);
+        }
 
         return context;
     }
