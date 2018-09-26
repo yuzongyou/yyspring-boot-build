@@ -247,7 +247,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
     }
 
     @Override
-    public synchronized void export(List<Object> thriftServiceList, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException {
+    public synchronized void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException {
 
         String mode = joinToParentThread ? "JOIN_TO_PARENT_THREAD" : "NEW_THREAD";
 
@@ -266,7 +266,15 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
         }
 
         try {
-            this.thriftServiceWrapperList = resolveThriftServices(thriftServiceList, applicationContext, environment);
+            if (thriftServiceWrappers == null || thriftServiceWrappers.isEmpty()) {
+                logger.warn("没有提供 Thrift 服务实例对象，不需要发布Thrift服务！");
+                return;
+            }
+
+            this.thriftServiceWrapperList = thriftServiceWrappers;
+
+            // 检查是否具有重复的 Router
+            checkDuplicateRouter(this.thriftServiceWrapperList);
 
             T args = createArgs();
 
@@ -430,47 +438,14 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
         return new TNonblockingServerSocket(port);
     }
 
-    public List<ThriftServiceWrapper> resolveThriftServices(List<Object> thriftServiceList, ApplicationContext applicationContext, Environment environment) {
-        // 解析并进行合并
-        if (thriftServiceList == null || thriftServiceList.isEmpty()) {
-            logger.warn("Spring容器中没有找到使用了 @ThriftService 注解的实例列表！");
-            return Collections.emptyList();
-        }
-
-        List<ThriftServiceWrapper> itemList = new ArrayList<>(thriftServiceList.size());
-        for (Object thriftService : thriftServiceList) {
-            itemList.add(new ThriftServiceWrapper(thriftService));
-        }
-
-        List<ThriftServiceWrapper> customAppendedList = getCustomAppendedThriftServices(applicationContext, environment);
-
-        itemList = appendCustomThriftServices(itemList, customAppendedList);
-
-        this.thriftServiceWrapperList = itemList;
-
-        return itemList;
-    }
-
-    protected List<ThriftServiceWrapper> getCustomAppendedThriftServices(ApplicationContext applicationContext, Environment environment) {
-        return null;
-    }
-
-    protected List<ThriftServiceWrapper> appendCustomThriftServices(List<ThriftServiceWrapper> itemList, List<ThriftServiceWrapper> customAppendedList) {
-        if (itemList == null) {
-            return customAppendedList;
-        }
-        if (customAppendedList == null || customAppendedList.isEmpty()) {
-            return itemList;
-        }
-        List<ThriftServiceWrapper> finalList = new ArrayList<>(itemList);
-
-        for (ThriftServiceWrapper wrapper : customAppendedList) {
-            if (!finalList.contains(wrapper)) {
-                finalList.add(wrapper);
+    private void checkDuplicateRouter(List<ThriftServiceWrapper> itemList) {
+        Set<String> existsRouters = new HashSet<>();
+        for (ThriftServiceWrapper wrapper : itemList) {
+            if (existsRouters.contains(wrapper.getRouter())) {
+                throw new ThriftServiceExportException("具有相同的 Router[" + wrapper.getRouter() + "]，请检查是否编码重复！");
             }
+            existsRouters.add(wrapper.getRouter());
         }
-
-        return finalList;
     }
 
     protected boolean applyCustomArgs(T args, List<ThriftServiceWrapper> thriftServiceWrapperList) {

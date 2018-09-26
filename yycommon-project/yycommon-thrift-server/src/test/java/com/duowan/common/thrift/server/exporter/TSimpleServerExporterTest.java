@@ -74,8 +74,8 @@ public class TSimpleServerExporterTest {
 
         TSimpleServerExporter exporter = new TSimpleServerExporter(port, true);
         exporter.export(Arrays.asList(
-                new HelloServiceImpl(),
-                new HiServiceImpl()
+                new ThriftServiceWrapper(new HelloServiceImpl()),
+                new ThriftServiceWrapper(new HiServiceImpl())
         ), null, null);
 
     }
@@ -234,8 +234,8 @@ public class TSimpleServerExporterTest {
 
         TSimpleServerExporter exporter = new TSimpleServerExporter(port, false);
         exporter.export(Arrays.asList(
-                new HelloServiceImpl(),
-                new HiServiceImpl()
+                new ThriftServiceWrapper(new HelloServiceImpl()),
+                        new ThriftServiceWrapper(new HiServiceImpl())
         ), null, null);
 
         Thread.sleep(1000);

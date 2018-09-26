@@ -16,12 +16,12 @@ public interface ThriftServiceExporter {
     /**
      * 获取发布服务所使用的 TServer 对象
      *
-     * @param thriftServiceList  实例列表
-     * @param applicationContext Spring 上下文
-     * @param environment        环境变量
+     * @param thriftServiceWrappers 实例列表
+     * @param applicationContext    Spring 上下文
+     * @param environment           环境变量
      * @throws ThriftServiceExportException 服务导出错误
      */
-    void export(List<Object> thriftServiceList, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException;
+    void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException;
 
 
     /**

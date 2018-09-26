@@ -14,6 +14,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 /**
  * @author Arvin
  * @version 1.0
@@ -56,19 +59,30 @@ public class ThriftExporterBeanFactoryPostProcessor implements BeanDefinitionReg
                 exporterBeanName = beanDefinitionNames[0];
             }
 
+            // 注册默认的 Thrift 服务实例搜索Bean
+            registerDefaultThriftServiceSearcherBeanDefinition(registry, thriftServiceBeanDefinitionNames);
+
             // 注册 调度器
-            registerThriftServiceExporterSchedulerBeanDefinition(beanFactory, exporterBeanName, thriftServiceBeanDefinitionNames);
+            registerThriftServiceExporterSchedulerBeanDefinition(beanFactory, exporterBeanName);
 
         }
 
     }
 
-    private void registerThriftServiceExporterSchedulerBeanDefinition(BeanDefinitionRegistry registry, String exporterBeanName, String[] thriftServiceBeanNames) {
+    private void registerDefaultThriftServiceSearcherBeanDefinition(BeanDefinitionRegistry registry, String[] thriftServiceBeanDefinitionNames) {
+
+        GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+        beanDefinition.setBeanClass(BeanNamesThriftServiceSearcher.class);
+        beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, new HashSet<>(Arrays.asList(thriftServiceBeanDefinitionNames)));
+
+        registry.registerBeanDefinition(BeanNamesThriftServiceSearcher.class.getSimpleName(), beanDefinition);
+    }
+
+    private void registerThriftServiceExporterSchedulerBeanDefinition(BeanDefinitionRegistry registry, String exporterBeanName) {
 
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(ThriftServiceExporterScheduler.class);
         beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, new RuntimeBeanReference(exporterBeanName));
-        beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(1, thriftServiceBeanNames);
 
         registry.registerBeanDefinition(ThriftServiceExporterScheduler.class.getSimpleName(), beanDefinition);
     }
