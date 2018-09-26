@@ -28,8 +28,11 @@ public class ThriftClientAutoConfiguration extends AbstractAutoConfiguration {
     private List<TClientConfig> clientConfigList;
 
     @Autowired(required = false)
-    public ThriftClientAutoConfiguration(List<TClientConfig> clientConfigList) {
+    public ThriftClientAutoConfiguration(List<TClientConfig> clientConfigList, ApplicationContext applicationContext, Environment environment) {
+        super(applicationContext, environment);
         this.clientConfigList = clientConfigList;
+
+        doAutoConfiguration(applicationContext, getRegistry(), environment);
     }
 
     /**
@@ -43,7 +46,6 @@ public class ThriftClientAutoConfiguration extends AbstractAutoConfiguration {
         return new ThriftResourceBeanPostProcessor();
     }
 
-    @Override
     protected void doAutoConfiguration(ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
         if (null == clientConfigList || clientConfigList.isEmpty()) {
             logger.warn("引入了 yycommon-thrift-client, 但是沒有配置任何的 Thrift 服务, 请检查是否有缺漏或者多余引入！");

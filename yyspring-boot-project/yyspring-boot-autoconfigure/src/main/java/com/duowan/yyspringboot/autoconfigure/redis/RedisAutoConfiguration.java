@@ -35,11 +35,13 @@ public class RedisAutoConfiguration extends AbstractAutoConfiguration {
 
     private RedisProperties redisProperties;
 
-    public RedisAutoConfiguration(RedisProperties redisProperties) {
+    public RedisAutoConfiguration(RedisProperties redisProperties, ApplicationContext applicationContext, Environment environment) {
+        super(applicationContext, environment);
         this.redisProperties = redisProperties;
+
+        doAutoConfiguration(applicationContext, getRegistry(), environment);
     }
 
-    @Override
     protected void doAutoConfiguration(ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
         List<RedisRegister> registerList = ReflectUtil.newInstancesByDefaultConstructor(RedisRegister.class, redisProperties.getRegisterClasses());
         List<RedisDefinitionProvider> providerList = ReflectUtil.newInstancesByDefaultConstructor(RedisDefinitionProvider.class, redisProperties.getRegisterClasses());

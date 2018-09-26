@@ -33,11 +33,13 @@ public class JdbcAutoConfiguration extends AbstractAutoConfiguration {
 
     private JdbcProperties jdbcProperties;
 
-    public JdbcAutoConfiguration(JdbcProperties jdbcProperties) {
+    public JdbcAutoConfiguration(JdbcProperties jdbcProperties, ApplicationContext applicationContext, Environment environment) {
+        super(applicationContext, environment);
         this.jdbcProperties = jdbcProperties;
+
+        doAutoConfiguration(applicationContext, getRegistry(), environment);
     }
 
-    @Override
     protected void doAutoConfiguration(ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
         List<DBProvider> dbProviderList = ReflectUtil.newInstancesByDefaultConstructor(DBProvider.class, jdbcProperties.getDbProviderClasses());
         List<PoolProvider> poolProviderList = ReflectUtil.newInstancesByDefaultConstructor(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
