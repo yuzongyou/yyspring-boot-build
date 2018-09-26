@@ -12,8 +12,10 @@ import java.util.Set;
  * @version 1.0
  * @since 2018/9/13 12:36
  */
-@ConfigurationProperties(prefix = "yyspring.jdbc")
+@ConfigurationProperties(prefix = JdbcProperties.PROPERTIES_PREFIX)
 public class JdbcProperties {
+
+    public static final String PROPERTIES_PREFIX = "yyspring.jdbc";
 
     /**
      * 配置启用的 JDBC IDS， 中间用英文逗号分隔，如果为空或为配置都会启用所有的 JDBC, 允许使用通配符 '*'

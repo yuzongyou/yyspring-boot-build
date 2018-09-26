@@ -2,6 +2,7 @@ package com.duowan.yyspringboot.autoconfigure.redis;
 
 import com.duowan.common.redis.JedisExecutor;
 import com.duowan.common.redis.Redis;
+import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +20,8 @@ import java.util.Map;
  * @since 2018/9/13 20:04
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {RedisAutoConfiguration.class, VirtualDnsAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestPropertySource("classpath:/com/duowan/yyspringboot/autoconfigure/redis/application.properties")
+@SpringBootTest(classes = {RedisAutoConfigurationTest.class, RedisAutoConfiguration.class, VirtualDnsAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@YYSpringBootApplication(resourceLookupDirs = {"classpath:/com/duowan/yyspringboot/autoconfigure/redis/"})
 public class RedisAutoConfigurationTest {
 
     @Autowired

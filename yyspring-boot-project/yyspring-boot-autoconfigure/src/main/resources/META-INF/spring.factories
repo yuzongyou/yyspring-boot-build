@@ -2,6 +2,8 @@
 org.springframework.boot.SpringApplicationRunListener=\
 com.duowan.yyspringboot.autoconfigure.logging.YyLoggingSpringApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.apollo.ApolloConfigApplicationRunListener,\
+com.duowan.yyspringboot.autoconfigure.jdbc.JdbcConfigApplicationRunListener,\
+com.duowan.yyspringboot.autoconfigure.redis.RedisConfigApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebSpringApplicationRunListener
 
 # Auto Configure
@@ -10,10 +12,13 @@ com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.recachedns.ReCacheDnsAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.alarm.AlarmAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.innerip.InnerIpAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.ipowner.IpOwnerAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.YyErrorMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.udb.UdbAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.jdbc.JdbcAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.redis.RedisAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.timer.TimerScheduleAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.thriftclient.ThriftClientAutoConfiguration
+com.duowan.yyspringboot.autoconfigure.thriftclient.ThriftClientAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.thriftserver.ThriftServiceExporterAutoConfiguration

@@ -2,6 +2,7 @@ package com.duowan.yyspringboot.autoconfigure.jdbc;
 
 import com.duowan.common.jdbc.Jdbc;
 import com.duowan.common.utils.JsonUtil;
+import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +21,9 @@ import java.util.Map;
  * @since 2018/9/13 12:56
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {JdbcAutoConfiguration.class, VirtualDnsAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@TestPropertySource("classpath:/com/duowan/yyspringboot/autoconfigure/jdbc/application.properties")
+@SpringBootTest(classes = {JdbcAutoConfigurationTest.class, JdbcAutoConfiguration.class, VirtualDnsAutoConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@YYSpringBootApplication(resourceLookupDirs = {"classpath:/com/duowan/yyspringboot/autoconfigure/jdbc/"})
+//@TestPropertySource("classpath:/com/duowan/yyspringboot/autoconfigure/jdbc/application.properties")
 public class JdbcAutoConfigurationTest {
 
     @Autowired

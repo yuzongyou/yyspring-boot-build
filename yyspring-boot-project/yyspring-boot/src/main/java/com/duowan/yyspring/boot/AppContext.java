@@ -7,6 +7,7 @@ import com.duowan.common.utils.PathUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -141,6 +142,29 @@ public class AppContext {
     public static void setEnvironment(StandardEnvironment environment) {
         AppContext.environment = environment;
         initAppAllKeySet();
+    }
+
+    public static <T> T bindProperties(String prefix, Class<T> target) {
+        return bindProperties(null, prefix, target, null);
+    }
+
+    public static <T> T bindProperties(Environment environment, String prefix, Class<T> target) {
+        return bindProperties(environment, prefix, target, null);
+    }
+
+    public static <T> T bindProperties(String prefix, Class<T> target, T defaultProperties) {
+        return bindProperties(null, prefix, target, defaultProperties);
+    }
+
+    public static <T> T bindProperties(Environment environment, String prefix, Class<T> target, T defaultProperties) {
+        try {
+            if (environment == null) {
+                environment = AppContext.environment;
+            }
+            return Binder.get(environment).bind(prefix, target).get();
+        } catch (NoSuchElementException e) {
+            return defaultProperties;
+        }
     }
 
     public static String getProjectDir() {
@@ -625,6 +649,9 @@ public class AppContext {
             // 开发环境的话，允许直接通过项目目录计算项目代号，如果项目目录为空则通过模块目录计算
             if (StringUtils.isNotBlank(projectDir)) {
                 projectNo = getLastSepFolderName(projectDir);
+                if (isDev() && "trunk".equalsIgnoreCase(projectNo)) {
+                    projectNo = getLastSepFolderName(projectDir.replaceFirst("[/\\\\]trunk[/\\\\]?$", ""));
+                }
             } else if (StringUtils.isNotBlank(moduleDir)) {
                 projectNo = getLastSepFolderName(moduleDir);
             } else {

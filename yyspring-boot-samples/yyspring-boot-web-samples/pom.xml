@@ -53,5 +53,15 @@
             <artifactId>yyspring-boot-starter-alarm</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yyspring-boot-starter-ipowner</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yyspring-boot-starter-jdbc</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
