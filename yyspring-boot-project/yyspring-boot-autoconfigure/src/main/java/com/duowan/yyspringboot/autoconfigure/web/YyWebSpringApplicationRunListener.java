@@ -39,8 +39,7 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
         fixServerPort(environment);
     }
 
-    public static final String PROD_DEFAULT_SERVER_PORT = "8081";
-    public static final String TEST_DEFAULT_SERVER_PORT = "8080";
+    public static final String DEFAULT_SERVER_PORT = "8081";
 
     private static void fixServerPort(ConfigurableEnvironment environment) {
 
@@ -51,9 +50,8 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
         }
 
         if (!AppContext.getApplicationProperties().containsKey(serverPortKey)) {
-            // 默认使用 PROD:8081, TEST:8080
-            AppContext.getApplicationProperties().put(serverPortKey,
-                    AppContext.isProd() ? PROD_DEFAULT_SERVER_PORT : TEST_DEFAULT_SERVER_PORT);
+            // 默认使用 PROD:8081
+            AppContext.getApplicationProperties().put(serverPortKey, DEFAULT_SERVER_PORT);
         }
     }
 
