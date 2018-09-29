@@ -16,13 +16,10 @@
 
     <properties>
         <!-- change java version -->
-        <java.version>1.8</java.version>
+        <java.version>1.7</java.version>
         <skip.it>true</skip.it>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <source.version>1.8</source.version>
-        <target.version>1.8</target.version>
-        <compiler.version>1.8</compiler.version>
 
         <junit.version>4.12</junit.version>
         <mockito.version>2.10.0</mockito.version>
@@ -261,9 +258,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${source.version}</source>
-                    <target>${target.version}</target>
-                    <compilerVersion>${compiler.version}</compilerVersion>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <compilerVersion>${java.version}</compilerVersion>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>

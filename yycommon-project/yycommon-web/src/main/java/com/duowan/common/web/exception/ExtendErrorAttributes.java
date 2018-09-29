@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -37,9 +39,12 @@ public class ExtendErrorAttributes extends DefaultErrorAttributes implements Err
      */
     private List<ExceptionViewResolver> sortExceptionViewResolverList(List<ExceptionViewResolver> exceptionViewResolverList) {
 
-        exceptionViewResolverList.sort((o1, o2) -> {
-            int ret = o1.getOrder() - o2.getOrder();
-            return ret == 0 ? 0 : ret > 0 ? 1 : -1;
+        Collections.sort(exceptionViewResolverList, new Comparator<ExceptionViewResolver>() {
+            @Override
+            public int compare(ExceptionViewResolver o1, ExceptionViewResolver o2) {
+                int ret = o1.getOrder() - o2.getOrder();
+                return ret == 0 ? 0 : ret > 0 ? 1 : -1;
+            }
         });
 
         return exceptionViewResolverList;

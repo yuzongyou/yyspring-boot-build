@@ -99,7 +99,7 @@ public class THsHaServerExporter extends AbstractThriftServiceExporter<THsHaServ
                 maxWorkerThreads,
                 keepAliveMinute,
                 TimeUnit.MINUTES,
-                new LinkedBlockingDeque<>(workerQueueCapacity)));
+                new LinkedBlockingDeque<Runnable>(workerQueueCapacity)));
 
         return true;
     }

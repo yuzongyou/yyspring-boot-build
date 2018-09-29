@@ -16,7 +16,7 @@ public class BeanNamesThriftServiceSearcher implements ThriftServiceSearcher {
     private final Set<String> beanNames;
 
     public BeanNamesThriftServiceSearcher(Collection<String> beanNames) {
-        this.beanNames = beanNames == null ? new HashSet<>() : new HashSet<>(beanNames);
+        this.beanNames = beanNames == null ? new HashSet<String>() : new HashSet<>(beanNames);
     }
 
     @Override

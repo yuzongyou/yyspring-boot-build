@@ -37,16 +37,12 @@ public interface TProtocolFactory {
      *
      * @return 路由ID
      */
-    default String router() {
-        return null;
-    }
+    String router();
 
     /**
      * 支持的客户端类型
      *
      * @return 默认是支持 Iface 接口
      */
-    default Set<ClientType> clientTypes() {
-        return new HashSet<>(Collections.singletonList(ClientType.IFACE));
-    }
+    Set<ClientType> clientTypes();
 }

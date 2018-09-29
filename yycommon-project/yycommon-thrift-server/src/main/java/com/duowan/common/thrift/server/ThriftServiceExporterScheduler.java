@@ -9,10 +9,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Arvin
@@ -62,7 +59,9 @@ public class ThriftServiceExporterScheduler implements ApplicationContextAware, 
         try {
             SelfOnlyThriftServiceSearcher searcher = applicationContext.getBean(SelfOnlyThriftServiceSearcher.class);
             if (null != searcher) {
-                return Collections.singletonList(searcher);
+                List<ThriftServiceSearcher> list = new ArrayList<>(1);
+                list.add(searcher);
+                return list;
             }
         } catch (BeansException ignored) {
         }

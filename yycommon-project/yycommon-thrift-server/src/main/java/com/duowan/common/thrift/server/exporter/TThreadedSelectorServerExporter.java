@@ -129,7 +129,7 @@ public class TThreadedSelectorServerExporter extends AbstractThriftServiceExport
                 maxWorkerThreads,
                 keepAliveMinute,
                 TimeUnit.MINUTES,
-                new LinkedBlockingDeque<>(workerQueueCapacity)));
+                new LinkedBlockingDeque<Runnable>(workerQueueCapacity)));
 
         return true;
     }

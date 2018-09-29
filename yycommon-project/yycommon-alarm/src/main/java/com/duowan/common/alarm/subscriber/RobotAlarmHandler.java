@@ -40,9 +40,12 @@ public class RobotAlarmHandler {
 
         Exception exception = null;
         try {
-            RetryUtil.execute(3, 1000, true, () -> {
-                HttpUtil.doPost(REPORT_URL, paramsMap, null, 3000, 3000);
-                return null;
+            RetryUtil.execute(3, 1000, true, new RetryUtil.Executor<Object>() {
+                @Override
+                public Object execute() throws Exception {
+                    HttpUtil.doPost(REPORT_URL, paramsMap, null, 3000, 3000);
+                    return null;
+                }
             });
         } catch (Exception e) {
             exception = e;

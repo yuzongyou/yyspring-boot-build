@@ -98,7 +98,9 @@ public class ThriftClientFactoryBean implements FactoryBean, InitializingBean {
      */
     private List<ThriftInterceptor> addLoggingInterceptorToFirst(List<ThriftInterceptor> interceptors) {
         if (interceptors == null || interceptors.isEmpty()) {
-            return new ArrayList<>(Collections.singletonList(new ThriftLoggingInterceptor()));
+            List<ThriftInterceptor> list = new ArrayList<>(1);
+            list.add(new ThriftLoggingInterceptor());
+            return list;
         }
         List<ThriftInterceptor> interceptorList = new ArrayList<>(interceptors.size() + 1);
         interceptorList.add(new ThriftLoggingInterceptor());
@@ -120,7 +122,7 @@ public class ThriftClientFactoryBean implements FactoryBean, InitializingBean {
         return Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{getObjectType()}, new InvocationHandler() {
 
             @Override
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
 
                 int tryTimes = clientConfig.getDefaultRetryTimes();
                 if (tryTimes < 0) {

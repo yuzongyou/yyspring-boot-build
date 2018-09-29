@@ -117,6 +117,22 @@
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Udb cookie parnerInfo decrypt -->
+        <dependency>
+            <groupId>com.duowan.udb</groupId>
+            <artifactId>udb_partner_client</artifactId>
+            <version>1.4</version>
+        </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>yy-internal-releases</id>
+            <name>yy internal releases</name>
+            <url>http://maven.app.duowan.com:8081/nexus/content/repositories/releases</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
 </project>

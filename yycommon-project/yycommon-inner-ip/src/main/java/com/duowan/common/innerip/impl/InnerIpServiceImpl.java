@@ -92,14 +92,17 @@ public class InnerIpServiceImpl implements InnerIpService {
         } finally {
             // 没有调度执行，调度任务刷新缓存
             if (!hadScheduled) {
-                new Thread(() -> {
-                    while (true) {
-                        try {
-                            Thread.sleep(getRefreshInterval() * 1000);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (true) {
+                            try {
+                                Thread.sleep(getRefreshInterval() * 1000);
 
-                            initBySync();
+                                initBySync();
 
-                        } catch (Exception e) {
+                            } catch (Exception ignored) {
+                            }
                         }
                     }
                 }).start();

@@ -99,9 +99,12 @@ public class DnsCacheUtil {
                 boolean isForever = InetAddressCachePolicy.FOREVER == policy;
                 if (isForever || isNever) {
                     // 虽然是永久，但是不排除中途变了，加个调度
-                    dnsRefreshExecutor.schedule(() -> {
-                        synchronized (hadScheduleHosts) {
-                            hadScheduleHosts.remove(host);
+                    dnsRefreshExecutor.schedule(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (hadScheduleHosts) {
+                                hadScheduleHosts.remove(host);
+                            }
                         }
                     }, 20000, TimeUnit.MILLISECONDS);
                     return;
@@ -112,10 +115,14 @@ public class DnsCacheUtil {
                 long scheduleExpireMillis = expireMillis - getMaxDnsMillis();
                 scheduleExpireMillis = scheduleExpireMillis < 1000 ? 1000 : scheduleExpireMillis;
 
-                scheduleFutureList.add(dnsRefreshExecutor.scheduleAtFixedRate(() -> {
-                    try {
-                        refreshDns(host);
-                    } catch (Exception ignored) {
+                scheduleFutureList.add(dnsRefreshExecutor.scheduleAtFixedRate(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+                            refreshDns(host);
+                        } catch (Exception ignored) {
+                        }
                     }
                 }, scheduleExpireMillis, scheduleExpireMillis, TimeUnit.MILLISECONDS));
             }
@@ -131,11 +138,14 @@ public class DnsCacheUtil {
             @Override
             public void beforePut(final String host, final Object object) {
                 try {
-                    executor.execute(() -> {
-                        try {
-                            DNS_START_TIME_MAP.put(host, System.currentTimeMillis());
-                            scheduleDnsAutoRefreshCache(host, false);
-                        } catch (Exception ignored) {
+                    executor.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                DNS_START_TIME_MAP.put(host, System.currentTimeMillis());
+                                scheduleDnsAutoRefreshCache(host, false);
+                            } catch (Exception ignored) {
+                            }
                         }
                     });
                 } catch (Exception ignored) {

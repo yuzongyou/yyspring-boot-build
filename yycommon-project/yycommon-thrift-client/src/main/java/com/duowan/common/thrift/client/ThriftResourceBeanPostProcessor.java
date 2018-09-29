@@ -53,7 +53,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
         return bean;
     }
 
-    private void injectBeanByMethod(Class<?> targetClass, Object targetBean) {
+    private void injectBeanByMethod(Class<?> targetClass, final Object targetBean) {
         ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
             @Override
             public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
@@ -69,7 +69,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
                 }
 
                 Class<?> fieldType = paramTypes[0];
-                Object refBean = lookupThriftBean(thriftResource, fieldType, method.getParameters()[0].getName());
+                Object refBean = lookupThriftBean(thriftResource, fieldType, null);
                 if (refBean == null) {
                     return;
                 }
@@ -85,7 +85,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
 
     }
 
-    private void injectBeanByField(Class<?> targetClass, Object targetBean) {
+    private void injectBeanByField(Class<?> targetClass, final Object targetBean) {
 
         ReflectionUtils.doWithFields(targetClass, new ReflectionUtils.FieldCallback() {
             @Override
@@ -150,9 +150,11 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
         if (null != bean) {
             return bean;
         }
-        bean = getBeanByName(secondBeanName);
-        if (null != bean) {
-            return bean;
+        if (null != secondBeanName) {
+            bean = getBeanByName(secondBeanName);
+            if (null != bean) {
+                return bean;
+            }
         }
         if (!beanType.isInterface()) {
             beanType = beanType.getInterfaces()[0];
