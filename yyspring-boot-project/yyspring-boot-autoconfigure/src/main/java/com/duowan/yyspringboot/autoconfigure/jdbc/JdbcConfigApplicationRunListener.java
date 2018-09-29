@@ -27,8 +27,18 @@ import java.util.Map;
  */
 public class JdbcConfigApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
+    private boolean needAutoConfigurer = false;
+
     public JdbcConfigApplicationRunListener(SpringApplication application, String[] args) {
         super(application, args);
+        this.needAutoConfigurer = isClassesImported(
+                "com.duowan.common.jdbc.Jdbc"
+        );
+    }
+
+    @Override
+    protected boolean needAutoConfigurer() {
+        return needAutoConfigurer;
     }
 
     @Override

@@ -19,23 +19,38 @@ import java.util.List;
  */
 public class YyWebSpringApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
+    private boolean needAutoConfigurer;
+
     public YyWebSpringApplicationRunListener(SpringApplication application, String[] args) {
         super(application, args);
+        needAutoConfigurer = isClassesImported(
+                "javax.servlet.Servlet",
+                "org.springframework.web.servlet.DispatcherServlet",
+                "com.duowan.common.web.YyServletContextInitializer",
+                "com.duowan.common.web.error.YyBasicErrorController"
+        );
     }
 
     @Override
-    public void starting() {
+    protected void doStarting() {
         WebApplicationType webApplicationType = getApplication().getWebApplicationType();
         if (WebApplicationType.REACTIVE.equals(webApplicationType) || WebApplicationType.SERVLET.equals(webApplicationType)) {
             if (AppContext.isDev()) {
                 WebPrepareUtil.prepareStaticResourceLocations(AppContext.getEnvironment(), AppContext.getModuleDir());
                 WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getEnvironment(), AppContext.getModuleDir());
             }
+        } else {
+            needAutoConfigurer = false;
         }
     }
 
     @Override
-    public void environmentPrepared(ConfigurableEnvironment environment) {
+    protected boolean needAutoConfigurer() {
+        return needAutoConfigurer;
+    }
+
+    @Override
+    public void doEnvironmentPrepared(ConfigurableEnvironment environment) {
         fixServerPort(environment);
     }
 
@@ -56,7 +71,7 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
     }
 
     @Override
-    public void started(ConfigurableApplicationContext context) {
+    protected void doStarted(ConfigurableApplicationContext context) {
         Logger webPrepareUtilLogger = LoggerFactory.getLogger(YyWebSpringApplicationRunListener.class);
         List<String> infoList = WebPrepareUtil.getInitInfo();
         for (String info : infoList) {

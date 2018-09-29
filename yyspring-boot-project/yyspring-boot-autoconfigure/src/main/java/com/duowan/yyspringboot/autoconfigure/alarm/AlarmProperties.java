@@ -7,9 +7,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @version 1.0
  * @since 2018/9/7 20:01
  */
-@ConfigurationProperties(prefix = "yyspring.alarm")
+@ConfigurationProperties(prefix = AlarmProperties.PROPERTIES_PREFIX)
 public class AlarmProperties {
 
+    public static final String PROPERTIES_PREFIX = "yyspring.alarm";
     /**
      * 是否需要真的发送告警信息, 默认只有生产环境才会发送
      **/

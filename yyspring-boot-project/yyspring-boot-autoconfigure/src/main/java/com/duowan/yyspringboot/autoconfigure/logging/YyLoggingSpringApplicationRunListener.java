@@ -1,14 +1,11 @@
 package com.duowan.yyspringboot.autoconfigure.logging;
 
 import com.duowan.yyspring.boot.AppContext;
+import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
 import com.duowan.yyspringboot.autoconfigure.logging.log4j2.Log4jYyDefaultLoggingConfigurer;
 import com.duowan.yyspringboot.autoconfigure.logging.logback.LogbackYyDefaultLoggingConfigurer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.ClassUtils;
 
@@ -17,19 +14,19 @@ import org.springframework.util.ClassUtils;
  * @version 1.0
  * @since 2018/9/10 14:32
  */
-public class YyLoggingSpringApplicationRunListener implements SpringApplicationRunListener, Ordered {
-
-    private final SpringApplication application;
-
-    private final String[] args;
+public class YyLoggingSpringApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
     public YyLoggingSpringApplicationRunListener(SpringApplication application, String[] args) {
-        this.application = application;
-        this.args = args;
+        super(application, args);
     }
 
     @Override
-    public void starting() {
+    protected boolean needAutoConfigurer() {
+        return true;
+    }
+
+    @Override
+    protected void doStarting() {
 
         StandardEnvironment environment = AppContext.getEnvironment();
         String loggingFile = environment.getProperty(LoggingConstants.CONFIG_PROPERTY);
@@ -44,7 +41,7 @@ public class YyLoggingSpringApplicationRunListener implements SpringApplicationR
         }
 
         // 配置默认日志
-        configurer.configure(environment, this.args);
+        configurer.configure(environment, this.getArgs());
     }
 
     private YyDefaultLoggingConfigurer deduceRuntimeDefaultLoggingConfigurer(ClassLoader classLoader) {
@@ -58,39 +55,5 @@ public class YyLoggingSpringApplicationRunListener implements SpringApplicationR
         }
 
         return null;
-    }
-
-    @Override
-    public void environmentPrepared(ConfigurableEnvironment environment) {
-    }
-
-    @Override
-    public void contextPrepared(ConfigurableApplicationContext context) {
-
-    }
-
-    @Override
-    public void contextLoaded(ConfigurableApplicationContext context) {
-
-    }
-
-    @Override
-    public void started(ConfigurableApplicationContext context) {
-
-    }
-
-    @Override
-    public void running(ConfigurableApplicationContext context) {
-
-    }
-
-    @Override
-    public void failed(ConfigurableApplicationContext context, Throwable exception) {
-
-    }
-
-    @Override
-    public int getOrder() {
-        return 2;
     }
 }

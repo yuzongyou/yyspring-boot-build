@@ -29,8 +29,16 @@ import java.util.Map;
  */
 public class RedisConfigApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
+    private boolean needAutoConfigurer = false;
+
     public RedisConfigApplicationRunListener(SpringApplication application, String[] args) {
         super(application, args);
+        this.needAutoConfigurer = isClassesImported("com.duowan.common.redis.Redis");
+    }
+
+    @Override
+    protected boolean needAutoConfigurer() {
+        return needAutoConfigurer;
     }
 
     @Override

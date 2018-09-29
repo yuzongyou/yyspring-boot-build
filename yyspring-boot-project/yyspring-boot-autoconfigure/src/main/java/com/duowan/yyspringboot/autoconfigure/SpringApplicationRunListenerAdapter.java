@@ -9,6 +9,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.util.ClassUtils;
 
 import java.util.NoSuchElementException;
 
@@ -17,7 +18,10 @@ import java.util.NoSuchElementException;
  * @version 1.0
  * @since 2018/9/26 15:34
  */
-public class SpringApplicationRunListenerAdapter implements SpringApplicationRunListener, Ordered {
+public abstract class SpringApplicationRunListenerAdapter implements SpringApplicationRunListener, Ordered {
+
+    protected static final int DEFAULT_ORDER = 100;
+    protected static final int YYCORE_DEFAULT_ORDER = 1;
 
     private final SpringApplication application;
 
@@ -30,6 +34,8 @@ public class SpringApplicationRunListenerAdapter implements SpringApplicationRun
         this.args = args;
     }
 
+    protected abstract boolean needAutoConfigurer();
+
     public SpringApplication getApplication() {
         return application;
     }
@@ -39,13 +45,24 @@ public class SpringApplicationRunListenerAdapter implements SpringApplicationRun
     }
 
     @Override
-    public void starting() {
+    public final void starting() {
+        if (needAutoConfigurer()) {
+            doStarting();
+        }
+    }
 
+    protected void doStarting() {
     }
 
     @Override
-    public void environmentPrepared(ConfigurableEnvironment environment) {
+    public final void environmentPrepared(ConfigurableEnvironment environment) {
         this.environment = environment;
+        if (needAutoConfigurer()) {
+            doEnvironmentPrepared(environment);
+        }
+    }
+
+    protected void doEnvironmentPrepared(ConfigurableEnvironment environment) {
     }
 
     private BeanDefinitionRegistry registry;
@@ -61,7 +78,9 @@ public class SpringApplicationRunListenerAdapter implements SpringApplicationRun
             }
         }
 
-        this.doContextPrepared(context, registry, environment);
+        if (needAutoConfigurer()) {
+            this.doContextPrepared(context, registry, environment);
+        }
     }
 
     protected void doContextPrepared(ConfigurableApplicationContext context, BeanDefinitionRegistry registry, ConfigurableEnvironment environment) {
@@ -88,31 +107,64 @@ public class SpringApplicationRunListenerAdapter implements SpringApplicationRun
     }
 
     @Override
-    public void contextLoaded(ConfigurableApplicationContext context) {
+    public final void contextLoaded(ConfigurableApplicationContext context) {
+        if (needAutoConfigurer()) {
+            doContextLoaded(context);
+        }
+    }
+
+    protected void doContextLoaded(ConfigurableApplicationContext context) {
     }
 
     @Override
-    public void started(ConfigurableApplicationContext context) {
+    public final void started(ConfigurableApplicationContext context) {
+        if (needAutoConfigurer()) {
+            doStarted(context);
+        }
+    }
 
+    protected void doStarted(ConfigurableApplicationContext context) {
     }
 
     @Override
-    public void running(ConfigurableApplicationContext context) {
+    public final void running(ConfigurableApplicationContext context) {
+        if (needAutoConfigurer()) {
+            doRunning(context);
+        }
+    }
 
+    protected void doRunning(ConfigurableApplicationContext context) {
     }
 
     @Override
-    public void failed(ConfigurableApplicationContext context, Throwable exception) {
+    public final void failed(ConfigurableApplicationContext context, Throwable exception) {
+        if (needAutoConfigurer()) {
+            doFailed(context, exception);
+        }
+    }
 
+    protected void doFailed(ConfigurableApplicationContext context, Throwable exception) {
     }
 
     @Override
     public final int getOrder() {
         // 必须在 com.duowan.yyspring.boot.YySpringApplicationRunListener 之后执行
-        return 2 + order();
+        return DEFAULT_ORDER + order();
     }
 
     protected int order() {
         return 0;
+    }
+
+    protected boolean isClassesImported(String... classes) {
+        if (classes == null || classes.length < 1) {
+            return true;
+        }
+        for (String clazz : classes) {
+            if (!ClassUtils.isPresent(clazz, Thread.currentThread().getContextClassLoader())) {
+                return false;
+            }
+        }
+        return true;
     }
 }

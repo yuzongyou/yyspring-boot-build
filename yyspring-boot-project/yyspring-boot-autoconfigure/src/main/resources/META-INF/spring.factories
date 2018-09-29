@@ -1,7 +1,9 @@
 # Initializers
 org.springframework.boot.SpringApplicationRunListener=\
 com.duowan.yyspringboot.autoconfigure.logging.YyLoggingSpringApplicationRunListener,\
+com.duowan.yyspringboot.autoconfigure.alarm.AlarmApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.apollo.ApolloConfigApplicationRunListener,\
+com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.jdbc.JdbcConfigApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.redis.RedisConfigApplicationRunListener,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebSpringApplicationRunListener

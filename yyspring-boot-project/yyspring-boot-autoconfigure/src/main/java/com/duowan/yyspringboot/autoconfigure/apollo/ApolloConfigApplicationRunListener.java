@@ -16,8 +16,19 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 public class ApolloConfigApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
+    private boolean needAutoConfigurer = true;
+
     public ApolloConfigApplicationRunListener(SpringApplication application, String[] args) {
         super(application, args);
+        this.needAutoConfigurer = isClassesImported(
+                "com.ctrip.framework.foundation.spi.provider.ApplicationProvider",
+                "com.ctrip.framework.foundation.internals.DefaultProviderManager"
+                );
+    }
+
+    @Override
+    protected boolean needAutoConfigurer() {
+        return needAutoConfigurer;
     }
 
     private void initialize() {
@@ -33,7 +44,7 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
     }
 
     @Override
-    public void starting() {
+    protected void doStarting() {
         initialize();
     }
 

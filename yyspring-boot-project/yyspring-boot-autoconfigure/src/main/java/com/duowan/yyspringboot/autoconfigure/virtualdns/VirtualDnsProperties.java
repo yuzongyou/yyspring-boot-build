@@ -10,9 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @version 1.0
  * @since 2018/9/1 19:50
  */
-@ConfigurationProperties(prefix = "yyspring.virtualdns")
+@ConfigurationProperties(prefix = VirtualDnsProperties.PROPERTIES_PREFIX)
 public class VirtualDnsProperties {
 
+    public static final String PROPERTIES_PREFIX = "yyspring.virtualdns";
     /**
      * 匹配的环境，如果是空字符串则表示所有环境生效，默认是开发环境才生效
      */
