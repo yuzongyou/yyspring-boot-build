@@ -1,4 +1,4 @@
-package com.duowan.common.web;
+package com.duowan.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,6 +10,32 @@ import javax.servlet.http.HttpServletRequest;
  * @author Arvin
  */
 public abstract class RequestUtil {
+
+    /**
+     * 搜索用户IP请求头Header名称列表
+     **/
+    private static String[] lookupClientIpHeaders = new String[]{"X-Real-IP", "RealIP"};
+
+    /**
+     * 获取当前请求协议的Header名称列表
+     **/
+    private static String[] lookupProtocolHeaders = new String[]{"X-HTTPS-Protocol", "X-Forwarded-Scheme"};
+
+    public static String[] getLookupClientIpHeaders() {
+        return lookupClientIpHeaders;
+    }
+
+    public static void setLookupClientIpHeaders(String[] lookupClientIpHeaders) {
+        RequestUtil.lookupClientIpHeaders = lookupClientIpHeaders;
+    }
+
+    public static String[] getLookupProtocolHeaders() {
+        return lookupProtocolHeaders;
+    }
+
+    public static void setLookupProtocolHeaders(String[] lookupProtocolHeaders) {
+        RequestUtil.lookupProtocolHeaders = lookupProtocolHeaders;
+    }
 
     /**
      * 获取客户端 IP 地址， 识别 X-Real-IP, X-Forwarded-For
@@ -47,7 +73,7 @@ public abstract class RequestUtil {
     }
 
     private static String lookupClientIpByHeaders(HttpServletRequest request) {
-        String[] lookupHeaders = WebContext.getLookupClientIpHeaders();
+        String[] lookupHeaders = getLookupClientIpHeaders();
 
         String realClientIp = null;
         for (String lookupHeader : lookupHeaders) {
@@ -78,7 +104,7 @@ public abstract class RequestUtil {
      */
     public static String getProtocolType(HttpServletRequest request) {
 
-        for (String headScheme : WebContext.getLookupProtocolHeaders()) {
+        for (String headScheme : getLookupProtocolHeaders()) {
             String protocol = request.getHeader(headScheme);
             if (StringUtils.isNotBlank(protocol)) {
                 return protocol;
@@ -133,5 +159,9 @@ public abstract class RequestUtil {
         }
 
         return protocol + domain + portStr;
+    }
+
+    public static String getReferer(HttpServletRequest request) {
+        return request.getHeader("referer");
     }
 }

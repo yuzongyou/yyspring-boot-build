@@ -1,4 +1,4 @@
-package com.duowan.yyspringboot.autoconfigure.udb;
+package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
 import com.duowan.udb.security.CheckMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;

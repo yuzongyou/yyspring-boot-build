@@ -1,5 +1,7 @@
 package com.duowan.common.web;
 
+import com.duowan.common.utils.RequestUtil;
+
 /**
  * @author xiajiqiu
  * @version 1.0
@@ -62,6 +64,7 @@ public class WebContext {
 
     public static void setLookupClientIpHeaders(String[] lookupClientIpHeaders) {
         WebContext.lookupClientIpHeaders = lookupClientIpHeaders;
+        RequestUtil.setLookupClientIpHeaders(lookupClientIpHeaders);
     }
 
     public static String[] getLookupProtocolHeaders() {
@@ -70,5 +73,6 @@ public class WebContext {
 
     public static void setLookupProtocolHeaders(String[] lookupProtocolHeaders) {
         WebContext.lookupProtocolHeaders = lookupProtocolHeaders;
+        RequestUtil.setLookupProtocolHeaders(lookupProtocolHeaders);
     }
 }

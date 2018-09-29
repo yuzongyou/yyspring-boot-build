@@ -35,6 +35,7 @@
         <module>yycommon-web</module>
         <module>yycommon-thrift-client</module>
         <module>yycommon-thrift-server</module>
+        <module>yycommon-udb-sdk</module>
     </modules>
 
 </project>

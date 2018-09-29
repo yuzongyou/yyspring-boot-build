@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.admincenter;
 
-import com.duowan.yyspringboot.autoconfigure.udb.PatternProvider;
+import com.duowan.yyspringboot.autoconfigure.udbsecurity.PatternProvider;
 
 import java.util.HashSet;
 import java.util.Set;

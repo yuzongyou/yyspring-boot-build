@@ -161,10 +161,10 @@ public class TSimpleServerExporterTest {
 
         clientConfig.setEnabledLogging(true);
         ThriftClientFactoryBean hiFactoryBean = new ThriftClientFactoryBean(clientConfig, hiProtocolFactory.router(), ClientType.IFACE);
-        HiService.Iface hiService = (HiService.Iface) hiFactoryBean.getObject();
+        final HiService.Iface hiService = (HiService.Iface) hiFactoryBean.getObject();
 
         ThriftClientFactoryBean helloFactoryBean = new ThriftClientFactoryBean(clientConfig, helloProtocolFactory.router(), ClientType.IFACE);
-        HelloService.Iface helloService = (HelloService.Iface) helloFactoryBean.getObject();
+        final HelloService.Iface helloService = (HelloService.Iface) helloFactoryBean.getObject();
 
         final CountDownLatch latch = new CountDownLatch(1000);
         ExecutorService executorService = Executors.newFixedThreadPool(20);

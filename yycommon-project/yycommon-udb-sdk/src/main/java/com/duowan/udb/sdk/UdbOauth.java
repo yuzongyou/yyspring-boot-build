@@ -1,9 +1,11 @@
-package com.duowan.udb.security;
+package com.duowan.udb.sdk;
 
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.ConvertUtil;
 import com.duowan.udb.auth.UserinfoForOauth;
+import com.duowan.udb.util.CookieUtils;
 import com.duowan.universal.login.client.YYSecCenterOpenWSInvoker;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +64,7 @@ public class UdbOauth {
      * @param strongVerify 强验证检查
      */
     public UdbOauth(HttpServletRequest request, boolean strongVerify) {
-        AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
-        init(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY,
-                new UserinfoForOauth(request, null, UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY),
-                strongVerify);
+        this(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, request, strongVerify);
     }
 
     /**
@@ -75,7 +74,41 @@ public class UdbOauth {
      */
     public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, boolean strongVerify) {
         AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
-        init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), strongVerify);
+
+        String oauthCookie = lookupCookieValueExt(request, "oauthCookie");
+        String udbOar = lookupCookieValueExt(request, "udb_oar");
+        String username = lookupCookieValueExt(request, "username");
+        String yyuid = lookupCookieValueExt(request, "yyuid");
+
+        if (StringUtils.isAllBlank(oauthCookie, udbOar, username, yyuid)) {
+            init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), strongVerify);
+        } else {
+            UserinfoForOauth userinfoForOauth = null;
+            if (StringUtils.isNotBlank(username)) {
+                userinfoForOauth = new UserinfoForOauth(username, -1, oauthCookie, udbOar, udbAppId, udbAppKey);
+            } else if (StringUtils.isNotBlank(yyuid)) {
+                userinfoForOauth = new UserinfoForOauth(null, Long.parseLong(yyuid), oauthCookie, udbOar, udbAppId, udbAppKey);
+            } else {
+                userinfoForOauth = new UserinfoForOauth(request, null, udbAppId, udbAppKey);
+            }
+
+            init(udbAppId, udbAppKey, userinfoForOauth, strongVerify);
+        }
+    }
+
+    private String lookupCookieValueExt(HttpServletRequest request, String ckName) {
+
+        String value = CookieUtils.getCookie(ckName, request);
+
+        if (StringUtils.isBlank(value)) {
+            value = request.getHeader(ckName);
+        }
+
+        if (StringUtils.isBlank(value)) {
+            value = request.getParameter(ckName);
+        }
+
+        return value;
     }
 
     public UdbOauth(String passport, String oauthCookieOrUdbOar, boolean strongVerify) {

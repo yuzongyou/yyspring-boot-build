@@ -1,11 +1,11 @@
 package com.duowan.udb.security.controller;
 
 import com.duowan.common.utils.AssertUtil;
+import com.duowan.common.utils.RequestUtil;
 import com.duowan.common.utils.UrlUtil;
-import com.duowan.udb.security.UdbConstants;
-import com.duowan.udb.security.UdbContext;
+import com.duowan.udb.security.UdbSecurityConstants;
+import com.duowan.udb.sdk.UdbContext;
 import com.duowan.udb.security.UdbLoginBox;
-import com.duowan.udb.security.util.RequestUtil;
 import com.duowan.udb.util.CookieUtils;
 import com.duowan.udb.util.codec.AESHelper;
 import com.duowan.universal.login.BasicCredentials;
@@ -122,7 +122,7 @@ public class UdbSecurityController {
         String oauthVerifier = request.getParameter(OAuthHeaderNames.VERIFIER);
         String username = request.getParameter(CallbackServiceParamName.USERNAME);
 
-        String tokenSecretCookie = CookieUtils.getCookie(UdbConstants.COOKIE_UDB_OAUTH_TMP_TOKSN_SEC, request);
+        String tokenSecretCookie = CookieUtils.getCookie(UdbSecurityConstants.COOKIE_UDB_OAUTH_TMP_TOKSN_SEC, request);
         String tokenSecret = null;
         if (StringUtils.isNotBlank(tokenSecretCookie)) {
             tokenSecret = AESHelper.decrypt(tokenSecretCookie, UdbContext.getAppkey());
@@ -196,7 +196,7 @@ public class UdbSecurityController {
             Set<String> cookieNames = new HashSet<>();
             for (Cookie cookie : cookies) {
                 // 这个 Cookie 不能删除，删除了就不能自动登录了
-                if (UdbConstants.COOKIE_UDB_OAUTH_TMP_TOKSN_SEC.equals(cookie.getName())) {
+                if (UdbSecurityConstants.COOKIE_UDB_OAUTH_TMP_TOKSN_SEC.equals(cookie.getName())) {
                     continue;
                 }
 

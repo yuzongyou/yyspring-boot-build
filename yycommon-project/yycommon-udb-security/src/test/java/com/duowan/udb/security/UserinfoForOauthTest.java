@@ -2,6 +2,7 @@ package com.duowan.udb.security;
 
 import com.duowan.udb.auth.QueryAPIDIServiceHelper;
 import com.duowan.udb.auth.UserinfoForOauth;
+import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.universal.login.client.YYSecCenterOpenWSInvoker;
 import org.junit.Test;
 import org.mockito.Mockito;

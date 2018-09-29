@@ -1,6 +1,6 @@
 package com.duowan.common.web.pageparameter;
 
-import com.duowan.common.web.RequestUtil;
+import com.duowan.common.utils.RequestUtil;
 
 import javax.servlet.http.HttpServletRequest;
 

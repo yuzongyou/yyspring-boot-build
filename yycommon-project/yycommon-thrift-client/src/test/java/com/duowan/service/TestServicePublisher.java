@@ -211,7 +211,7 @@ public class TestServicePublisher {
         args.acceptQueueSizePerThread(1000);
 
         args.executorService(new ThreadPoolExecutor(5, 20, 5, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000)));
+                new LinkedBlockingQueue<Runnable>(1000)));
 
         TestService.Processor<TestService.Iface> singleProcessor = new TestService.Processor<TestService.Iface>(new TestServiceImpl());
 
@@ -239,7 +239,7 @@ public class TestServicePublisher {
         args.acceptQueueSizePerThread(1000);
 
         args.executorService(new ThreadPoolExecutor(5, 20, 5, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000)));
+                new LinkedBlockingQueue<Runnable>(1000)));
 
         TestService.Processor<TestService.Iface> singleProcessor = new TestService.Processor<TestService.Iface>(new TestServiceImpl());
         TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();
@@ -265,7 +265,7 @@ public class TestServicePublisher {
         args.protocolFactory(new TCompactProtocol.Factory());
 
         args.executorService(new ThreadPoolExecutor(5, 20, 5, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000)));
+                new LinkedBlockingQueue<Runnable>(1000)));
 
         TestService.Processor<TestService.Iface> singleProcessor = new TestService.Processor<TestService.Iface>(new TestServiceImpl());
 
@@ -290,7 +290,7 @@ public class TestServicePublisher {
         args.protocolFactory(new TCompactProtocol.Factory());
 
         args.executorService(new ThreadPoolExecutor(5, 20, 5, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000)));
+                new LinkedBlockingQueue<Runnable>(1000)));
 
         TestService.Processor<TestService.Iface> singleProcessor = new TestService.Processor<TestService.Iface>(new TestServiceImpl());
         TMultiplexedProcessor multiplexedProcessor = new TMultiplexedProcessor();

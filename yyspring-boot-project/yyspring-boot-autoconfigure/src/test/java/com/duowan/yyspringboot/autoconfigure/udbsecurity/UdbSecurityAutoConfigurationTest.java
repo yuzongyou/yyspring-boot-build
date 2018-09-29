@@ -1,4 +1,4 @@
-package com.duowan.yyspringboot.autoconfigure.udb;
+package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
 import com.duowan.common.utils.JsonUtil;
 import org.junit.Test;
@@ -15,9 +15,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2018/9/10 18:05
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = UdbAutoConfiguration.class)
-@TestPropertySource("classpath:/com/duowan/yyspringboot/autoconfigure/udb/application.properties")
-public class UdbAutoConfigurationTest {
+@SpringBootTest(classes = UdbSecurityAutoConfiguration.class)
+@TestPropertySource("classpath:/com/duowan/yyspringboot/autoconfigure/udbsecurity/application.properties")
+public class UdbSecurityAutoConfigurationTest {
 
     @Autowired
     private ApplicationContext acx;

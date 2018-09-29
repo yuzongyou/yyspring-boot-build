@@ -3,6 +3,8 @@ package com.duowan.common.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 
 /**
@@ -67,5 +69,28 @@ public class EncryptUtil {
             sb.append(stmp);
         }
         return sb.toString().toUpperCase();
+    }
+
+    /**
+     * 进行 HmacSHA1 加密
+     *
+     * @param key   加密key
+     * @param value 要加密的值
+     * @return 返回加密后的值
+     */
+    public static String hmacSHA1(String key, String value) {
+        try {
+
+            // 加密密钥
+            SecretKeySpec localSecretKeySpec = new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA1");
+            Mac localMac = Mac.getInstance("HmacSHA1");
+            localMac.init(localSecretKeySpec);
+            // 加密内容，这里使用时间
+            localMac.update(value.getBytes("UTF-8"));
+
+            return byte2hex(localMac.doFinal());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

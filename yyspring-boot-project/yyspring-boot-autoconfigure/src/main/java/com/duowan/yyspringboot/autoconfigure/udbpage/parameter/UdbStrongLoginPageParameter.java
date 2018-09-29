@@ -1,8 +1,8 @@
-package com.duowan.yyspringboot.autoconfigure.udb.page;
+package com.duowan.yyspringboot.autoconfigure.udbpage.parameter;
 
 import com.duowan.common.web.pageparameter.AbstractPageParameter;
-import com.duowan.udb.security.UdbContext;
-import com.duowan.udb.security.UdbOauth;
+import com.duowan.udb.sdk.UdbOauth;
+import com.duowan.udb.sdk.UdbContext;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;

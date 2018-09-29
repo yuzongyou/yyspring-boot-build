@@ -1,4 +1,4 @@
-package com.duowan.yyspringboot.autoconfigure.udb;
+package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
 import java.util.Set;
 

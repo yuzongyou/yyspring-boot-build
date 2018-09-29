@@ -1,4 +1,4 @@
-package com.duowan.udb.security;
+package com.duowan.udb.sdk;
 
 /**
  * @author dw_xiajiqiu1

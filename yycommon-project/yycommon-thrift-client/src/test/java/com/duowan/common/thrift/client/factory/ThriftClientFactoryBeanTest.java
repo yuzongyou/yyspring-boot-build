@@ -3,6 +3,7 @@ package com.duowan.common.thrift.client.factory;
 import com.duowan.common.thrift.client.ClientType;
 import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
+import com.duowan.common.thrift.client.factory.protocol.AbstractTProtocolFactory;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.service.TestService;
@@ -37,7 +38,7 @@ public class ThriftClientFactoryBeanTest {
             }
         };
 
-        TProtocolFactory protocolFactory = new TProtocolFactory() {
+        TProtocolFactory protocolFactory = new AbstractTProtocolFactory(HiService.class, null, router) {
 
             @Override
             public TProtocol create(TClientConfig clientConfig, TTransport transport) {
@@ -46,15 +47,6 @@ public class ThriftClientFactoryBeanTest {
                 //return new TCompactProtocol(transport);
             }
 
-            @Override
-            public Class<?> getServiceClass() {
-                return HiService.class;
-            }
-
-            @Override
-            public String router() {
-                return router;
-            }
         };
 
         ThriftServerNode serverNode = new ThriftServerNode("127.0.0.1", 25000);

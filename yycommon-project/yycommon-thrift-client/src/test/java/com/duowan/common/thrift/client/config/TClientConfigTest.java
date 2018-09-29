@@ -2,6 +2,7 @@ package com.duowan.common.thrift.client.config;
 
 import com.duowan.common.thrift.client.factory.TProtocolFactory;
 import com.duowan.common.thrift.client.factory.TTransportFactory;
+import com.duowan.common.thrift.client.factory.protocol.AbstractTProtocolFactory;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
 import com.duowan.service.TestService;
@@ -32,8 +33,7 @@ public class TClientConfigTest {
         }
     };
 
-
-    private static TProtocolFactory PROTOCOL_FACTORY = new TProtocolFactory() {
+    private static TProtocolFactory PROTOCOL_FACTORY = new AbstractTProtocolFactory(TestService.class, null, "test") {
         @Override
         public TProtocol create(TClientConfig clientConfig, TTransport transport) {
             return new TMultiplexedProtocol(new TCompactProtocol(transport), router());
@@ -41,15 +41,6 @@ public class TClientConfigTest {
             //return new TCompactProtocol(transport);
         }
 
-        @Override
-        public Class<?> getServiceClass() {
-            return TestService.class;
-        }
-
-        @Override
-        public String router() {
-            return "test";
-        }
     };
 
     @Test

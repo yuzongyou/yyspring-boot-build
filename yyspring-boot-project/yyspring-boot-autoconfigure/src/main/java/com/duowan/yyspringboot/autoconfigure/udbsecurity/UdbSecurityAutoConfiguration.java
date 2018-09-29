@@ -1,9 +1,9 @@
-package com.duowan.yyspringboot.autoconfigure.udb;
+package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
 import com.duowan.common.utils.ConvertUtil;
+import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.PrivilegeInterceptor;
-import com.duowan.udb.security.UdbConstants;
-import com.duowan.udb.security.UdbContext;
+import com.duowan.udb.sdk.UdbContext;
 import com.duowan.udb.security.UdbSecurityInterceptor;
 import com.duowan.udb.security.controller.UdbSecurityController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.handler.MappedInterceptor;
@@ -33,10 +32,9 @@ import java.util.Set;
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, UdbSecurityInterceptor.class})
 @ConditionalOnExpression("${yyspring.udb.interceptor-enabled:true}")
 @EnableConfigurationProperties(UdbProperties.class)
-@ComponentScan({"com.duowan.yyspringboot.autoconfigure.udb.page"})
-public class UdbAutoConfiguration {
+public class UdbSecurityAutoConfiguration {
 
-    public UdbAutoConfiguration(UdbProperties udbProperties) {
+    public UdbSecurityAutoConfiguration(UdbProperties udbProperties) {
         // 初始化UDB的配置
         UdbContext.setAppid(ConvertUtil.toString(udbProperties.getAppid(), UdbConstants.DEFAULT_UDB_APPID));
         UdbContext.setAppkey(ConvertUtil.toString(udbProperties.getAppkey(), UdbConstants.DEFAULT_UDB_APPKEY));

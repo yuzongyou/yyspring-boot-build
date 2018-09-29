@@ -30,6 +30,7 @@
         <apollo.client.version>0.10.3-SNAPSHOT</apollo.client.version>
         <thrift.version>0.10.0</thrift.version>
         <commons.pool2.version>2.5.0</commons.pool2.version>
+        <fastjson.version>1.2.49</fastjson.version>
 
         <flatten-maven-plugin.version>1.0.1</flatten-maven-plugin.version>
     </properties>
@@ -67,10 +68,17 @@
             </dependency>
 
             <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-            <version>${commons.pool2.version}</version>
-        </dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${commons.pool2.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -147,6 +155,12 @@
             <dependency>
                 <groupId>com.duowan</groupId>
                 <artifactId>yycommon-ip-owner</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-udb-sdk</artifactId>
                 <version>${yyproject.version}</version>
             </dependency>
 

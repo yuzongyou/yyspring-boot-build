@@ -1,6 +1,6 @@
 package com.duowan.common.web.filter;
 
-import com.duowan.common.web.RequestUtil;
+import com.duowan.common.utils.RequestUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
