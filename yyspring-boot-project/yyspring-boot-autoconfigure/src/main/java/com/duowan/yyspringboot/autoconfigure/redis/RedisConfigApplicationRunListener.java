@@ -9,7 +9,7 @@ import com.duowan.common.redis.register.RedisRegister;
 import com.duowan.common.redis.util.RedisRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;

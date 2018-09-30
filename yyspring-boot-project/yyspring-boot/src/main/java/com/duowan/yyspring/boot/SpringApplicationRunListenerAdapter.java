@@ -1,4 +1,4 @@
-package com.duowan.yyspringboot.autoconfigure;
+package com.duowan.yyspring.boot;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -11,7 +11,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Arvin
@@ -29,9 +32,28 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     private ConfigurableEnvironment environment;
 
+    private static Map<String, AtomicInteger> instanceCountMap = new HashMap<>();
+
+    private static synchronized int addInstanceCount(Class<?> clazz) {
+        String className = clazz.getName();
+        AtomicInteger counter = instanceCountMap.get(className);
+        if (counter == null) {
+            counter = new AtomicInteger(0);
+            instanceCountMap.put(className, counter);
+        }
+        return counter.incrementAndGet();
+    }
+
+    private int instanceIndex = 0;
+
     public SpringApplicationRunListenerAdapter(SpringApplication application, String[] args) {
         this.application = application;
         this.args = args;
+        instanceIndex = addInstanceCount(getClass());
+    }
+
+    private boolean isFirstInit() {
+        return instanceIndex == 1;
     }
 
     protected abstract boolean needAutoConfigurer();
@@ -46,7 +68,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void starting() {
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             doStarting();
         }
     }
@@ -56,8 +78,8 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void environmentPrepared(ConfigurableEnvironment environment) {
-        this.environment = environment;
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
+            this.environment = environment;
             doEnvironmentPrepared(environment);
         }
     }
@@ -69,6 +91,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void contextPrepared(ConfigurableApplicationContext context) {
+
         if (context instanceof BeanDefinitionRegistry) {
             this.registry = (BeanDefinitionRegistry) context;
         } else {
@@ -78,7 +101,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
             }
         }
 
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             this.doContextPrepared(context, registry, environment);
         }
     }
@@ -108,7 +131,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void contextLoaded(ConfigurableApplicationContext context) {
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             doContextLoaded(context);
         }
     }
@@ -118,7 +141,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void started(ConfigurableApplicationContext context) {
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             doStarted(context);
         }
     }
@@ -128,7 +151,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void running(ConfigurableApplicationContext context) {
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             doRunning(context);
         }
     }
@@ -138,7 +161,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void failed(ConfigurableApplicationContext context, Throwable exception) {
-        if (needAutoConfigurer()) {
+        if (isFirstInit() && needAutoConfigurer()) {
             doFailed(context, exception);
         }
     }

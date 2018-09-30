@@ -4,13 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>Cairo-SR4</version>
-    </parent>
-
     <groupId>com.duowan</groupId>
     <artifactId>yyspring-boot-build</artifactId>
     <version>2.0.0-SNAPSHOT</version>
@@ -22,6 +15,13 @@
         <main.basedir>${basedir}</main.basedir>
         <yyproject.version>2.0.0-SNAPSHOT</yyproject.version>
     </properties>
+
+    <modules>
+        <module>yyspring-boot-project</module>
+        <module>yycommon-project</module>
+        <module>yyproject-bom</module>
+        <module>yyproject-parent</module>
+    </modules>
 
     <licenses>
         <license>
@@ -48,63 +48,6 @@
         <system>Git</system>
         <url>https://git.yy.com/opensource/yygame/yyspring-boot/issues</url>
     </issueManagement>
-
-    <profiles>
-        <!-- Default profile for command line build -->
-        <profile>
-            <id>default</id>
-            <activation>
-                <property>
-                    <name>!disable-yyspring-boot-default-profile</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>versions-maven-plugin</artifactId>
-                        <version>2.3</version>
-                        <configuration>
-                            <generateBackupPoms>false</generateBackupPoms>
-                        </configuration>
-                    </plugin>
-
-                </plugins>
-            </build>
-            <modules>
-                <module>yyspring-boot-project</module>
-                <module>yycommon-project</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>repository</id>
-            <activation>
-                <property>
-                    <name>repository</name>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>repository</id>
-                    <url>${repository}</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>repository</id>
-                    <url>${repository}</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
-    </profiles>
 
     <pluginRepositories>
         <pluginRepository>
@@ -161,5 +104,20 @@
             <url>http://devserv-game.yy.com/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

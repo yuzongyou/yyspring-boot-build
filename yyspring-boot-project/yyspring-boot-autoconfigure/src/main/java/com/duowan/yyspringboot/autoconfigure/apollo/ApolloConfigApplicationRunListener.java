@@ -1,13 +1,9 @@
 package com.duowan.yyspringboot.autoconfigure.apollo;
 
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.Ordered;
-import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
  * @author Arvin

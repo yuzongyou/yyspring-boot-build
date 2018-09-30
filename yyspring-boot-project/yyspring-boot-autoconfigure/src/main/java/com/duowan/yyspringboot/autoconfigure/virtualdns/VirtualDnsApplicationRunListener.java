@@ -3,7 +3,7 @@ package com.duowan.yyspringboot.autoconfigure.virtualdns;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.virtualdns.VirtualDnsUtil;
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;

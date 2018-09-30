@@ -6,6 +6,7 @@ import com.duowan.common.utils.exception.AssertFailException;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -21,19 +22,19 @@ import java.util.Set;
  * @version 1.0
  * @since 2018/9/1 17:36
  */
-public class YySpringApplicationRunListener implements SpringApplicationRunListener, Ordered {
-
-    private final SpringApplication application;
-
-    private final String[] args;
+public class YySpringApplicationRunListener extends SpringApplicationRunListenerAdapter {
 
     public YySpringApplicationRunListener(SpringApplication application, String[] args) {
-        this.application = application;
-        this.args = args;
+        super(application, args);
+    }
+
+    @Override
+    protected boolean needAutoConfigurer() {
+        return true;
     }
 
     private void initialize() {
-        Set<Object> sources = application.getAllSources();
+        Set<Object> sources = getApplication().getAllSources();
         Class<?> sourceClass = validateSourcesThenReturnFirstHasYYSpringApplicationAnnotationSource(sources);
         // 初始化
         AppContext.initialize(sourceClass);
@@ -45,9 +46,9 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
         }
         if (tryEnabledDefaultBeanNameGenerator) {
             // 如果用户没有自定义 BeanNameGenerator 则默认给一个
-            Object beanNameGenerator = ReflectUtil.getFieldValue(application, "beanNameGenerator");
+            Object beanNameGenerator = ReflectUtil.getFieldValue(getApplication(), "beanNameGenerator");
             if (null == beanNameGenerator) {
-                application.setBeanNameGenerator(new DefaultAnnotationBeanNameGenerator());
+                getApplication().setBeanNameGenerator(new DefaultAnnotationBeanNameGenerator());
             }
         }
     }
@@ -95,27 +96,27 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     }
 
     @Override
-    public void starting() {
+    public void doStarting() {
         initialize();
     }
 
     @Override
-    public void environmentPrepared(ConfigurableEnvironment environment) {
+    public void doEnvironmentPrepared(ConfigurableEnvironment environment) {
         environment.getPropertySources().addLast(new MapPropertySource("projectInfo", AppContext.getProjectInfoMap()));
         environment.getPropertySources().addLast(new MapPropertySource("yyApplicationProperties", AppContext.getApplicationProperties()));
     }
 
     @Override
-    public void contextPrepared(ConfigurableApplicationContext context) {
+    public void doContextPrepared(ConfigurableApplicationContext context, BeanDefinitionRegistry registry, ConfigurableEnvironment environment) {
         AppContext.setAcx(context);
     }
 
     @Override
-    public void contextLoaded(ConfigurableApplicationContext context) {
+    public void doContextLoaded(ConfigurableApplicationContext context) {
     }
 
     @Override
-    public void started(ConfigurableApplicationContext context) {
+    public void doStarted(ConfigurableApplicationContext context) {
         Logger appContextLogger = LoggerFactory.getLogger(AppContext.class);
         List<String> infoList = AppContext.getInitInfo();
         for (String info : infoList) {
@@ -124,17 +125,17 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     }
 
     @Override
-    public void running(ConfigurableApplicationContext context) {
+    public void doRunning(ConfigurableApplicationContext context) {
 
     }
 
     @Override
-    public void failed(ConfigurableApplicationContext context, Throwable exception) {
+    public void doFailed(ConfigurableApplicationContext context, Throwable exception) {
 
     }
 
     @Override
-    public int getOrder() {
-        return 1;
+    public int order() {
+        return -1 * DEFAULT_ORDER + YYCORE_DEFAULT_ORDER;
     }
 }

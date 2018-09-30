@@ -211,12 +211,20 @@ public class AppContext {
         throw new IllegalStateException("Could not locate BeanDefinitionRegistry");
     }
 
+    private static volatile boolean hadInit = false;
+
     /**
      * 初始化应用环境， 项目代号， 环境， 日志等
      *
      * @param sourceClass 应用启动来源
      */
     public static void initialize(Class<?> sourceClass) {
+
+        if (hadInit) {
+            return ;
+        }
+
+        hadInit = true;
 
         initInfo.clear();
         initInfo.add("Initialize AppContext By Source : " + sourceClass);

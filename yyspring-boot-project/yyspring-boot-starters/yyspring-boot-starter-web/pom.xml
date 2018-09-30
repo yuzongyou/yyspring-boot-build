@@ -11,7 +11,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yyspring-boot-starter-web</artifactId>
-    <name>WebMvc YYSpring Boot Starter</name>
     <description>WebMvc YYSpring Boot Starter</description>
 
     <properties>

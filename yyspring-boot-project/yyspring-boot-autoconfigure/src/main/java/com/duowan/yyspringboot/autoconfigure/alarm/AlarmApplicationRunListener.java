@@ -4,7 +4,7 @@ import com.duowan.common.alarm.Alarm;
 import com.duowan.common.alarm.subscriber.RobotAlarmHandler;
 import com.duowan.common.alarm.subscriber.ZxaAlarmHandler;
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.ConfigurableEnvironment;

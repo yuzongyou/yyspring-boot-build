@@ -11,8 +11,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yyspring-boot-starter</artifactId>
-
-    <name>YY Spring Boot Starter</name>
     <description>YY Core starter, including auto-configuration support, logging</description>
 
     <properties>

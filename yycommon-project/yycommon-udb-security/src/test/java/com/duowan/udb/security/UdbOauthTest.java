@@ -1,5 +1,6 @@
 package com.duowan.udb.security;
 
+import com.duowan.udb.sdk.UdbOauth;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

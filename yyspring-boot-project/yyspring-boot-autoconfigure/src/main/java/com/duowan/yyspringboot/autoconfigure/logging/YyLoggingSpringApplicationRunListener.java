@@ -1,7 +1,7 @@
 package com.duowan.yyspringboot.autoconfigure.logging;
 
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import com.duowan.yyspringboot.autoconfigure.logging.log4j2.Log4jYyDefaultLoggingConfigurer;
 import com.duowan.yyspringboot.autoconfigure.logging.logback.LogbackYyDefaultLoggingConfigurer;
 import org.apache.commons.lang3.StringUtils;

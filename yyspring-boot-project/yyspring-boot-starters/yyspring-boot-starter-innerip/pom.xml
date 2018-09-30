@@ -11,7 +11,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yyspring-boot-starter-innerip</artifactId>
-    <name>InnerIP YYSpring Boot Starter</name>
     <description>InnerIP YYSpring Boot Starter</description>
 
     <properties>

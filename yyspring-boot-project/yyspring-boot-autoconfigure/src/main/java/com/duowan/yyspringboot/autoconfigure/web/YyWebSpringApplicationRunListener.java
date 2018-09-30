@@ -1,7 +1,7 @@
 package com.duowan.yyspringboot.autoconfigure.web;
 
 import com.duowan.yyspring.boot.AppContext;
-import com.duowan.yyspringboot.autoconfigure.SpringApplicationRunListenerAdapter;
+import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
