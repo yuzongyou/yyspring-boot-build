@@ -9,10 +9,10 @@ import java.security.Key;
 
 /**
  * This class is used for ...
- * AES Coder<br/>
- * secret key length:   128bit, default:    128 bit<br/>
+ * AES Coder
+ * secret key length:   128bit, default:    128 bit
  * Generated through md5.
- * mode:    ECB/CBC/PCBC/CTR/CTS/CFB/CFB8 to CFB128/OFB/OBF8 to OFB128<br/>
+ * mode:    ECB/CBC/PCBC/CTR/CTS/CFB/CFB8 to CFB128/OFB/OBF8 to OFB128
  * padding: Nopadding/PKCS5Padding/ISO10126Padding/
  * <p>
  * Improvement:If want to improve performence,you could cache Cipher to reduce the time of producing the Cipher.
@@ -21,7 +21,7 @@ import java.security.Key;
  * @version 1.0
  *          <p>
  *          1.1 Implements improvement by apache collections LRUMap.
- * @time 2011-11-16 下午05:16:01
+ * @since  2011-11-16 下午05:16:01
  */
 public class AESHelper {
     /**

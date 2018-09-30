@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.duowan</groupId>
         <artifactId>yyspring-boot-build</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -18,8 +18,8 @@
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
 
         <!-- change java version -->
-        <java.version>1.8</java.version>
-        <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
+        <java.version>1.7</java.version>
+        <spring.boot.version>1.5.16.RELEASE</spring.boot.version>
         <skip.it>true</skip.it>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -2,7 +2,7 @@ package com.duowan.udb.sdk;
 
 /**
  * @author Arvin
- * @time 2018/4/2 14:35
+ * @since 2018/4/2 14:35
  */
 public class UdbAesKey {
 

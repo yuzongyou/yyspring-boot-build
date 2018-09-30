@@ -2,7 +2,7 @@ package com.duowan.udb.sdk;
 
 /**
  * @author Arvin
- * @time 2018/1/16 11:09
+ * @since 2018/1/16 11:09
  */
 public class CK {
 

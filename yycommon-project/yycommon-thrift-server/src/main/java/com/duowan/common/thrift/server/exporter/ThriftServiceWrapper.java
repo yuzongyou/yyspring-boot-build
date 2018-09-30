@@ -4,7 +4,6 @@ import com.duowan.common.thrift.server.annotation.ThriftService;
 import com.duowan.common.thrift.server.exception.DuplicateIfaceFoundException;
 import com.duowan.common.thrift.server.exception.ThriftIfaceNotFoundException;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 
 import java.util.Set;
@@ -19,31 +18,26 @@ public class ThriftServiceWrapper {
     /**
      * 服务类本身
      **/
-    @NonNull
     private final Class<?> serviceClass;
 
     /**
      * Thrift 服务类 Iface、AsyncIface 接口所在类
      **/
-    @NonNull
     private final Class<?> thriftServiceClass;
 
     /**
      * IFace 接口
      **/
-    @NonNull
     private final Class<?> ifaceClass;
 
     /**
      * 服务发布路由
      **/
-    @NonNull
     private final String router;
 
     /**
      * 服务实例对象
      */
-    @NonNull
     private Object thriftService;
 
     public ThriftServiceWrapper(Object thriftService) {

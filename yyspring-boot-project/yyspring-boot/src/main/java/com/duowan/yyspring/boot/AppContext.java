@@ -6,9 +6,11 @@ import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.PathUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.system.ApplicationHome;
+import org.springframework.boot.ApplicationHome;
+import org.springframework.boot.bind.RelaxedDataBinder;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.env.*;
@@ -16,6 +18,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import javax.xml.bind.Binder;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
@@ -156,13 +159,19 @@ public class AppContext {
         return bindProperties(null, prefix, target, defaultProperties);
     }
 
-    public static <T> T bindProperties(Environment environment, String prefix, Class<T> target, T defaultProperties) {
+    public static <T> T bindProperties(Environment environment, String prefix, Class<T> targetType, T defaultProperties) {
         try {
             if (environment == null) {
                 environment = AppContext.environment;
             }
-            return Binder.get(environment).bind(prefix, target).get();
-        } catch (NoSuchElementException e) {
+
+            RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment);
+            Map<String, Object> properties = resolver.getSubProperties("");
+            T target = targetType.newInstance();
+            RelaxedDataBinder binder = new RelaxedDataBinder(target, prefix);
+            binder.bind(new MutablePropertyValues(properties));
+            return target;
+        } catch (Exception e) {
             return defaultProperties;
         }
     }

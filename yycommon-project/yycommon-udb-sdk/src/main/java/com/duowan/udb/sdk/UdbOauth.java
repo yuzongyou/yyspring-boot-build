@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.duowan.common.utils.CommonUtil.isAllBlank;
+
 /**
  * UDB 登录Oatuh 认证
  *
@@ -58,20 +60,10 @@ public class UdbOauth {
     private String udbAppId;
     private String udbAppKey;
 
-    /**
-     * 验证
-     *
-     * @param strongVerify 强验证检查
-     */
     public UdbOauth(HttpServletRequest request, boolean strongVerify) {
         this(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, request, strongVerify);
     }
 
-    /**
-     * 验证
-     *
-     * @param strongVerify 强验证检查
-     */
     public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, boolean strongVerify) {
         AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
 
@@ -80,7 +72,7 @@ public class UdbOauth {
         String username = lookupCookieValueExt(request, "username");
         String yyuid = lookupCookieValueExt(request, "yyuid");
 
-        if (StringUtils.isAllBlank(oauthCookie, udbOar, username, yyuid)) {
+        if (isAllBlank(oauthCookie, udbOar, username, yyuid)) {
             init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), strongVerify);
         } else {
             UserinfoForOauth userinfoForOauth = null;
@@ -143,9 +135,6 @@ public class UdbOauth {
         init(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, userinfoForOauth, strongVerify);
     }
 
-    /**
-     * 初始化
-     */
     void init(String udbAppId, String udbAppKey, UserinfoForOauth oauth, boolean strongVerify) {
         AssertUtil.assertNotBlank(udbAppId, "UDB 验证， udbAppId 不能为空");
         AssertUtil.assertNotBlank(udbAppKey, "UDB 验证， udbAppKey 不能为空");

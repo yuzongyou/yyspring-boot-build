@@ -1,17 +1,19 @@
 package com.duowan.yyspringboot.autoconfigure;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringApplicationRunListener;
-import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.bind.RelaxedDataBinder;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
 
-import java.util.NoSuchElementException;
+import java.util.Map;
 
 /**
  * @author Arvin
@@ -87,13 +89,18 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     }
 
-    protected <T> T bindProperties(Environment environment, String prefix, Class<T> target, T defaultProperties) {
+    protected <T> T bindProperties(Environment environment, String prefix, Class<T> targetType, T defaultProperties) {
         try {
             if (environment == null) {
                 environment = this.environment;
             }
-            return Binder.get(environment).bind(prefix, target).get();
-        } catch (NoSuchElementException e) {
+            RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(environment);
+            Map<String, Object> properties = resolver.getSubProperties("");
+            T target = targetType.newInstance();
+            RelaxedDataBinder binder = new RelaxedDataBinder(target, prefix);
+            binder.bind(new MutablePropertyValues(properties));
+            return target;
+        } catch (Exception e) {
             return defaultProperties;
         }
     }
@@ -117,33 +124,13 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
     }
 
     @Override
-    public final void started(ConfigurableApplicationContext context) {
+    public final void finished(ConfigurableApplicationContext context, Throwable throwable) {
         if (needAutoConfigurer()) {
-            doStarted(context);
+            doFinished(context, throwable);
         }
     }
 
-    protected void doStarted(ConfigurableApplicationContext context) {
-    }
-
-    @Override
-    public final void running(ConfigurableApplicationContext context) {
-        if (needAutoConfigurer()) {
-            doRunning(context);
-        }
-    }
-
-    protected void doRunning(ConfigurableApplicationContext context) {
-    }
-
-    @Override
-    public final void failed(ConfigurableApplicationContext context, Throwable exception) {
-        if (needAutoConfigurer()) {
-            doFailed(context, exception);
-        }
-    }
-
-    protected void doFailed(ConfigurableApplicationContext context, Throwable exception) {
+    protected void doFinished(ConfigurableApplicationContext context, Throwable throwable) {
     }
 
     @Override

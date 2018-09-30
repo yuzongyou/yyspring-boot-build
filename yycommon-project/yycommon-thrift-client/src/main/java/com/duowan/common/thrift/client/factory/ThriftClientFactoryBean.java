@@ -210,4 +210,9 @@ public class ThriftClientFactoryBean implements FactoryBean, InitializingBean {
     public void afterPropertiesSet() throws Exception {
 
     }
+
+    @Override
+    public boolean isSingleton() {
+        return false;
+    }
 }

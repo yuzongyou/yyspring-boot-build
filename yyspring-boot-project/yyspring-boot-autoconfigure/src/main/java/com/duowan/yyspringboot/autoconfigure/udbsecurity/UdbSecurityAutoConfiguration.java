@@ -2,8 +2,8 @@ package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
 import com.duowan.common.utils.ConvertUtil;
 import com.duowan.udb.sdk.UdbConstants;
-import com.duowan.udb.security.PrivilegeInterceptor;
 import com.duowan.udb.sdk.UdbContext;
+import com.duowan.udb.security.PrivilegeInterceptor;
 import com.duowan.udb.security.UdbSecurityInterceptor;
 import com.duowan.udb.security.controller.UdbSecurityController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.Set;
  * @since 2018/8/22 11:09
  */
 @Configuration
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnWebApplication
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, UdbSecurityInterceptor.class})
 @ConditionalOnExpression("${yyspring.udb.interceptor-enabled:true}")
 @EnableConfigurationProperties(UdbProperties.class)
