@@ -6,7 +6,7 @@ import java.util.List;
  * 登录互联结果
  *
  * @author Arvin
- * @since 2018/1/15 18:15
+ * @time 2018/1/15 18:15
  */
 public class LoginResult {
 

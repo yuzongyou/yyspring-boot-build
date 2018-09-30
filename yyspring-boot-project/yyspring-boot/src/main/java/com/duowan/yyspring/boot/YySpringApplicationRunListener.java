@@ -33,7 +33,7 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     }
 
     private void initialize() {
-        Set<Object> sources = application.getSources();
+        Set<Object> sources = application.getAllSources();
         Class<?> sourceClass = validateSourcesThenReturnFirstHasYYSpringApplicationAnnotationSource(sources);
         // 初始化
         AppContext.initialize(sourceClass);
@@ -114,14 +114,23 @@ public class YySpringApplicationRunListener implements SpringApplicationRunListe
     public void contextLoaded(ConfigurableApplicationContext context) {
     }
 
-
     @Override
-    public void finished(ConfigurableApplicationContext configurableApplicationContext, Throwable throwable) {
+    public void started(ConfigurableApplicationContext context) {
         Logger appContextLogger = LoggerFactory.getLogger(AppContext.class);
         List<String> infoList = AppContext.getInitInfo();
         for (String info : infoList) {
             appContextLogger.info(info);
         }
+    }
+
+    @Override
+    public void running(ConfigurableApplicationContext context) {
+
+    }
+
+    @Override
+    public void failed(ConfigurableApplicationContext context, Throwable exception) {
+
     }
 
     @Override

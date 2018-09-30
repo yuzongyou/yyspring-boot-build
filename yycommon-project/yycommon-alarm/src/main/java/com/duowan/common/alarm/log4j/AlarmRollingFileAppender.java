@@ -9,7 +9,10 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender;
 import org.apache.logging.log4j.core.appender.rolling.*;
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.plugins.*;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginBuilderAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginBuilderFactory;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.Required;
 import org.apache.logging.log4j.core.net.Advertiser;
 import org.apache.logging.log4j.core.util.Booleans;
@@ -33,13 +36,12 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
     /**
      * Builds FileAppender instances.
      *
-     * @param <B> This builder class
+     * @param <B> The type to build
      */
-    public static class Builder<B extends Builder<B>> extends AbstractOutputStreamAppender.Builder<B>
+    public static class Builder<B extends AlarmRollingFileAppender.Builder<B>> extends AbstractOutputStreamAppender.Builder<B>
             implements org.apache.logging.log4j.core.util.Builder<AlarmRollingFileAppender> {
 
         @PluginBuilderAttribute
-        @Required
         private String fileName;
 
         @PluginBuilderAttribute
@@ -68,8 +70,14 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
         @PluginBuilderAttribute
         private boolean createOnDemand;
 
-        @PluginConfiguration
-        private Configuration configuration;
+        @PluginBuilderAttribute
+        private String filePermissions;
+
+        @PluginBuilderAttribute
+        private String fileOwner;
+
+        @PluginBuilderAttribute
+        private String fileGroup;
 
         @Override
         public AlarmRollingFileAppender build() {
@@ -78,43 +86,45 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
             final boolean isBufferedIo = isBufferedIo();
             final int bufferSize = getBufferSize();
             if (getName() == null) {
-                LOGGER.error("RollingFileAppender '{}': No name provided.", getName());
+                LOGGER.error("AlarmRollingFileAppender '{}': No name provided.", getName());
                 return null;
             }
 
             if (!isBufferedIo && bufferSize > 0) {
-                LOGGER.warn("RollingFileAppender '{}': The bufferSize is set to {} but bufferedIO is not true", getName(), bufferSize);
-            }
-
-            if (fileName == null) {
-                LOGGER.error("RollingFileAppender '{}': No file name provided.", getName());
-                return null;
+                LOGGER.warn("AlarmRollingFileAppender '{}': The bufferSize is set to {} but bufferedIO is not true", getName(), bufferSize);
             }
 
             if (filePattern == null) {
-                LOGGER.error("RollingFileAppender '{}': No file name pattern provided.", getName());
+                LOGGER.error("AlarmRollingFileAppender '{}': No file name pattern provided.", getName());
                 return null;
             }
 
             if (policy == null) {
-                LOGGER.error("RollingFileAppender '{}': No TriggeringPolicy provided.", getName());
+                LOGGER.error("AlarmRollingFileAppender '{}': No TriggeringPolicy provided.", getName());
                 return null;
             }
 
             if (strategy == null) {
-                strategy = DefaultRolloverStrategy.createStrategy(null, null, null,
-                        String.valueOf(Deflater.DEFAULT_COMPRESSION), null, true, configuration);
-            }
-
-            if (strategy == null) {
-                strategy = DefaultRolloverStrategy.createStrategy(null, null, null,
-                        String.valueOf(Deflater.DEFAULT_COMPRESSION), null, true, configuration);
+                if (fileName != null) {
+                    strategy = DefaultRolloverStrategy.newBuilder()
+                            .withCompressionLevelStr(String.valueOf(Deflater.DEFAULT_COMPRESSION))
+                            .withConfig(getConfiguration())
+                            .build();
+                } else {
+                    strategy = DirectWriteRolloverStrategy.newBuilder()
+                            .withCompressionLevelStr(String.valueOf(Deflater.DEFAULT_COMPRESSION))
+                            .withConfig(getConfiguration())
+                            .build();
+                }
+            } else if (fileName == null && !(strategy instanceof DirectFileRolloverStrategy)) {
+                LOGGER.error("AlarmRollingFileAppender '{}': When no file name is provided a DirectFilenameRolloverStrategy must be configured");
+                return null;
             }
 
             final Layout<? extends Serializable> layout = getOrCreateLayout();
             final RollingFileManager manager = RollingFileManager.getFileManager(fileName, filePattern, append,
                     isBufferedIo, policy, strategy, advertiseUri, layout, bufferSize, isImmediateFlush(),
-                    createOnDemand, configuration);
+                    createOnDemand, filePermissions, fileOwner, fileGroup, getConfiguration());
             if (manager == null) {
                 return null;
             }
@@ -122,15 +132,11 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
             manager.initialize();
 
             return new AlarmRollingFileAppender(getName(), layout, getFilter(), manager, fileName, filePattern,
-                    isIgnoreExceptions(), isImmediateFlush(), advertise ? configuration.getAdvertiser() : null);
+                    isIgnoreExceptions(), isImmediateFlush(), advertise ? getConfiguration().getAdvertiser() : null);
         }
 
         public String getAdvertiseUri() {
             return advertiseUri;
-        }
-
-        public Configuration getConfiguration() {
-            return configuration;
         }
 
         public String getFileName() {
@@ -153,6 +159,18 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
             return locking;
         }
 
+        public String getFilePermissions() {
+            return filePermissions;
+        }
+
+        public String getFileOwner() {
+            return fileOwner;
+        }
+
+        public String getFileGroup() {
+            return fileGroup;
+        }
+
         public B withAdvertise(final boolean advertise) {
             this.advertise = advertise;
             return asBuilder();
@@ -165,11 +183,6 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
 
         public B withAppend(final boolean append) {
             this.append = append;
-            return asBuilder();
-        }
-
-        public B withConfiguration(final Configuration config) {
-            this.configuration = config;
             return asBuilder();
         }
 
@@ -215,6 +228,21 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
             return asBuilder();
         }
 
+        public B withFilePermissions(final String filePermissions) {
+            this.filePermissions = filePermissions;
+            return asBuilder();
+        }
+
+        public B withFileOwner(final String fileOwner) {
+            this.fileOwner = fileOwner;
+            return asBuilder();
+        }
+
+        public B withFileGroup(final String fileGroup) {
+            this.fileGroup = fileGroup;
+            return asBuilder();
+        }
+
     }
 
     private static final int DEFAULT_BUFFER_SIZE = 8192;
@@ -250,6 +278,11 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
         return stopped;
     }
 
+    /**
+     * Writes the log entry rolling over the file when required.
+     *
+     * @param event The LogEvent.
+     */
     /**
      * Writes the log entry rolling over the file when required.
      *
@@ -324,11 +357,12 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
      * @param advertise      "true" if the appender configuration should be advertised, "false" otherwise.
      * @param advertiseUri   The advertised URI which can be used to retrieve the file contents.
      * @param config         The Configuration.
+     * @param <B>            Builder 的类型
      * @return A RollingFileAppender.
      * @deprecated Use {@link #newBuilder()}.
      */
     @Deprecated
-    public static AlarmRollingFileAppender createAppender(
+    public static <B extends AlarmRollingFileAppender.Builder<B>> AlarmRollingFileAppender createAppender(
             // @formatter:off
             final String fileName,
             final String filePattern,
@@ -348,14 +382,14 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
         // @formatter:on
         final int bufferSize = Integers.parseInt(bufferSizeStr, DEFAULT_BUFFER_SIZE);
         // @formatter:off
-        AlarmRollingFileAppender.Builder builder = AlarmRollingFileAppender.newBuilder();
+        AlarmRollingFileAppender.Builder builder = newBuilder();
 
         builder.withAdvertise(Boolean.parseBoolean(advertise));
         builder.withAdvertiseUri(advertiseUri);
         builder.withAppend(Booleans.parseBoolean(append, true));
         builder.withBufferedIo(Booleans.parseBoolean(bufferedIO, true));
         builder.withBufferSize(bufferSize);
-        builder.withConfiguration(config);
+        builder.setConfiguration(config);
         builder.withFileName(fileName);
         builder.withFilePattern(filePattern);
         builder.withFilter(filter);
@@ -367,12 +401,12 @@ public class AlarmRollingFileAppender extends AbstractOutputStreamAppender<Rolli
         builder.withName(name);
         builder.withPolicy(policy);
         builder.withStrategy(strategy);
-        return builder.build();
         // @formatter:on
+        return builder.build();
     }
 
     @PluginBuilderFactory
-    public static <B extends Builder<B>> B newBuilder() {
-        return new Builder<B>().asBuilder();
+    public static <B extends AlarmRollingFileAppender.Builder<B>> B newBuilder() {
+        return new AlarmRollingFileAppender.Builder<B>().asBuilder();
     }
 }

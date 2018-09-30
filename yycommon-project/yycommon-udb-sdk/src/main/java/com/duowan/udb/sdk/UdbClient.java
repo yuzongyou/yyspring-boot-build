@@ -14,7 +14,7 @@ import java.util.*;
  * UDB 工具类
  *
  * @author Arvin
- * @since 2018/3/30 18:21
+ * @time 2018/3/30 18:21
  */
 public class UdbClient {
 
@@ -51,7 +51,7 @@ public class UdbClient {
      * @param source      渠道来源
      * @param thirdSubSys 子渠道
      * @param unionId     微信 unionId
-     * @return 如果不存在则返回 &lt;= 0 的数字
+     * @return 如果不存在则返回 <= 0 的数字
      */
     public static long getYyuidByWeixinUnionId(String udbAppId, String udbAppKey, String source, String thirdSubSys, String unionId) {
         String miacct = source + "|" + thirdSubSys + "|" + unionId;
@@ -257,7 +257,7 @@ public class UdbClient {
      * 实际是 7 天有效
      *
      * @param udbAppId udb 的 appid
-     * @return 返回udb aes key
+     * @return
      */
     public static String getAesEncryptKey(String udbAppId) {
 

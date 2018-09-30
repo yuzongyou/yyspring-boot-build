@@ -7,7 +7,7 @@ import java.util.Map;
  * UDB 登录结果Code
  *
  * @author Arvin
- * @since 2017/12/4 17:13
+ * @time 2017/12/4 17:13
  */
 public enum RCode {
 

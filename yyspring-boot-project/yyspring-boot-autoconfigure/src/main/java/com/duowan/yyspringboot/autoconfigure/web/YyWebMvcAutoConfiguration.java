@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.boot.autoconfigure.web.HttpMessageConverters;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +39,7 @@ import java.util.Collections;
  * @since 2018/9/10 10:27
  */
 @Configuration
-@ConditionalOnWebApplication
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyServletContextInitializer.class})
 @EnableConfigurationProperties({WebMvcProperties.class})
 @Import({JsonpAdvice.class, JsonJavascriptAdvice.class, StringHttpMessageAdvice.class})
@@ -129,7 +129,7 @@ public class YyWebMvcAutoConfiguration {
     @Bean
     @ConditionalOnBean(YyRootFilter.class)
     public FilterRegistrationBean filterRegistrationBean(YyRootFilter yyRootFilter) {
-        FilterRegistrationBean registration = new FilterRegistrationBean(yyRootFilter);
+        FilterRegistrationBean<YyRootFilter> registration = new FilterRegistrationBean<>(yyRootFilter);
         registration.setUrlPatterns(Collections.singletonList("/*"));
         registration.setName("yyRootFilter");
         registration.setOrder(0);

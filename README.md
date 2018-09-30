@@ -4,9 +4,9 @@
 # 如何deploy
 如果要deploy，并且deploy同样的版本，先在最顶层的 pom.xml 中修改，即与本文件同级目录下的 pom.xml, 修改:
 ```xml
-<version>1.0.0-SNAPSHOT</version>
+<version>2.0.0-SNAPSHOT</version>
 和 
-<yyproject.version>1.0.0-SNAPSHOT</yyproject.version>
+<yyproject.version>2.0.0-SNAPSHOT</yyproject.version>
 ```
 为你要发布的版本，然后执行如下命令:
 ```cmd

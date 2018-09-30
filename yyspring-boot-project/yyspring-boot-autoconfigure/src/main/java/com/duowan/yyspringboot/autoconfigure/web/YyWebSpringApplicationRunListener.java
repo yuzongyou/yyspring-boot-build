@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -32,7 +33,8 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
 
     @Override
     protected void doStarting() {
-        if (getApplication().isWebEnvironment()) {
+        WebApplicationType webApplicationType = getApplication().getWebApplicationType();
+        if (WebApplicationType.REACTIVE.equals(webApplicationType) || WebApplicationType.SERVLET.equals(webApplicationType)) {
             if (AppContext.isDev()) {
                 WebPrepareUtil.prepareStaticResourceLocations(AppContext.getEnvironment(), AppContext.getModuleDir());
                 WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getEnvironment(), AppContext.getModuleDir());
@@ -69,7 +71,7 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
     }
 
     @Override
-    protected void doFinished(ConfigurableApplicationContext context, Throwable throwable) {
+    protected void doStarted(ConfigurableApplicationContext context) {
         Logger webPrepareUtilLogger = LoggerFactory.getLogger(YyWebSpringApplicationRunListener.class);
         List<String> infoList = WebPrepareUtil.getInitInfo();
         for (String info : infoList) {

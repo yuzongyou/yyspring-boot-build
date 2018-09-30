@@ -4,7 +4,8 @@ import com.duowan.common.utils.ClassUtil;
 import com.duowan.common.utils.PathUtil;
 import com.duowan.yyspring.boot.AppContext;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.UrlResource;
 
@@ -52,8 +53,12 @@ public class WebPrepareUtil {
 
         String locationKeyPrefix = "spring.resources.static-locations";
 
-        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(appEnvironment);
-        Map<String, Object> map = resolver.getSubProperties(locationKeyPrefix);
+        Binder binder = Binder.get(appEnvironment);
+        Map<String, Object> map = null;
+        BindResult<Map> result = binder.bind(locationKeyPrefix, Map.class);
+        if (result.isBound()) {
+            map = result.get();
+        }
 
         if (map == null || map.isEmpty()) {
             resetStaticResourceLocationsAsDefault(resourceLocationPrefix, locationKeyPrefix);
