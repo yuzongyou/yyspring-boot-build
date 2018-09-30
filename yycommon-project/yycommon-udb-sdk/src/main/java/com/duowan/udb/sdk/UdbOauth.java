@@ -61,6 +61,7 @@ public class UdbOauth {
     /**
      * 验证
      *
+     * @param request      当前请求
      * @param strongVerify 强验证检查
      */
     public UdbOauth(HttpServletRequest request, boolean strongVerify) {
@@ -70,6 +71,9 @@ public class UdbOauth {
     /**
      * 验证
      *
+     * @param udbAppId     UDB appid
+     * @param udbAppKey    UDB appkey
+     * @param request      当前请求
      * @param strongVerify 强验证检查
      */
     public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, boolean strongVerify) {
@@ -143,9 +147,6 @@ public class UdbOauth {
         init(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, userinfoForOauth, strongVerify);
     }
 
-    /**
-     * 初始化
-     */
     void init(String udbAppId, String udbAppKey, UserinfoForOauth oauth, boolean strongVerify) {
         AssertUtil.assertNotBlank(udbAppId, "UDB 验证， udbAppId 不能为空");
         AssertUtil.assertNotBlank(udbAppKey, "UDB 验证， udbAppKey 不能为空");

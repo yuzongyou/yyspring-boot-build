@@ -4,33 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.duowan</groupId>
-        <artifactId>yycommon-bom</artifactId>
+        <artifactId>yycommon-parent</artifactId>
         <version>2.0.0-SNAPSHOT</version>
-        <relativePath>../yycommon-bom</relativePath>
+        <relativePath>../yycommon-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>yycommon-jdbc</artifactId>
-
-    <properties>
-        <spring.version>4.3.17.RELEASE</spring.version>
-        <mysql.connector.version>5.1.46</mysql.connector.version>
-        <HikariCP.version>3.1.0</HikariCP.version>
-        <tomcat.jdbc.version>8.5.24</tomcat.jdbc.version>
-        <druid.version>1.1.9</druid.version>
-        <dbcp2.version>2.3.0</dbcp2.version>
-        <dbcp.version>1.4</dbcp.version>
-        <c3p0.version>0.9.5.2</c3p0.version>
-        <jsqlparser.version>1.2</jsqlparser.version>
-        <h2.version>1.4.197</h2.version>
-    </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -42,13 +28,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -101,64 +85,4 @@
 
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- 数据库相关 开始 -->
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.connector.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.github.jsqlparser</groupId>
-                <artifactId>jsqlparser</artifactId>
-                <version>${jsqlparser.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.mchange</groupId>
-                <artifactId>c3p0</artifactId>
-                <version>${c3p0.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${dbcp.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-dbcp2</artifactId>
-                <version>${dbcp2.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>${druid.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${HikariCP.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-juli</artifactId>
-                <version>${tomcat.jdbc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.tomcat</groupId>
-                <artifactId>tomcat-jdbc</artifactId>
-                <version>${tomcat.jdbc.version}</version>
-            </dependency>
-
-            <!-- 数据库相关 结束 -->
-        </dependencies>
-    </dependencyManagement>
 </project>

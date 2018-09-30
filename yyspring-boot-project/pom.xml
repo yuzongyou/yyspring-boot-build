@@ -23,6 +23,7 @@
         <module>yyspring-boot-bom</module>
         <module>yyspring-boot-autoconfigure</module>
         <module>yyspring-boot-starters</module>
+        <module>yyspring-boot-parent</module>
     </modules>
 
 </project>
