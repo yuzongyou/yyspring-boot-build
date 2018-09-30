@@ -37,6 +37,7 @@
         <module>yycommon-thrift-server</module>
         <module>yycommon-udb-sdk</module>
         <module>yycommon-okhttp3</module>
+        <module>yycommon-wxmp-sdk</module>
     </modules>
 
 </project>

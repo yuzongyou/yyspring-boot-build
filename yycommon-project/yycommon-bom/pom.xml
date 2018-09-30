@@ -32,6 +32,7 @@
         <commons.pool2.version>2.5.0</commons.pool2.version>
         <fastjson.version>1.2.49</fastjson.version>
         <okhttp3.version>3.11.0</okhttp3.version>
+        <bcprov.jdk16.version>1.46</bcprov.jdk16.version>
 
         <flatten-maven-plugin.version>1.0.1</flatten-maven-plugin.version>
     </properties>
@@ -48,6 +49,7 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <dependencyManagement>
@@ -74,6 +76,12 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-pool2</artifactId>
                 <version>${commons.pool2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk16</artifactId>
+                <version>${bcprov.jdk16.version}</version>
             </dependency>
 
             <dependency>
@@ -217,6 +225,12 @@
             <dependency>
                 <groupId>com.duowan</groupId>
                 <artifactId>yycommon-okhttp3</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-wxmp-sdk</artifactId>
                 <version>${yyproject.version}</version>
             </dependency>
 

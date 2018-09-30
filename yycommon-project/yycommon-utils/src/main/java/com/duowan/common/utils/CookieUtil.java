@@ -122,7 +122,19 @@ public class CookieUtil {
      * @return 返回顶级域名，如 login.yy.com to .yy.com
      */
     public static String getTopDomain(String domain) {
-        return domain.replaceAll("(?i)^.*\\.([^.]+)\\.([^.]+)$", ".$1.$2");
+        String[] str = domain.split("\\.");
+        return "." + str[str.length - 2] + "." + str[str.length - 1];
+    }
+
+    /**
+     * 获取顶级域名，不包含 .
+     *
+     * @param request 当前请求
+     * @return 返回顶级域名
+     */
+    public static String getTopDomainWithoutDot(HttpServletRequest request) {
+        String[] str = request.getServerName().split("\\.");
+        return str[str.length - 2] + "." + str[str.length - 1];
     }
 
     /**

@@ -25,7 +25,7 @@ public class OkHttp3ApiTest {
                 .dns(Dns.SYSTEM)
                 .build();
 
-        String httpUrl = "http://proxyapi.yy.com/leopardtest-service/myip";
+        String httpUrl = "http://proxyapi.duowan.com/leopardtest-service/myip";
 
         System.out.println("初始化耗时： " + (System.currentTimeMillis() - begTime) + " 毫秒！");
         begTime = System.currentTimeMillis();
