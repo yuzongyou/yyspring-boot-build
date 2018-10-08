@@ -185,15 +185,31 @@ public abstract class CommonUtil {
         separator = null == separator ? "" : separator;
         StringBuilder builder = new StringBuilder();
         for (Object obj : objects) {
-            if (null == obj) {
-                if (!nullToIgnore) {
-                    builder.append("null").append(separator);
+
+            concatObject(builder, nullToIgnore, separator, obj);
+
+        }
+        builder.setLength(builder.length() - 1);
+        return builder.toString();
+    }
+
+    private static void concatObject(StringBuilder builder, boolean nullToIgnore, String separator, Object obj) {
+
+        if (null == obj) {
+            if (!nullToIgnore) {
+                builder.append("null").append(separator);
+            }
+        } else {
+            if (obj instanceof Collection) {
+                Collection collection = (Collection)obj;
+                for (Object subObj : collection) {
+                    concatObject(builder, nullToIgnore, separator, subObj);
                 }
             } else {
                 builder.append(obj).append(separator);
             }
         }
-        return builder.toString();
+
     }
 
     /**
