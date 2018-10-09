@@ -24,6 +24,9 @@ public class DecryptPartnerInfoPageParameter extends AbstractPageParameter {
     protected String customGetValue(HttpServletRequest request) {
 
         String encryptData = CookieUtil.getCookie(request, "parnerInfo");
+        if (encryptData == null) {
+            encryptData = CookieUtil.getCookie(request, "partnerInfo");
+        }
 
         if (StringUtils.isBlank(encryptData)) {
             return null;

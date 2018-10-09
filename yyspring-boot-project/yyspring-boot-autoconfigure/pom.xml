@@ -94,6 +94,18 @@
 
         <dependency>
             <groupId>com.duowan</groupId>
+            <artifactId>yycommon-udb-sdk</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-wxmp-sdk</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
             <artifactId>yycommon-admincenter</artifactId>
             <optional>true</optional>
         </dependency>
