@@ -21,6 +21,10 @@ public enum RCode {
     ERR_WRITE_COOKIE(-10006, "写cookie失败"),
     ERR_INTERNAL(-10010, "操作失败,稍后重试"),
     ERR_FETCH_ACCOUNT_INFO(-10015, "获取accountinfo失败"),
+    ERR_WXMP_FORBIDDEN(-100, "用户封禁"),
+    ERR_WXMP_INVALID_JSDATA(-200, "验证参数jsdata失败"),
+    ERR_WXMP_WXUNKNOWN(-300, "微信错误，查看msg"),
+    ERR_WXMP_UNKNOWN(-400, "未知错误"),
     ERR_UNKNOWN(-9999, "未知错误");
 
     private int id;

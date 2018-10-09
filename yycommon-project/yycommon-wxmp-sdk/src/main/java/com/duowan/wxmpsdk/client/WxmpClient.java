@@ -21,7 +21,7 @@ public class WxmpClient {
 
     private static final String CODE_TO_SESSION_URL = " https://api.weixin.qq.com/sns/jscode2session";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(WxmpClient.class);
 
     /**
      * 使用一次性微信小程序 code 换取会话信息
@@ -32,7 +32,7 @@ public class WxmpClient {
      * @return 返回
      * @throws WxmpException 发生任何错误将包装成本异常抛出
      */
-    public Code2Session code2Session(String appid, String secret, String code) throws WxmpException {
+    public static Code2Session code2Session(String appid, String secret, String code) throws WxmpException {
 
         String reqUrl = CODE_TO_SESSION_URL + "?appid=" + appid + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code";
 
@@ -72,7 +72,7 @@ public class WxmpClient {
      * @return 返回解密后的文本信息
      * @throws WxmpException 发生任何错误将包装成本异常抛出
      */
-    public String decryptData(String encryptText, String ivText, String sessionKeyText) throws WxmpException {
+    public static String decryptData(String encryptText, String ivText, String sessionKeyText) throws WxmpException {
         AssertUtil.assertNotBlank(encryptText, "要解密的数据为空！");
         AssertUtil.assertNotBlank(ivText, "要解密的初始向量为空！");
         AssertUtil.assertNotBlank(sessionKeyText, "要解密的会话key为空！");

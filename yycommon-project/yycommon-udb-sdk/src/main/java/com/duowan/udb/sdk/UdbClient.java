@@ -302,4 +302,72 @@ public class UdbClient {
         return udbAesKey;
     }
 
+    /**
+     * 微信小程序登录URL
+     */
+    private static final String UDB_LOGIN_BY_WXMP_URL = "https://thirdlogin.yy.com/open/wx/mplogin.do";
+
+    /**
+     * 微信小程序登录
+     *
+     * @param reqid           请求跟踪ID
+     * @param code            微信小程序一次性授权 code
+     * @param udbAppId        UDB 的微信 APPID
+     * @param wxAppId         微信小程序提供的 APPID
+     * @param userEncryptData 用户加密数据
+     * @param iv              加密数据初始向量，用于解密用户加密的数据
+     * @return 返回用户登录结果数据
+     */
+    public static LoginResult loginForWxmp(String reqid, String code, String udbAppId, String wxAppId, String userEncryptData, String iv) {
+
+        long begTime = System.currentTimeMillis();
+
+        Map<String, String> paramsMap = new HashMap<>();
+        paramsMap.put("reqid", reqid);
+        paramsMap.put("appid", udbAppId);
+        paramsMap.put("wxappid", wxAppId);
+        paramsMap.put("jscode", code);
+        paramsMap.put("jsdata", userEncryptData);
+        paramsMap.put("jsiv", iv);
+
+        String paramString = JsonUtil.toJson(paramsMap);
+        String responseText = null;
+
+        try {
+            logger.info("UdbWxmpLogin start: " + paramString);
+
+            responseText = HttpUtil.doPost(UDB_LOGIN_BY_WXMP_URL, paramsMap, null, 5000, 5000);
+
+            return wxmpResponseToLoginResult(code, responseText);
+        } finally {
+            logger.info("UdbWxmpLogin end: 耗时 " + (System.currentTimeMillis() - begTime) + " 毫秒 " + paramString + ", resp: " + CommonUtil.trim(responseText));
+        }
+
+    }
+
+    private static LoginResult wxmpResponseToLoginResult(String codeOrToken, String response) {
+
+        Map<String, Object> map = JsonUtil.toObjectMap(response);
+
+        RCode rcode = RCode.get(ConvertUtil.toInteger(map.get("rcode"), RCode.ERR_WXMP_WXUNKNOWN.getId()));
+
+        boolean isSuccess = RCode.SUCCESS.equals(rcode);
+
+        if (!isSuccess) {
+            String errorMsg = String.valueOf(map.get("msg"));
+            if (StringUtils.isBlank(errorMsg)) {
+                errorMsg = rcode.getReason();
+            }
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        LoginResult loginResult = new LoginResult();
+        loginResult.setId(codeOrToken);
+        List<CK> ckList = convertUdbLoginCookieList(map);
+        ckList.add(new CK("wxmp", "1"));
+        loginResult.setCkList(ckList);
+
+        return loginResult;
+    }
+
 }
