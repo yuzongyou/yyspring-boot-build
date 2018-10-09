@@ -7,8 +7,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class UdbContext {
 
-    private static String appid;
-    private static String appkey;
+    private static String appid = UdbConstants.DEFAULT_UDB_APPID;
+    private static String appkey = UdbConstants.DEFAULT_UDB_APPKEY;
 
     private UdbContext() {
     }

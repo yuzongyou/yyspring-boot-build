@@ -12,6 +12,15 @@ public abstract class AbstractPageParameter implements PageParameter {
 
         String name = getName();
 
+        String val = commonGetValue(request, name);
+        if (null != val) {
+            return val;
+        }
+
+        return customGetValue(request);
+    }
+
+    public static String commonGetValue(HttpServletRequest request, String name) {
         if (request.getParameterMap().containsKey(name)) {
             return request.getParameter(name);
         }
@@ -21,7 +30,7 @@ public abstract class AbstractPageParameter implements PageParameter {
             return String.valueOf(value);
         }
 
-        return customGetValue(request);
+        return request.getHeader(name);
     }
 
     protected abstract String customGetValue(HttpServletRequest request);

@@ -202,6 +202,17 @@ public class HttpUtil {
     /**
      * Post 请求
      *
+     * @param url 请求地址
+     * @param paramsMap 请求参数
+     * @return 返回请求结果
+     */
+    public static String doPost(String url, Map<String,String> paramsMap) {
+        return doPost(url, paramsMap, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT);
+    }
+
+    /**
+     * Post 请求
+     *
      * @param url               请求地址
      * @param paramMap          参数MAP
      * @param connectionTimeout 连接超时时间
@@ -251,7 +262,7 @@ public class HttpUtil {
             // use for Input
             conn.setDoInput(true);
 
-            String postData = UrlUtil.toUrlParamsString(paramMap, true, false);
+            String postData = UrlUtil.toUrlParamsString(paramMap, false, false);
             if (StringUtils.isNotBlank(postData)) {
                 PrintWriter out = new PrintWriter(conn.getOutputStream());
                 // send to server

@@ -25,6 +25,10 @@ public class DecryptOauthCookiePageParameter extends AbstractPageParameter {
 
         String encryptData = CookieUtil.getCookie(request, "thirdCookie");
 
+        if (encryptData == null) {
+            encryptData = commonGetValue(request, "thirdCookie");
+        }
+
         if (StringUtils.isBlank(encryptData)) {
             return null;
         }
@@ -32,6 +36,7 @@ public class DecryptOauthCookiePageParameter extends AbstractPageParameter {
         String aesKey = UdbClient.getAesEncryptKey(UdbContext.getAppid());
         return AESHelper.decrypt(encryptData, aesKey);
     }
+
 
     @Override
     public String getName() {
