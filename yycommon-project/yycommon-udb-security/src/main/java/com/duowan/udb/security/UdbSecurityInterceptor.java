@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
@@ -27,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,17 +56,19 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
     private PrivilegeInterceptor privilegeInterceptor;
 
-    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode) {
-        this(udbAppId, udbAppKey, defaultCheckMode, new HashSet<String>());
-    }
+    private Set<String> interceptorPatterns;
+    private Set<String> excludePatterns;
 
-    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames) {
-        this(udbAppId, udbAppKey, defaultCheckMode, excludePackagesOrClassNames, false);
-    }
+    private AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames, boolean staticSkip) {
+    public UdbSecurityInterceptor(String udbAppId,
+                                  String udbAppKey,
+                                  CheckMode defaultCheckMode,
+                                  Set<String> interceptorPatterns,
+                                  Set<String> excludePatterns,
+                                  Set<String> excludePackagesOrClassNames, boolean staticSkip) {
         this.defaultCheckMode = defaultCheckMode;
-        this.excludePackagesOrClassNames = excludePackagesOrClassNames;
+        this.excludePackagesOrClassNames = fixExcludePackagesOrClassNames(excludePackagesOrClassNames);
         this.staticSkip = staticSkip;
 
         if (StringUtils.isBlank(udbAppId) || StringUtils.isBlank(udbAppKey)) {
@@ -74,7 +78,38 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
             this.udbAppId = udbAppId;
             this.udbAppKey = udbAppKey;
         }
+
+        this.interceptorPatterns = fixPatterns(interceptorPatterns);
+        this.excludePatterns = fixPatterns(excludePatterns);
+
         logger.info("初始化 UdbSecurityInterceptor 拦截器, 跳过静态资源: " + staticSkip + ", 默认拦截模式： " + defaultCheckMode + ", 排除的包名和类： " + JsonUtil.toJson(excludePackagesOrClassNames));
+    }
+
+    private Set<String> fixExcludePackagesOrClassNames(Set<String> excludePackagesOrClassNames) {
+
+        if (excludePackagesOrClassNames == null || excludePackagesOrClassNames.isEmpty()) {
+            return new HashSet<>(Collections.singletonList("org.springframework"));
+        }
+
+        excludePackagesOrClassNames.add("org.springframework");
+        return excludePackagesOrClassNames;
+    }
+
+    private Set<String> fixPatterns(Set<String> patternSet) {
+        if (null == patternSet || patternSet.isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<String> patterns = new HashSet<>();
+
+        for (String pattern : patternSet) {
+            if (pattern.endsWith("/")) {
+                patterns.add(pattern + "**");
+            } else {
+                patterns.add(pattern);
+            }
+        }
+
+        return patterns;
     }
 
     public PrivilegeInterceptor getPrivilegeInterceptor() {
@@ -93,7 +128,6 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         if (isStatic && this.staticSkip) {
             return true;
         }
-
         CheckMode checkMode = detectUdbCheckMode(request, response, handler, isStatic);
 
         if (null == checkMode || CheckMode.NONE.equals(checkMode)) {
@@ -130,9 +164,14 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
     private CheckMode detectUdbCheckMode(HttpServletRequest request, HttpServletResponse response, Object handler, boolean isStatic) {
 
-        CheckMode checkMode;
+        String requestUri = request.getRequestURI();
+        boolean isMatchExcludePattern = isMatchExcludePattern(requestUri);
+
         if (isStatic) {
-            checkMode = defaultCheckMode;
+            if (isMatchExcludePattern) {
+                return null;
+            }
+            return defaultCheckMode;
         } else {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Class<?> beanType = handlerMethod.getBeanType();
@@ -141,10 +180,83 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
                 return null;
             }
 
-            checkMode = getUdbCheckMode(request, beanType, handlerMethod);
+            // 获取注解拦截要求
+            CheckMode checkMode = detectAnnotatedUdbCheckMode(request, beanType, handlerMethod);
+            if (checkMode == null) {
+                // 注解为空，表示根据当前请求地址是否需要拦截来计算
+                if (isMatchExcludePattern) {
+                    // 匹配到不需要拦截的地址，不进行拦截
+                    return null;
+                }
+                // 看看是否在拦截的配置里面，如果在的话就拦截
+                if (isMatchInterceptorPattern(requestUri)) {
+                    return defaultCheckMode;
+                }
+                // 不需要拦截
+                return null;
+            }
+            // 明确指定了不需要拦截的，直接不进行拦截
+            if (CheckMode.NONE.equals(checkMode)) {
+                return null;
+            }
+            if (CheckMode.DEFAULT.equals(checkMode)) {
+                return this.defaultCheckMode;
+            }
         }
 
-        return checkMode;
+        return null;
+    }
+
+    private CheckMode detectAnnotatedUdbCheckMode(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
+
+        CheckMode methodCheckMode = detectMethodAnnotatedUdbCheckMode(request, beanType, handlerMethod);
+        if (null != methodCheckMode) {
+            return methodCheckMode;
+        }
+
+        if (null != beanType.getAnnotation(IgnoredUdbCheck.class)) {
+            return CheckMode.NONE;
+        }
+
+        UdbCheck udbCheck = beanType.getAnnotation(UdbCheck.class);
+        if (null != udbCheck) {
+            return udbCheck.value();
+        }
+        return null;
+    }
+
+    private CheckMode detectMethodAnnotatedUdbCheckMode(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
+
+        if (null != handlerMethod.getMethodAnnotation(IgnoredUdbCheck.class)) {
+            return CheckMode.NONE;
+        }
+
+        UdbCheck udbCheck = handlerMethod.getMethodAnnotation(UdbCheck.class);
+        if (null != udbCheck) {
+            return udbCheck.value();
+        }
+
+        return null;
+    }
+
+    private boolean isMatchInterceptorPattern(String requestUri) {
+        return isMatchPatterns(requestUri, this.interceptorPatterns);
+    }
+
+    private boolean isMatchExcludePattern(String requestUri) {
+        return isMatchPatterns(requestUri, this.excludePatterns);
+    }
+
+    private boolean isMatchPatterns(String requestUri, Set<String> patterns) {
+        if (patterns == null || patterns.isEmpty() || StringUtils.isBlank(requestUri)) {
+            return false;
+        }
+        for (String pattern : patterns) {
+            if (pathMatcher.match(pattern, requestUri)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -174,33 +286,6 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         }
 
         return true;
-    }
-
-    private CheckMode getUdbCheckMode(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
-
-        if (null != handlerMethod.getMethodAnnotation(IgnoredUdbCheck.class)) {
-            return CheckMode.NONE;
-        }
-
-        UdbCheck udbCheck = handlerMethod.getMethodAnnotation(UdbCheck.class);
-        if (null == udbCheck) {
-            udbCheck = beanType.getAnnotation(UdbCheck.class);
-        }
-        if (udbCheck == null) {
-            if (null != beanType.getAnnotation(IgnoredUdbCheck.class)) {
-                return CheckMode.NONE;
-            }
-            return this.defaultCheckMode;
-        }
-
-        CheckMode checkMode = udbCheck.value();
-        if (CheckMode.NONE.equals(checkMode)) {
-            return null;
-        }
-        if (CheckMode.DEFAULT.equals(checkMode)) {
-            return this.defaultCheckMode;
-        }
-        return checkMode;
     }
 
     /**

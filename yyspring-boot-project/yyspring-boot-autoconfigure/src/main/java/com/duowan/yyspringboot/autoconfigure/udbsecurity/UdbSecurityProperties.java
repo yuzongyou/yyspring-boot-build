@@ -49,7 +49,7 @@ public class UdbSecurityProperties {
     /**
      * 要忽略的包名或者类名称列表，中间用英文逗号分隔
      **/
-    private String[] excludePackagesAndClasses = new String[]{"org.springframework"};
+    private String[] excludePackagesAndClasses = new String[]{};
 
     public String getAppid() {
         return appid;

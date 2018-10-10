@@ -48,12 +48,12 @@ public class UdbSecurityAutoConfiguration {
 
         Set<String> excludePackagesOrClassNames = new HashSet<String>(Arrays.asList(udbSecurityProperties.getExcludePackagesAndClasses()));
         // 默认派排除 spring 内置的
-        excludePackagesOrClassNames.add("org.springframework");
-
         UdbSecurityInterceptor udbSecurityInterceptor = new UdbSecurityInterceptor(
                 udbSecurityProperties.getAppid(),
                 udbSecurityProperties.getAppkey(),
                 udbSecurityProperties.getDefaultCheckMode(),
+                getPathPatterns(udbSecurityProperties, patternProviders),
+                getExcludePatterns(udbSecurityProperties, patternProviders),
                 excludePackagesOrClassNames,
                 udbSecurityProperties.isStaticSkip());
 
@@ -61,13 +61,10 @@ public class UdbSecurityAutoConfiguration {
             udbSecurityInterceptor.setPrivilegeInterceptor(privilegeInterceptor);
         }
 
-        return new MappedInterceptor(
-                getPathPatterns(udbSecurityProperties, patternProviders),
-                getExcludePatterns(udbSecurityProperties, patternProviders),
-                udbSecurityInterceptor);
+        return new MappedInterceptor(new String[]{"/**"}, udbSecurityInterceptor);
     }
 
-    private String[] getExcludePatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
+    private Set<String> getExcludePatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
         Set<String> patterns = new HashSet<String>(Arrays.asList(udbSecurityProperties.getExcludePathPatterns()));
 
         if (patternProviders != null && !patternProviders.isEmpty()) {
@@ -79,10 +76,10 @@ public class UdbSecurityAutoConfiguration {
             }
         }
 
-        return patterns.toArray(new String[patterns.size()]);
+        return patterns;
     }
 
-    private String[] getPathPatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
+    private Set<String> getPathPatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
         Set<String> patterns = new HashSet<>(Arrays.asList(udbSecurityProperties.getPathPatterns()));
 
         if (patternProviders != null && !patternProviders.isEmpty()) {
@@ -98,7 +95,7 @@ public class UdbSecurityAutoConfiguration {
             patterns.add("/admin/**");
         }
 
-        return patterns.toArray(new String[patterns.size()]);
+        return patterns;
     }
 
 }
