@@ -1,5 +1,8 @@
 # 具有UDB校验的web项目示例
 
+## 前提概要
+<font color=#0099ff size="8" face="黑体">**阅读本文档前，可以前往以下地址查看非 UDB 登录态校验的说明：**[yycommon-udb-security](../../yycommon-project/yycommon-udb-security)</font>
+
 ## 场景说明
 - 希望某个地址下都要进行UDB登录态校验
 - 假设某个地址下(如 /admin/**) 要求登录态，但是希望其下某些不需要拦截
@@ -148,4 +151,12 @@ yyspring.udbsecurity.exclude-path-patterns=/mgr/**
 - <code>@IgnoredUdbCheck</code> 可以在 Controller 类或该类的方法 中使用这个注解，表示不需要进行UDB登录态校验
 
 ### Controller 自动参数注入
-参考 <code>UdbController</code> 类
+参考 <code>UdbController</code> 类:
+| **参数** | **说明** |
+| :----------------------- | :-------- |
+| strongPassport | UDB 强校验登录通过的通行证。 |
+| weakPassport | UDB 本地校验登录通过的通行证。 |
+| strongYyuid | UDB 强校验登录通过的 yyuid。 |
+| weakYyuid | UDB 本地校验登录通过的 yyuid。 |
+| udbStrongLogin | 是否通过了UDB强校验。 |
+| udbWeakLogin | 是否通过了UDB本地校验。 |
