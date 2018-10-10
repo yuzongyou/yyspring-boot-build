@@ -4,7 +4,8 @@ import com.duowan.common.utils.CookieUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.SessionUtil;
 import com.duowan.common.utils.UrlUtil;
-import com.duowan.udb.sdk.UdbContext;
+import com.duowan.udb.sdk.UdbAuthLevel;
+import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.sdk.UdbOauth;
 import com.duowan.udb.security.annotations.IgnoredUdbCheck;
 import com.duowan.udb.security.annotations.UdbCheck;
@@ -31,6 +32,9 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
     private final CheckMode defaultCheckMode;
 
+    private final String udbAppId;
+    private final String udbAppKey;
+
     /**
      * 要忽略的包名或者类名
      */
@@ -43,18 +47,26 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
     private PrivilegeInterceptor privilegeInterceptor;
 
-    public UdbSecurityInterceptor(CheckMode defaultCheckMode) {
-        this(defaultCheckMode, new HashSet<String>());
+    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode) {
+        this(udbAppId, udbAppKey, defaultCheckMode, new HashSet<String>());
     }
 
-    public UdbSecurityInterceptor(CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames) {
-        this(defaultCheckMode, excludePackagesOrClassNames, false);
+    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames) {
+        this(udbAppId, udbAppKey, defaultCheckMode, excludePackagesOrClassNames, false);
     }
 
-    public UdbSecurityInterceptor(CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames, boolean staticSkip) {
+    public UdbSecurityInterceptor(String udbAppId, String udbAppKey, CheckMode defaultCheckMode, Set<String> excludePackagesOrClassNames, boolean staticSkip) {
         this.defaultCheckMode = defaultCheckMode;
         this.excludePackagesOrClassNames = excludePackagesOrClassNames;
         this.staticSkip = staticSkip;
+
+        if (StringUtils.isBlank(udbAppId) || StringUtils.isBlank(udbAppKey)) {
+            this.udbAppId = UdbConstants.DEFAULT_UDB_APPID;
+            this.udbAppKey = UdbConstants.DEFAULT_UDB_APPKEY;
+        } else {
+            this.udbAppId = udbAppId;
+            this.udbAppKey = udbAppKey;
+        }
         logger.info("初始化 UdbSecurityInterceptor 拦截器, 跳过静态资源: " + staticSkip + ", 默认拦截模式： " + defaultCheckMode + ", 排除的包名和类： " + JsonUtil.toJson(excludePackagesOrClassNames));
     }
 
@@ -91,7 +103,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         UdbOauth udbOauth = SessionUtil.get(request, udbOauthKey, UdbOauth.class);
         if (null == udbOauth || !username.equals(udbOauth.getPassport())) {
             // 需要重新计算
-            udbOauth = UdbContext.getOauth(request, CheckMode.STRONG.equals(checkMode));
+            udbOauth = new UdbOauth(udbAppId, udbAppKey, request, CheckMode.STRONG.equals(checkMode) ? UdbAuthLevel.STRONG : UdbAuthLevel.LOCAL);
             SessionUtil.set(request, udbOauthKey, udbOauth);
         }
 

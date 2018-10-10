@@ -1,6 +1,8 @@
 package com.duowan.udb.controller;
 
 import com.duowan.common.web.view.JsonView;
+import com.duowan.udb.sdk.UdbAuthLevel;
+import com.duowan.yyspringboot.autoconfigure.udbpage.annotations.UdbLoginCheck;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,7 +19,8 @@ public class UdbController {
 
     @RequestMapping("/udbpages")
     public JsonView udbpages(String strongPassport, Long strongYyuid,
-                             String weakPassport, String weakYyuid,
+                             String weakPassport, Long weakYyuid,
+                             @UdbLoginCheck(UdbAuthLevel.LOCAL) String loginPassport, @UdbLoginCheck(UdbAuthLevel.STRONG) Long loginYyuid,
                              Boolean udbStrongLogin, Boolean udbWeakLogin,
                              String decryptPartnerInfo, String decryptOauthCookie) {
 
@@ -27,6 +30,8 @@ public class UdbController {
         dataMap.put("strongYyuid", strongYyuid);
         dataMap.put("weakPassport", weakPassport);
         dataMap.put("weakYyuid", weakYyuid);
+        dataMap.put("loginPassport", loginPassport);
+        dataMap.put("loginYyuid", loginYyuid);
         dataMap.put("udbStrongLogin", udbStrongLogin);
         dataMap.put("udbWeakLogin", udbWeakLogin);
         dataMap.put("decryptPartnerInfo", decryptPartnerInfo);

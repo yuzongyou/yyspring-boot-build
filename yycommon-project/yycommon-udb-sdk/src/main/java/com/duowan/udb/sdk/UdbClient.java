@@ -155,7 +155,7 @@ public class UdbClient {
      * 转成 UDB 的 Cookie
      *
      * @param map 结果 MAP
-     * @return cookie 对象列表
+     * @return
      */
     private static List<CK> convertUdbLoginCookieList(Map<String, Object> map) {
         List<CK> ckList = new ArrayList<>();
@@ -257,7 +257,7 @@ public class UdbClient {
      * 实际是 7 天有效
      *
      * @param udbAppId udb 的 appid
-     * @return udb aes key
+     * @return 返回udb aes key
      */
     public static String getAesEncryptKey(String udbAppId) {
 
@@ -369,5 +369,4 @@ public class UdbClient {
 
         return loginResult;
     }
-
 }

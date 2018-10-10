@@ -1,6 +1,5 @@
 package com.duowan.udb.security;
 
-import com.duowan.udb.sdk.UdbContext;
 import com.duowan.universal.login.client.YYSecCenterOpenWSInvoker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,13 +52,15 @@ public class UdbLoginBox {
     /**
      * 获取退出页面文本.
      *
-     * @param redirectUrl
+     * @param udbAppId    UDB APPID
+     * @param udbAppKey   UDB APPKEY
+     * @param redirectUrl 重定向地址
      */
-    public static String getLogoutHtml(String redirectUrl) {
+    public static String getLogoutHtml(String udbAppId, String udbAppKey, String redirectUrl) {
 
         // TODO 这里要验证 redirectUrl 的合法性以及XSS
 
-        String deleteCookieURL = YYSecCenterOpenWSInvoker.getOAuthCookieDeleteURL(UdbContext.getAppid(), UdbContext.getAppkey());
+        String deleteCookieURL = YYSecCenterOpenWSInvoker.getOAuthCookieDeleteURL(udbAppId, udbAppKey);
         logger.info("deleteCookieURL:" + deleteCookieURL);
         StringBuilder builder = new StringBuilder();
 

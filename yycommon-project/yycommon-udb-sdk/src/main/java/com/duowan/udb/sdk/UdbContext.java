@@ -7,40 +7,18 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class UdbContext {
 
-    private static String appid = UdbConstants.DEFAULT_UDB_APPID;
-    private static String appkey = UdbConstants.DEFAULT_UDB_APPKEY;
-
-    private UdbContext() {
-    }
-
-    public static String getAppid() {
-        return appid;
-    }
-
-    public static void setAppid(String appid) {
-        UdbContext.appid = appid;
-    }
-
-    public static String getAppkey() {
-        return appkey;
-    }
-
-    public static void setAppkey(String appkey) {
-        UdbContext.appkey = appkey;
-    }
-
     /**
      * 默认获取的是弱验证
      *
      * @param request 当前请求
      * @return 返回弱验证的对象
      */
-    public static UdbOauth getOauth(HttpServletRequest request) {
-        return getOauth(request, false);
+    public static UdbOauth getOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
+        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.LOCAL);
     }
 
-    public static UdbOauth getOauth(HttpServletRequest request, boolean strongVerify) {
-        return new UdbOauth(request, strongVerify);
+    public static UdbOauth getOauth(String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
+        return new UdbOauth(udbAppId, udbAppKey, request, authLevel);
     }
 
     /**
@@ -49,8 +27,8 @@ public class UdbContext {
      * @param request 当前请求对象
      * @return 返回弱验证的 Oauth
      */
-    public static UdbOauth getWeakOauth(HttpServletRequest request) {
-        return getOauth(request, false);
+    public static UdbOauth getWeakOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
+        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.LOCAL);
     }
 
     /**
@@ -59,8 +37,8 @@ public class UdbContext {
      * @param request 当前请求对象
      * @return 返回强验证的 Oauth
      */
-    public static UdbOauth getStrongOauth(HttpServletRequest request) {
-        return getOauth(request, true);
+    public static UdbOauth getStrongOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
+        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.STRONG);
     }
 
     /**
@@ -69,8 +47,8 @@ public class UdbContext {
      * @param request 当前请求
      * @return 返回是否弱登录，只是进行本地校验
      */
-    public static boolean isLoginWeak(HttpServletRequest request) {
-        UdbOauth oauth = getWeakOauth(request);
+    public static boolean isLoginWeak(String udbAppId, String udbAppKey, HttpServletRequest request) {
+        UdbOauth oauth = getWeakOauth(udbAppId, udbAppKey, request);
         return null != oauth && oauth.isLogin();
     }
 
@@ -80,8 +58,8 @@ public class UdbContext {
      * @param request 当前请求
      * @return 返回是否强登录，只是进行本地校验
      */
-    public static boolean isLoginStrong(HttpServletRequest request) {
-        UdbOauth oauth = getStrongOauth(request);
+    public static boolean isLoginStrong(String udbAppId, String udbAppKey, HttpServletRequest request) {
+        UdbOauth oauth = getStrongOauth(udbAppId, udbAppKey, request);
         return null != oauth && oauth.isLogin();
     }
 

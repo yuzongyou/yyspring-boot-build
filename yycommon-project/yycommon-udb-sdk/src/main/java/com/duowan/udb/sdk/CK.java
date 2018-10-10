@@ -39,7 +39,6 @@ public class CK {
 
     /**
      * 将 Cookie 列表转成CK key - value 姓氏
-     *
      * @param ckList cookie 列表
      * @return 返回 map
      */
@@ -56,5 +55,4 @@ public class CK {
 
         return map;
     }
-
 }

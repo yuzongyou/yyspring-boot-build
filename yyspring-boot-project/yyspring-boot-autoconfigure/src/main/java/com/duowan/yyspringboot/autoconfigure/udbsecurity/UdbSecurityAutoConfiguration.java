@@ -1,9 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
-import com.duowan.common.utils.ConvertUtil;
-import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.PrivilegeInterceptor;
-import com.duowan.udb.sdk.UdbContext;
 import com.duowan.udb.security.UdbSecurityInterceptor;
 import com.duowan.udb.security.controller.UdbSecurityController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +25,11 @@ import java.util.Set;
  * @since 2018/8/22 11:09
  */
 @Configuration
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnWebApplication
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, UdbSecurityInterceptor.class})
-@ConditionalOnExpression("${yyspring.udb.interceptor-enabled:true}")
-@EnableConfigurationProperties(UdbProperties.class)
+@ConditionalOnExpression("${yyspring.udbsecurity.interceptor-enabled:true}")
+@EnableConfigurationProperties(UdbSecurityProperties.class)
 public class UdbSecurityAutoConfiguration {
-
-    public UdbSecurityAutoConfiguration(UdbProperties udbProperties) {
-        // 初始化UDB的配置
-        UdbContext.setAppid(ConvertUtil.toString(udbProperties.getAppid(), UdbConstants.DEFAULT_UDB_APPID));
-        UdbContext.setAppkey(ConvertUtil.toString(udbProperties.getAppkey(), UdbConstants.DEFAULT_UDB_APPKEY));
-    }
 
     @Bean
     public UdbLoginRequirePatternProvider udbLoginRequirePatternProvider() {
@@ -46,35 +37,38 @@ public class UdbSecurityAutoConfiguration {
     }
 
     @Bean
-    public UdbSecurityController udbSecurityController() {
-        return new UdbSecurityController();
+    public UdbSecurityController udbSecurityController(UdbSecurityProperties udbSecurityProperties) {
+        return new UdbSecurityController(udbSecurityProperties.getAppid(), udbSecurityProperties.getAppkey());
     }
 
     @Bean
-    public MappedInterceptor mappedInterceptor(UdbProperties udbProperties,
+    public MappedInterceptor mappedInterceptor(UdbSecurityProperties udbSecurityProperties,
                                                @Autowired(required = false) PrivilegeInterceptor privilegeInterceptor,
                                                @Autowired(required = false) List<PatternProvider> patternProviders) {
 
-        Set<String> excludePackagesOrClassNames = new HashSet<String>(Arrays.asList(udbProperties.getExcludePackagesAndClasses()));
+        Set<String> excludePackagesOrClassNames = new HashSet<String>(Arrays.asList(udbSecurityProperties.getExcludePackagesAndClasses()));
         // 默认派排除 spring 内置的
         excludePackagesOrClassNames.add("org.springframework");
 
-        UdbSecurityInterceptor udbSecurityInterceptor = new UdbSecurityInterceptor(udbProperties.getDefaultCheckMode(),
+        UdbSecurityInterceptor udbSecurityInterceptor = new UdbSecurityInterceptor(
+                udbSecurityProperties.getAppid(),
+                udbSecurityProperties.getAppkey(),
+                udbSecurityProperties.getDefaultCheckMode(),
                 excludePackagesOrClassNames,
-                udbProperties.isStaticSkip());
+                udbSecurityProperties.isStaticSkip());
 
         if (null != privilegeInterceptor) {
             udbSecurityInterceptor.setPrivilegeInterceptor(privilegeInterceptor);
         }
 
         return new MappedInterceptor(
-                getPathPatterns(udbProperties, patternProviders),
-                getExcludePatterns(udbProperties, patternProviders),
+                getPathPatterns(udbSecurityProperties, patternProviders),
+                getExcludePatterns(udbSecurityProperties, patternProviders),
                 udbSecurityInterceptor);
     }
 
-    private String[] getExcludePatterns(UdbProperties udbProperties, List<PatternProvider> patternProviders) {
-        Set<String> patterns = new HashSet<String>(Arrays.asList(udbProperties.getExcludePathPatterns()));
+    private String[] getExcludePatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
+        Set<String> patterns = new HashSet<String>(Arrays.asList(udbSecurityProperties.getExcludePathPatterns()));
 
         if (patternProviders != null && !patternProviders.isEmpty()) {
             for (PatternProvider patternProvider : patternProviders) {
@@ -88,8 +82,8 @@ public class UdbSecurityAutoConfiguration {
         return patterns.toArray(new String[patterns.size()]);
     }
 
-    private String[] getPathPatterns(UdbProperties udbProperties, List<PatternProvider> patternProviders) {
-        Set<String> patterns = new HashSet<>(Arrays.asList(udbProperties.getPathPatterns()));
+    private String[] getPathPatterns(UdbSecurityProperties udbSecurityProperties, List<PatternProvider> patternProviders) {
+        Set<String> patterns = new HashSet<>(Arrays.asList(udbSecurityProperties.getPathPatterns()));
 
         if (patternProviders != null && !patternProviders.isEmpty()) {
             for (PatternProvider patternProvider : patternProviders) {

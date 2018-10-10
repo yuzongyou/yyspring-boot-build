@@ -1,5 +1,6 @@
 package com.duowan.udb.security;
 
+import com.duowan.udb.sdk.UdbAuthLevel;
 import com.duowan.udb.sdk.UdbOauth;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class UdbOauthTest {
     @Test
     public void testConstructor1() {
 
-        UdbOauth udbOauth = new UdbOauth(appid, appkey, passport, oauthCookieOrUdbOar, false);
+        UdbOauth udbOauth = new UdbOauth(appid, appkey, passport, oauthCookieOrUdbOar, UdbAuthLevel.LOCAL);
 
         assertEquals(udbOauth.getPassport(), passport);
         assertEquals(udbOauth.getYyuid().longValue(), yyuid);
@@ -63,7 +64,7 @@ public class UdbOauthTest {
     @Test
     public void testConstructor2() {
 
-        UdbOauth udbOauth = new UdbOauth(appid, appkey, yyuid, oauthCookieOrUdbOar, false);
+        UdbOauth udbOauth = new UdbOauth(appid, appkey, yyuid, oauthCookieOrUdbOar, UdbAuthLevel.LOCAL);
 
         assertEquals(udbOauth.getPassport(), passport);
         assertEquals(udbOauth.getYyuid().longValue(), yyuid);
@@ -79,7 +80,7 @@ public class UdbOauthTest {
     @Test
     public void testConstructor3() {
 
-        UdbOauth udbOauth = new UdbOauth(appid, appkey, request, false);
+        UdbOauth udbOauth = new UdbOauth(appid, appkey, request, UdbAuthLevel.LOCAL);
 
         assertEquals(udbOauth.getPassport(), passport);
         assertEquals(udbOauth.getYyuid().longValue(), yyuid);

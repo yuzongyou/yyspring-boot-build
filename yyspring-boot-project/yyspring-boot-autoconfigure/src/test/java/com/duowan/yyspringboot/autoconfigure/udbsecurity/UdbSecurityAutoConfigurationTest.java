@@ -26,7 +26,7 @@ public class UdbSecurityAutoConfigurationTest {
     public void getUdbProperties() {
 
         try {
-            UdbProperties udbProperties = acx.getBean(UdbProperties.class);
+            UdbSecurityProperties udbProperties = acx.getBean(UdbSecurityProperties.class);
 
             System.out.println(JsonUtil.toPrettyJson(udbProperties));
         } catch (Exception e) {

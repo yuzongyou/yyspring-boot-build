@@ -7,10 +7,6 @@ import com.duowan.common.web.converter.json.JsonJavascriptAdvice;
 import com.duowan.common.web.converter.json.JsonpAdvice;
 import com.duowan.common.web.converter.json.StringHttpMessageAdvice;
 import com.duowan.common.web.filter.YyRootFilter;
-import com.duowan.common.web.pageparameter.ClientIpPageParameter;
-import com.duowan.common.web.pageparameter.ProtocolPageParameter;
-import com.duowan.common.web.pageparameter.ProtocolTypePageParameter;
-import com.duowan.common.web.pageparameter.RequestUriPageParameter;
 import com.duowan.common.web.view.AjaxView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -134,29 +130,5 @@ public class YyWebMvcAutoConfiguration {
         registration.setName("yyRootFilter");
         registration.setOrder(0);
         return registration;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ClientIpPageParameter clientIpPageParameter() {
-        return new ClientIpPageParameter();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ProtocolPageParameter protocolPageParameter() {
-        return new ProtocolPageParameter();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ProtocolTypePageParameter protocolTypePageParameter() {
-        return new ProtocolTypePageParameter();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public RequestUriPageParameter requestUriPageParameter() {
-        return new RequestUriPageParameter();
     }
 }

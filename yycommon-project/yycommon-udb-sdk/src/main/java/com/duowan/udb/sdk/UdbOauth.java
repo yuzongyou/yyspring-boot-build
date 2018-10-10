@@ -3,13 +3,14 @@ package com.duowan.udb.sdk;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.ConvertUtil;
 import com.duowan.udb.auth.UserinfoForOauth;
-import com.duowan.udb.util.CookieUtils;
 import com.duowan.universal.login.client.YYSecCenterOpenWSInvoker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
+import static com.duowan.common.utils.CommonUtil.isAllBlank;
 
 /**
  * UDB 登录Oatuh 认证
@@ -58,34 +59,28 @@ public class UdbOauth {
     private String udbAppId;
     private String udbAppKey;
 
-    /**
-     * 验证
-     *
-     * @param request      当前请求
-     * @param strongVerify 强验证检查
-     */
-    public UdbOauth(HttpServletRequest request, boolean strongVerify) {
-        this(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, request, strongVerify);
+    private UdbAuthLevel authLevel;
+
+    private AuthAttrLookupScope[] authAttrLookupScopes = new AuthAttrLookupScope[]{AuthAttrLookupScope.COOKIE, AuthAttrLookupScope.HEADER};
+
+    public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
+        this(null, udbAppId, udbAppKey, request, authLevel);
     }
 
-    /**
-     * 验证
-     *
-     * @param udbAppId     UDB appid
-     * @param udbAppKey    UDB appkey
-     * @param request      当前请求
-     * @param strongVerify 强验证检查
-     */
-    public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, boolean strongVerify) {
+    public UdbOauth(AuthAttrLookupScope[] authAttrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
         AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
+
+        if (null != authAttrLookupScopes && authAttrLookupScopes.length > 0) {
+            this.authAttrLookupScopes = authAttrLookupScopes;
+        }
 
         String oauthCookie = lookupCookieValueExt(request, "oauthCookie");
         String udbOar = lookupCookieValueExt(request, "udb_oar");
         String username = lookupCookieValueExt(request, "username");
         String yyuid = lookupCookieValueExt(request, "yyuid");
 
-        if (StringUtils.isAllBlank(oauthCookie, udbOar, username, yyuid)) {
-            init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), strongVerify);
+        if (isAllBlank(oauthCookie, udbOar, username, yyuid)) {
+            init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), authLevel);
         } else {
             UserinfoForOauth userinfoForOauth = null;
             if (StringUtils.isNotBlank(username)) {
@@ -96,58 +91,31 @@ public class UdbOauth {
                 userinfoForOauth = new UserinfoForOauth(request, null, udbAppId, udbAppKey);
             }
 
-            init(udbAppId, udbAppKey, userinfoForOauth, strongVerify);
+            init(udbAppId, udbAppKey, userinfoForOauth, authLevel);
         }
     }
 
     private String lookupCookieValueExt(HttpServletRequest request, String ckName) {
-
-        String value = CookieUtils.getCookie(ckName, request);
-
-        if (StringUtils.isBlank(value)) {
-            value = request.getHeader(ckName);
-        }
-
-        if (StringUtils.isBlank(value)) {
-            value = request.getParameter(ckName);
-        }
-
-        return value;
+        return AttrLookupUtil.lookupAttr(this.authAttrLookupScopes, request, ckName);
     }
 
-    public UdbOauth(String passport, String oauthCookieOrUdbOar, boolean strongVerify) {
-        AssertUtil.assertNotBlank(passport, "UDB 验证， 通行证不能为空");
-        AssertUtil.assertNotBlank(oauthCookieOrUdbOar, "UDB 验证， 认证Cookie不能为空");
-
-        UserinfoForOauth userinfoForOauth = new UserinfoForOauth(passport, -1, oauthCookieOrUdbOar, oauthCookieOrUdbOar, UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY);
-        init(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, userinfoForOauth, strongVerify);
-    }
-
-    public UdbOauth(String udbAppId, String udbAppKey, String passport, String oauthCookieOrUdbOar, boolean strongVerify) {
+    public UdbOauth(String udbAppId, String udbAppKey, String passport, String oauthCookieOrUdbOar, UdbAuthLevel authLevel) {
         AssertUtil.assertNotBlank(passport, "UDB 验证， 通行证不能为空");
         AssertUtil.assertNotBlank(oauthCookieOrUdbOar, "UDB 验证， 认证Cookie不能为空");
 
         UserinfoForOauth userinfoForOauth = new UserinfoForOauth(passport, -1, oauthCookieOrUdbOar, oauthCookieOrUdbOar, udbAppId, udbAppKey);
-        init(udbAppId, udbAppKey, userinfoForOauth, strongVerify);
+        init(udbAppId, udbAppKey, userinfoForOauth, authLevel);
     }
 
-    public UdbOauth(String udbAppId, String udbAppKey, long yyuid, String oauthCookieOrUdbOar, boolean strongVerify) {
+    public UdbOauth(String udbAppId, String udbAppKey, long yyuid, String oauthCookieOrUdbOar, UdbAuthLevel authLevel) {
         AssertUtil.assertTrue(yyuid > 0, "UDB 验证， yyuid 不合法");
         AssertUtil.assertNotBlank(oauthCookieOrUdbOar, "UDB 验证， 认证Cookie不能为空");
 
         UserinfoForOauth userinfoForOauth = new UserinfoForOauth(null, yyuid, oauthCookieOrUdbOar, oauthCookieOrUdbOar, udbAppId, udbAppKey);
-        init(udbAppId, udbAppKey, userinfoForOauth, strongVerify);
+        init(udbAppId, udbAppKey, userinfoForOauth, authLevel);
     }
 
-    public UdbOauth(long yyuid, String oauthCookieOrUdbOar, boolean strongVerify) {
-        AssertUtil.assertTrue(yyuid > 0, "UDB 验证， yyuid 不合法");
-        AssertUtil.assertNotBlank(oauthCookieOrUdbOar, "UDB 验证， 认证Cookie不能为空");
-
-        UserinfoForOauth userinfoForOauth = new UserinfoForOauth(null, yyuid, oauthCookieOrUdbOar, oauthCookieOrUdbOar, UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY);
-        init(UdbConstants.DEFAULT_UDB_APPID, UdbConstants.DEFAULT_UDB_APPKEY, userinfoForOauth, strongVerify);
-    }
-
-    void init(String udbAppId, String udbAppKey, UserinfoForOauth oauth, boolean strongVerify) {
+    void init(String udbAppId, String udbAppKey, UserinfoForOauth oauth, UdbAuthLevel authLevel) {
         AssertUtil.assertNotBlank(udbAppId, "UDB 验证， udbAppId 不能为空");
         AssertUtil.assertNotBlank(udbAppKey, "UDB 验证， udbAppKey 不能为空");
         AssertUtil.assertNotNull(oauth, "UDB 验证，UserinfoForOauth 不能为空");
@@ -157,7 +125,8 @@ public class UdbOauth {
         this.oauth = oauth;
 
         this.weakLogin = oauth.validate();
-        this.strongVerify = strongVerify;
+        this.authLevel = null == authLevel ? UdbAuthLevel.LOCAL : authLevel;
+        this.strongVerify = UdbAuthLevel.STRONG.equals(authLevel);
 
         if (this.weakLogin) {
             this.yyuid = ConvertUtil.toLong(oauth.getYyuid());
@@ -222,5 +191,13 @@ public class UdbOauth {
 
     public String getUdbAppKey() {
         return udbAppKey;
+    }
+
+    public UdbAuthLevel getAuthLevel() {
+        return authLevel;
+    }
+
+    public AuthAttrLookupScope[] getAuthAttrLookupScopes() {
+        return authAttrLookupScopes;
     }
 }

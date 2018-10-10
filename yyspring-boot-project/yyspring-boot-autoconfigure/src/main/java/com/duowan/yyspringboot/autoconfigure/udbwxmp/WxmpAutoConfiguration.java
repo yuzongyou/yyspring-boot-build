@@ -1,4 +1,4 @@
-package com.duowan.yyspringboot.autoconfigure.wxmp;
+package com.duowan.yyspringboot.autoconfigure.udbwxmp;
 
 import com.duowan.udb.sdk.UdbClient;
 import com.duowan.wxmpsdk.client.WxmpClient;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnClass({WxmpClient.class, UdbClient.class})
-@ComponentScan({"com.duowan.yyspringboot.autoconfigure.wxmp.parameter"})
+@ComponentScan({"com.duowan.yyspringboot.autoconfigure.udbwxmp.parameter"})
 public class WxmpAutoConfiguration {
 
 }

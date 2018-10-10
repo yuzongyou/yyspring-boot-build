@@ -8,8 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @version 1.0
  * @since 2018/8/22 11:05
  */
-@ConfigurationProperties(prefix = "yyspring.udb")
-public class UdbProperties {
+@ConfigurationProperties(prefix = "yyspring.udbsecurity")
+public class UdbSecurityProperties {
 
     /**
      * UDB 提供的APPID，登录验证任意UDB的UDBID即可默认是5048

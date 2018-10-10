@@ -3,9 +3,9 @@ package com.duowan.udb.security.controller;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.RequestUtil;
 import com.duowan.common.utils.UrlUtil;
-import com.duowan.udb.security.UdbSecurityConstants;
-import com.duowan.udb.sdk.UdbContext;
+import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.UdbLoginBox;
+import com.duowan.udb.security.UdbSecurityConstants;
 import com.duowan.udb.util.CookieUtils;
 import com.duowan.udb.util.codec.AESHelper;
 import com.duowan.universal.login.BasicCredentials;
@@ -39,6 +39,19 @@ public class UdbSecurityController {
 
     private static final Logger logger = LoggerFactory.getLogger(UdbSecurityController.class);
 
+    private final String udbAppId;
+    private final String udbAppKey;
+
+    public UdbSecurityController(String udbAppId, String udbAppKey) {
+        if (StringUtils.isBlank(udbAppId) || StringUtils.isBlank(udbAppKey)) {
+            this.udbAppId = UdbConstants.DEFAULT_UDB_APPID;
+            this.udbAppKey = UdbConstants.DEFAULT_UDB_APPKEY;
+        } else {
+            this.udbAppId = udbAppId;
+            this.udbAppKey = udbAppKey;
+        }
+    }
+
     @RequestMapping("/udb/getSdkAuthReq4LayerClose.do")
     public void getSdkAuthReq4LayerClose(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String callbackURL = request.getParameter("callbackURL");
@@ -54,13 +67,13 @@ public class UdbSecurityController {
 
         try {
             // 提取必要信息，并假定一定存在
-            Credentials cc = new BasicCredentials(UdbContext.getAppid(), UdbContext.getAppkey());
+            Credentials cc = new BasicCredentials(udbAppId, udbAppKey);
             UniversalLoginClient duowan = new UniversalLoginClient(cc);
             duowan.initialize(callbackURL);
             String tmpTokenSecret = duowan.getTokenSecret();
-            tmpTokenSecret = AESHelper.encrypt(tmpTokenSecret, UdbContext.getAppkey());
+            tmpTokenSecret = AESHelper.encrypt(tmpTokenSecret, udbAppKey);
 
-            logger.info(String.format("entoken:%s,detoken:%s", tmpTokenSecret, AESHelper.decrypt(tmpTokenSecret, UdbContext.getAppkey())));
+            logger.info(String.format("entoken:%s,detoken:%s", tmpTokenSecret, AESHelper.decrypt(tmpTokenSecret, udbAppKey)));
 
             URL redirectURL = duowan.getAuthorizationURL();
             String url = redirectURL.toExternalForm() + "&denyCallbackURL=" + UrlUtil.encodeUrl(denyCallbackURL) + "&UIStyle=qlogin";
@@ -125,7 +138,7 @@ public class UdbSecurityController {
         String tokenSecretCookie = CookieUtils.getCookie(UdbSecurityConstants.COOKIE_UDB_OAUTH_TMP_TOKSN_SEC, request);
         String tokenSecret = null;
         if (StringUtils.isNotBlank(tokenSecretCookie)) {
-            tokenSecret = AESHelper.decrypt(tokenSecretCookie, UdbContext.getAppkey());
+            tokenSecret = AESHelper.decrypt(tokenSecretCookie, udbAppKey);
         }
 
         logger.info((String.format("[token:%s,tokenSecret:%s,verifierCode:%s,usernmae:%s]",
@@ -138,7 +151,7 @@ public class UdbSecurityController {
 
         // 用返回的
         // requestToken以及veriferCode，来做：①换取accessToken；②验证返回信息是否都是合法
-        Credentials cc = new BasicCredentials(UdbContext.getAppid(), UdbContext.getAppkey());
+        Credentials cc = new BasicCredentials(udbAppId, udbAppKey);
         UniversalLoginClient duowan = new UniversalLoginClient(cc);
 
         logger.info("oauth_token:" + oauthToken + " tokenSecret:" + tokenSecret + " oauth_verifier:" + oauthVerifier);
@@ -225,7 +238,7 @@ public class UdbSecurityController {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        out.append(UdbLoginBox.getLogoutHtml(redirectUrl));
+        out.append(UdbLoginBox.getLogoutHtml(udbAppId, udbAppKey, redirectUrl));
         out.flush();
         out.close();
     }

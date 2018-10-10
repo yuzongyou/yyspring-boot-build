@@ -17,9 +17,10 @@ com.duowan.yyspringboot.autoconfigure.innerip.InnerIpAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.ipowner.IpOwnerAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.YyErrorMvcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.web.YyWebMvcAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.web.YyWebMvcArgumentResolverAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbSecurityAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.udbpage.UdbPageParameterAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.wxmp.WxmpAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.udbpage.UdbPageAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.udbwxmp.UdbWxmpAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.jdbc.JdbcAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.redis.RedisAutoConfiguration,\

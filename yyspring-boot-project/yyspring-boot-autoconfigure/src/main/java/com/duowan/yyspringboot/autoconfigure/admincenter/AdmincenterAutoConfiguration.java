@@ -9,7 +9,7 @@ import com.duowan.common.admincenter.service.impl.AdmincenterInterceptorService;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbSecurityAutoConfiguration;
-import com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbProperties;
+import com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbSecurityProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -33,7 +33,7 @@ import java.util.Set;
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, AdmincenterService.class})
-@EnableConfigurationProperties({UdbProperties.class, AdmincenterProperties.class})
+@EnableConfigurationProperties({UdbSecurityProperties.class, AdmincenterProperties.class})
 @AutoConfigureAfter(UdbSecurityAutoConfiguration.class)
 public class AdmincenterAutoConfiguration {
 
