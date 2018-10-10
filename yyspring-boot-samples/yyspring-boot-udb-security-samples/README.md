@@ -151,7 +151,9 @@ yyspring.udbsecurity.exclude-path-patterns=/mgr/**
 - <code>@IgnoredUdbCheck</code> 可以在 Controller 类或该类的方法 中使用这个注解，表示不需要进行UDB登录态校验
 
 ### Controller 自动参数注入
+
 参考 <code>UdbController</code> 类:
+
 | **参数** | **说明** |
 | :----------------------- | :-------- |
 | strongPassport | UDB 强校验登录通过的通行证。 |
