@@ -21,6 +21,7 @@
         <module>yyspring-boot-udb-samples</module>
         <module>yyspring-boot-admincenter-samples</module>
         <module>yyspring-boot-admincenter-ui-smaples</module>
+        <module>yyspring-boot-udb-security-samples</module>
     </modules>
 
     <properties>

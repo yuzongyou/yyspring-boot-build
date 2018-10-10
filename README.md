@@ -45,6 +45,11 @@ mvn clean deploy
 | [yyspring-autoconfigure](yyspring-boot-project/yyspring-boot-autoconfigure)   | 内部自动配置，集成内部常用组件的自动配置。 |
 | [yyproject-bom](yyproject-bom)   | 组件依赖，管理各种版本问题, 开发的时候直接设置这个为parent或者 import pom 即可。 |
 
+# 示例项目说明
+| **示例代号** | **模块说明** |
+| :----------------------- | :-------- |
+| [yyspring-boot-udb-security-samples](yyspring-boot-samples/yyspring-boot-udb-security-samples)   | 接口进行UDB登录态拦截web项目示例。 |
+
 
 # 附录
 [GitLab Markdown 语法参考指南](https://docs.gitlab.com/ee/user/markdown.html)
