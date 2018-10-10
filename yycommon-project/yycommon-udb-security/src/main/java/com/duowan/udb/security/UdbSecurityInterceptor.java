@@ -17,7 +17,6 @@ import com.duowan.udb.security.exception.UdbUnLoginException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -268,12 +267,6 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
     }
 
     private boolean isRequestNeedUdbCheck(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
-
-        // 不带 @Controller 注解的不拦截
-        Controller controller = beanType.getAnnotation(Controller.class);
-        if (null == controller) {
-            return false;
-        }
 
         // spring 开头的不拦截
         if (null != this.excludePackagesOrClassNames) {

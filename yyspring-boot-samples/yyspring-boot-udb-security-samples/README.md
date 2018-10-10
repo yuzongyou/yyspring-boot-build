@@ -142,3 +142,7 @@ yyspring.udbsecurity.path-patterns=/admin/**,/secure/**,/mgr/**
 yyspring.udbsecurity.exclude-path-patterns=/mgr/**
 
 ```
+
+### 注解说明
+- <code>@UdbCheck</code> 可以在 Controller 类或该类的方法 中使用这个注解，表示需要进行UDB登录态校验
+- <code>@IgnoredUdbCheck</code> 可以在 Controller 类或该类的方法 中使用这个注解，表示不需要进行UDB登录态校验
