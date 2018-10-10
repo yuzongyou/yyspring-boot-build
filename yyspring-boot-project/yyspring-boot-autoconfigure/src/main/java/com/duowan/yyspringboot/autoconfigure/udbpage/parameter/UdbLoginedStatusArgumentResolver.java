@@ -2,10 +2,7 @@ package com.duowan.yyspringboot.autoconfigure.udbpage.parameter;
 
 import com.duowan.common.web.ParamLookupScope;
 import com.duowan.common.web.argresolvers.AbstractArgumentResolver;
-import com.duowan.udb.sdk.AuthAttrLookupScope;
-import com.duowan.udb.sdk.UdbAuthLevel;
-import com.duowan.udb.sdk.UdbConstants;
-import com.duowan.udb.sdk.UdbOauth;
+import com.duowan.udb.sdk.*;
 import com.duowan.yyspringboot.autoconfigure.udbpage.annotations.UdbLoginCheck;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
@@ -55,7 +52,7 @@ public class UdbLoginedStatusArgumentResolver extends AbstractArgumentResolver {
             authLevel = UdbAuthLevel.LOCAL;
         }
 
-        UdbOauth udbOauth = new UdbOauth(attrLookupScopes, udbAppId, udbAppKey, nativeRequest, authLevel);
+        UdbOauth udbOauth = UdbContext.getUdbOauth(attrLookupScopes, udbAppId, udbAppKey, nativeRequest, authLevel);
 
         return udbOauth.isLogin();
     }

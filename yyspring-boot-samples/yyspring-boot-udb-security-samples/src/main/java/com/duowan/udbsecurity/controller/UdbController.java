@@ -5,7 +5,10 @@ import com.duowan.udb.sdk.UdbAuthLevel;
 import com.duowan.yyspringboot.autoconfigure.udbpage.annotations.UdbLoginCheck;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,5 +44,21 @@ public class UdbController {
         dataMap.put("decryptOauthCookie", decryptOauthCookie);
 
         return new JsonView(dataMap);
+    }
+
+    @RequestMapping("/redirect")
+    public ModelAndView redirect(String url) {
+        return new ModelAndView("redirect:" + url);
+    }
+
+    @RequestMapping("/redirect2")
+    public void redirect2(String url, HttpServletResponse response) {
+        response.setStatus(302);
+        response.setHeader("Location", url);
+    }
+
+    @RequestMapping("/redirect3")
+    public void redirect3(String url, HttpServletResponse response) throws IOException {
+        response.sendRedirect(url);
     }
 }

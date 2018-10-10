@@ -80,7 +80,7 @@ public class UdbOauthTest {
     @Test
     public void testConstructor3() {
 
-        UdbOauth udbOauth = new UdbOauth(appid, appkey, request, UdbAuthLevel.LOCAL);
+        UdbOauth udbOauth = new UdbOauth(null, appid, appkey, request, UdbAuthLevel.LOCAL);
 
         assertEquals(udbOauth.getPassport(), passport);
         assertEquals(udbOauth.getYyuid().longValue(), yyuid);

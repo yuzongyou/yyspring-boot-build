@@ -63,10 +63,6 @@ public class UdbOauth {
 
     private AuthAttrLookupScope[] authAttrLookupScopes = new AuthAttrLookupScope[]{AuthAttrLookupScope.COOKIE, AuthAttrLookupScope.HEADER};
 
-    public UdbOauth(String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
-        this(null, udbAppId, udbAppKey, request, authLevel);
-    }
-
     public UdbOauth(AuthAttrLookupScope[] authAttrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
         AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
 

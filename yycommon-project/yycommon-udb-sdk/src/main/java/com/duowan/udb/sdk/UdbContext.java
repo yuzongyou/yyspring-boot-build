@@ -1,5 +1,7 @@
 package com.duowan.udb.sdk;
 
+import org.apache.commons.lang3.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -8,59 +10,51 @@ import javax.servlet.http.HttpServletRequest;
 public class UdbContext {
 
     /**
-     * 默认获取的是弱验证
+     * 获取Udb认证
      *
-     * @param request 当前请求
-     * @return 返回弱验证的对象
+     * @param authAttrLookupScopes 认证属性搜索作用域
+     * @param udbAppId             udbAppId
+     * @param udbAppKey            UdbAppKey
+     * @param request              当前请求对象
+     * @param authLevel            认证级别
+     * @return 返回认证对象
      */
-    public static UdbOauth getOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
-        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.LOCAL);
+    public static UdbOauth getUdbOauth(AuthAttrLookupScope[] authAttrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
+
+        if (StringUtils.isBlank(udbAppId) || StringUtils.isBlank(udbAppKey)) {
+            udbAppId = UdbConstants.DEFAULT_UDB_APPID;
+            udbAppKey = UdbConstants.DEFAULT_UDB_APPKEY;
+        }
+
+        String key = buildRequestKey(authAttrLookupScopes, udbAppId, authLevel);
+
+        Object obj = request.getAttribute(key);
+
+        if (null != obj) {
+            if (obj instanceof UdbOauth) {
+                return (UdbOauth) obj;
+            }
+        }
+
+        UdbOauth oauth = new UdbOauth(authAttrLookupScopes, udbAppId, udbAppKey, request, authLevel);
+        request.setAttribute(key, oauth);
+
+        return oauth;
     }
 
-    public static UdbOauth getOauth(String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
-        return new UdbOauth(udbAppId, udbAppKey, request, authLevel);
-    }
+    private static String buildRequestKey(AuthAttrLookupScope[] authAttrLookupScopes, String udbAppId, UdbAuthLevel authLevel) {
+        StringBuilder builder = new StringBuilder();
 
-    /**
-     * 获取 弱验证
-     *
-     * @param request 当前请求对象
-     * @return 返回弱验证的 Oauth
-     */
-    public static UdbOauth getWeakOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
-        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.LOCAL);
-    }
+        if (null != authAttrLookupScopes && authAttrLookupScopes.length > 0) {
+            for (AuthAttrLookupScope scope : authAttrLookupScopes) {
+                builder.append(scope);
+            }
+            builder.append("-");
+        }
+        builder.append(udbAppId).append("-").append(authLevel);
 
-    /**
-     * 获取 强验证
-     *
-     * @param request 当前请求对象
-     * @return 返回强验证的 Oauth
-     */
-    public static UdbOauth getStrongOauth(String udbAppId, String udbAppKey, HttpServletRequest request) {
-        return getOauth(udbAppId, udbAppKey, request, UdbAuthLevel.STRONG);
-    }
+        return builder.toString();
 
-    /**
-     * 弱登录
-     *
-     * @param request 当前请求
-     * @return 返回是否弱登录，只是进行本地校验
-     */
-    public static boolean isLoginWeak(String udbAppId, String udbAppKey, HttpServletRequest request) {
-        UdbOauth oauth = getWeakOauth(udbAppId, udbAppKey, request);
-        return null != oauth && oauth.isLogin();
-    }
-
-    /**
-     * 强登录验证
-     *
-     * @param request 当前请求
-     * @return 返回是否强登录，只是进行本地校验
-     */
-    public static boolean isLoginStrong(String udbAppId, String udbAppKey, HttpServletRequest request) {
-        UdbOauth oauth = getStrongOauth(udbAppId, udbAppKey, request);
-        return null != oauth && oauth.isLogin();
     }
 
 }

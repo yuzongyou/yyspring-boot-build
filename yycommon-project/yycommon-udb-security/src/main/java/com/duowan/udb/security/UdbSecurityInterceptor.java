@@ -10,6 +10,7 @@ import com.duowan.common.web.view.JsonView;
 import com.duowan.common.web.view.TextView;
 import com.duowan.udb.sdk.UdbAuthLevel;
 import com.duowan.udb.sdk.UdbConstants;
+import com.duowan.udb.sdk.UdbContext;
 import com.duowan.udb.sdk.UdbOauth;
 import com.duowan.udb.security.annotations.IgnoredUdbCheck;
 import com.duowan.udb.security.annotations.UdbCheck;
@@ -143,7 +144,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         UdbOauth udbOauth = SessionUtil.get(request, udbOauthKey, UdbOauth.class);
         if (null == udbOauth || !username.equals(udbOauth.getPassport())) {
             // 需要重新计算
-            udbOauth = new UdbOauth(udbAppId, udbAppKey, request, CheckMode.STRONG.equals(checkMode) ? UdbAuthLevel.STRONG : UdbAuthLevel.LOCAL);
+            udbOauth = UdbContext.getUdbOauth(null, udbAppId, udbAppKey, request, CheckMode.STRONG.equals(checkMode) ? UdbAuthLevel.STRONG : UdbAuthLevel.LOCAL);
             SessionUtil.set(request, udbOauthKey, udbOauth);
         }
 
