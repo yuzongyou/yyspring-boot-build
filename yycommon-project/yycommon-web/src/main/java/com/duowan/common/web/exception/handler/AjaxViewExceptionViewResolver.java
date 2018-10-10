@@ -19,7 +19,7 @@ public class AjaxViewExceptionViewResolver extends AbstractExceptionViewResolver
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
         Class<?> returnType = handlerMethod.getMethod().getReturnType();
-        return AjaxView.class == returnType;
+        return AjaxView.class == returnType || AjaxView.class.isAssignableFrom(returnType);
     }
 
     @Override

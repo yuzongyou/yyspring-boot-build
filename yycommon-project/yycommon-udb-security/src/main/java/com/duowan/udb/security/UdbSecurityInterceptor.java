@@ -1,18 +1,25 @@
 package com.duowan.udb.security;
 
+import com.duowan.common.exception.CodeException;
 import com.duowan.common.utils.CookieUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.SessionUtil;
 import com.duowan.common.utils.UrlUtil;
+import com.duowan.common.web.view.AjaxView;
+import com.duowan.common.web.view.JsonView;
+import com.duowan.common.web.view.TextView;
 import com.duowan.udb.sdk.UdbAuthLevel;
 import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.sdk.UdbOauth;
 import com.duowan.udb.security.annotations.IgnoredUdbCheck;
 import com.duowan.udb.security.annotations.UdbCheck;
+import com.duowan.udb.security.exception.UdbUnLoginException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -96,7 +103,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
         String username = CookieUtil.getCookie(request, "username", null);
         if (StringUtils.isBlank(username)) {
-            forwardToUdbLoginUI(request, response);
+            toUdbUnloginView(request, response, handler);
             return false;
         }
         String udbOauthKey = "UdbOauth_" + checkMode + "_" + username;
@@ -116,7 +123,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
             }
             return true;
         } else {
-            forwardToUdbLoginUI(request, response);
+            toUdbUnloginView(request, response, handler);
             return false;
         }
     }
@@ -201,8 +208,62 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
      *
      * @param request  请求
      * @param response 响应
+     * @param handler  处理方法
      */
+    private void toUdbUnloginView(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
+        if (!needForwardToUdbLoginUI(request, response, handler)) {
+            throw new UdbUnLoginException();
+        }
+
+        forwardToUdbLoginUI(request, response);
+    }
+
+    private boolean needForwardToUdbLoginUI(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
+        if (handler instanceof HandlerMethod) {
+
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Class<?> returnType = handlerMethod.getMethod().getReturnType();
+            if (isCustomView(returnType)) {
+                return false;
+            }
+
+            ResponseBody responseBodyAnn = handlerMethod.getMethod().getAnnotation(ResponseBody.class);
+            if (null != responseBodyAnn) {
+                return false;
+            }
+
+            RestController restControllerAnn = handlerMethod.getBeanType().getAnnotation(RestController.class);
+            if (null != restControllerAnn) {
+                return false;
+            }
+
+        }
+
+        return true;
+
+    }
+
+    private static Class<?>[] customViewTypes = new Class[]{AjaxView.class, JsonView.class, TextView.class};
+
+    private boolean isCustomView(Class<?> returnType) {
+
+        if (returnType == null) {
+            return false;
+        }
+
+        for (Class<?> viewType : customViewTypes) {
+            if (viewType.equals(returnType) || returnType.isAssignableFrom(viewType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void forwardToUdbLoginUI(HttpServletRequest request, HttpServletResponse response) {
+
         String domain = getDomain(request);
         String url = domain + request.getRequestURI();
         if (StringUtils.isNotEmpty(request.getQueryString())) {
@@ -218,7 +279,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
             out.flush();
             out.close();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new CodeException(e.getMessage(), e);
         }
     }
 

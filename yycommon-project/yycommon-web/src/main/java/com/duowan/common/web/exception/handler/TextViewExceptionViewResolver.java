@@ -19,7 +19,7 @@ public class TextViewExceptionViewResolver extends AbstractExceptionViewResolver
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
         Class<?> returnType = handlerMethod.getMethod().getReturnType();
-        return TextView.class == returnType || returnType.isAssignableFrom(TextView.class);
+        return TextView.class == returnType || TextView.class.isAssignableFrom(returnType);
     }
 
     @Override

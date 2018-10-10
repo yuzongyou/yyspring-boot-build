@@ -19,7 +19,7 @@ public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolve
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
         Class<?> returnType = handlerMethod.getMethod().getReturnType();
-        return JsonView.class == returnType || JsonView.class == returnType;
+        return JsonView.class == returnType || JsonView.class.isAssignableFrom(returnType);
     }
 
     @Override

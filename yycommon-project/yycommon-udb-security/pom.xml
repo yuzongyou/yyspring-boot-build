@@ -29,6 +29,11 @@
             <artifactId>yycommon-udb-sdk</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-web</artifactId>
+        </dependency>
+
         <!-- Servlet 容器相关 开始 -->
         <dependency>
             <groupId>javax.servlet</groupId>
