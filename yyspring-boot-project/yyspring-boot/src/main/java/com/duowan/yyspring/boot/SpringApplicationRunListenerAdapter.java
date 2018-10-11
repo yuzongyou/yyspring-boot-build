@@ -14,6 +14,7 @@ import org.springframework.util.ClassUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,28 +33,27 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     private ConfigurableEnvironment environment;
 
-    private static Map<String, AtomicInteger> instanceCountMap = new HashMap<>();
-
-    private static synchronized int addInstanceCount(Class<?> clazz) {
-        String className = clazz.getName();
-        AtomicInteger counter = instanceCountMap.get(className);
-        if (counter == null) {
-            counter = new AtomicInteger(0);
-            instanceCountMap.put(className, counter);
-        }
-        return counter.incrementAndGet();
-    }
-
-    private int instanceIndex = 0;
-
     public SpringApplicationRunListenerAdapter(SpringApplication application, String[] args) {
         this.application = application;
         this.args = args;
-        instanceIndex = addInstanceCount(getClass());
     }
 
-    private boolean isFirstInit() {
-        return instanceIndex == 1;
+    private static final Map<String, Boolean> instanceMethodInitMap = new HashMap<>();
+
+    private synchronized boolean isFirstInit(String method) {
+
+        synchronized (instanceMethodInitMap) {
+
+            String className = getClass().getName();
+            String methodKey = className + "." + method;
+
+            Boolean hadInit = instanceMethodInitMap.get(methodKey);
+            if (hadInit == null) {
+                instanceMethodInitMap.put(className, true);
+                return true;
+            }
+            return false;
+        }
     }
 
     protected abstract boolean needAutoConfigurer();
@@ -68,7 +68,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void starting() {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("starting") && needAutoConfigurer()) {
             doStarting();
         }
     }
@@ -78,7 +78,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void environmentPrepared(ConfigurableEnvironment environment) {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("environmentPrepared") && needAutoConfigurer()) {
             this.environment = environment;
             doEnvironmentPrepared(environment);
         }
@@ -101,7 +101,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
             }
         }
 
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("contextPrepared") && needAutoConfigurer()) {
             this.doContextPrepared(context, registry, environment);
         }
     }
@@ -131,7 +131,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void contextLoaded(ConfigurableApplicationContext context) {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("contextLoaded") && needAutoConfigurer()) {
             doContextLoaded(context);
         }
     }
@@ -141,7 +141,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void started(ConfigurableApplicationContext context) {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("started") && needAutoConfigurer()) {
             doStarted(context);
         }
     }
@@ -151,7 +151,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void running(ConfigurableApplicationContext context) {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("running") && needAutoConfigurer()) {
             doRunning(context);
         }
     }
@@ -161,7 +161,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     @Override
     public final void failed(ConfigurableApplicationContext context, Throwable exception) {
-        if (isFirstInit() && needAutoConfigurer()) {
+        if (isFirstInit("failed") && needAutoConfigurer()) {
             doFailed(context, exception);
         }
     }
