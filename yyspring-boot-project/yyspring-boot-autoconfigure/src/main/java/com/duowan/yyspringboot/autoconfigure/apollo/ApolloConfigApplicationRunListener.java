@@ -45,9 +45,18 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
         }
 
         try {
-            Field field = Foundation.class.getDeclaredField("s_manager");
+
+            Class<?> foundationClass = Class.forName("com.ctrip.framework.foundation.Foundation");
+            Field field = foundationClass.getDeclaredField("s_manager");
             field.setAccessible(true);
-            field.set(Foundation.class, new YYApolloProviderManager());
+
+            Object instance = field.get(foundationClass);
+            if (instance != null && instance.getClass() != Class.forName("com.ctrip.framework.foundation.internals.DefaultProviderManager")) {
+                field.setAccessible(false);
+                return ;
+            }
+
+            field.set(foundationClass, new YYApolloProviderManager());
             field.setAccessible(false);
         } catch (Exception ignored) {
         }
