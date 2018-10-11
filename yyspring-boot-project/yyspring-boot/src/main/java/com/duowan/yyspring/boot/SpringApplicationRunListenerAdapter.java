@@ -40,7 +40,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
     private static final Map<String, Boolean> instanceMethodInitMap = new HashMap<>();
 
-    private synchronized boolean isFirstInit(String method) {
+    protected synchronized boolean isFirstInit(String method) {
 
         synchronized (instanceMethodInitMap) {
 
@@ -49,7 +49,7 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
 
             Boolean hadInit = instanceMethodInitMap.get(methodKey);
             if (hadInit == null) {
-                instanceMethodInitMap.put(className, true);
+                instanceMethodInitMap.put(methodKey, true);
                 return true;
             }
             return false;

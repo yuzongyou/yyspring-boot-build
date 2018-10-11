@@ -26,6 +26,13 @@ public class YySpringApplicationRunListener extends SpringApplicationRunListener
 
     public YySpringApplicationRunListener(SpringApplication application, String[] args) {
         super(application, args);
+
+        if (isFirstInit("constructor")) {
+            Set<Object> sources = getApplication().getAllSources();
+            Class<?> sourceClass = validateSourcesThenReturnFirstHasYYSpringApplicationAnnotationSource(sources);
+            // 初始化
+            AppContext.initialize(sourceClass);
+        }
     }
 
     @Override
@@ -36,8 +43,6 @@ public class YySpringApplicationRunListener extends SpringApplicationRunListener
     private void initialize() {
         Set<Object> sources = getApplication().getAllSources();
         Class<?> sourceClass = validateSourcesThenReturnFirstHasYYSpringApplicationAnnotationSource(sources);
-        // 初始化
-        AppContext.initialize(sourceClass);
 
         YYSpringBootApplication applicationAnn = sourceClass.getAnnotation(YYSpringBootApplication.class);
         boolean tryEnabledDefaultBeanNameGenerator = true;

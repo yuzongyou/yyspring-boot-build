@@ -1,9 +1,12 @@
 package com.duowan.yyspringboot.autoconfigure.apollo;
 
+import com.ctrip.framework.foundation.Foundation;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
+
+import java.lang.reflect.Field;
 
 /**
  * @author Arvin
@@ -20,6 +23,9 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
                 "com.ctrip.framework.foundation.spi.provider.ApplicationProvider",
                 "com.ctrip.framework.foundation.internals.DefaultProviderManager"
                 );
+        if (isFirstInit("constructor") && needAutoConfigurer()) {
+            initialize();
+        }
     }
 
     @Override
@@ -37,11 +43,14 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
         if (StringUtils.isBlank(dwanv)) {
             System.setProperty(dwanvKey, AppContext.getEnv());
         }
-    }
 
-    @Override
-    protected void doStarting() {
-        initialize();
+        try {
+            Field field = Foundation.class.getDeclaredField("s_manager");
+            field.setAccessible(true);
+            field.set(Foundation.class, new YYApolloProviderManager());
+            field.setAccessible(false);
+        } catch (Exception ignored) {
+        }
     }
 
 }
