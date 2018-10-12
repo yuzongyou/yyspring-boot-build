@@ -1,6 +1,5 @@
 package com.duowan.yyspringboot.autoconfigure.apollo;
 
-import com.ctrip.framework.foundation.Foundation;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
