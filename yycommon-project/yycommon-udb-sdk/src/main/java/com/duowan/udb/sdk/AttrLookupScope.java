@@ -7,7 +7,7 @@ package com.duowan.udb.sdk;
  * @version 1.0
  * @since 2018/10/9 20:48
  */
-public enum AuthAttrLookupScope {
+public enum AttrLookupScope {
 
     /**
      * 请求参数，即 request.getParameter(name)

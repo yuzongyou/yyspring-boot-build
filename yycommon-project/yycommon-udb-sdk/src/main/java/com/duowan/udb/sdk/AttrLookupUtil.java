@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class AttrLookupUtil {
 
-    public static String lookupAttr(AuthAttrLookupScope[] lookupScopes, HttpServletRequest request, String name) {
+    public static String lookupAttr(AttrLookupScope[] lookupScopes, HttpServletRequest request, String name) {
 
         if (null == lookupScopes || lookupScopes.length < 1) {
             return null;
         }
 
-        for (AuthAttrLookupScope lookupScope : lookupScopes) {
+        for (AttrLookupScope lookupScope : lookupScopes) {
             String value = lookupAttr(lookupScope, request, name);
             if (StringUtils.isNotBlank(value)) {
                 return value;
@@ -29,7 +29,7 @@ public class AttrLookupUtil {
         return null;
     }
 
-    public static String lookupAttr(AuthAttrLookupScope lookupScope, HttpServletRequest request, String name) {
+    public static String lookupAttr(AttrLookupScope lookupScope, HttpServletRequest request, String name) {
         if (null == lookupScope) {
             return null;
         }

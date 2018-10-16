@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.udbpage.annotations;
 
-import com.duowan.udb.sdk.AuthAttrLookupScope;
+import com.duowan.udb.sdk.AttrLookupScope;
 import com.duowan.udb.sdk.UdbAuthLevel;
 import org.springframework.core.annotation.AliasFor;
 
@@ -33,5 +33,5 @@ public @interface UdbLoginCheck {
      *
      * @return 返回属性搜索路径
      */
-    AuthAttrLookupScope[] scopes() default {};
+    AttrLookupScope[] scopes() default {};
 }

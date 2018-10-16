@@ -36,7 +36,7 @@ public class UdbLoginedStatusArgumentResolver extends AbstractArgumentResolver {
     protected Object resolveArgumentByAutoScope(ParamLookupScope[] lookupScopes, String name, MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, HttpServletRequest nativeRequest, WebDataBinderFactory binderFactory) {
         String parameterName = parameter.getParameterName();
         UdbAuthLevel authLevel = null;
-        AuthAttrLookupScope[] attrLookupScopes = null;
+        AttrLookupScope[] attrLookupScopes = null;
         if ("udbStrongLogin".equals(parameterName)) {
             authLevel = UdbAuthLevel.STRONG;
         } else if ("udbWeakLogin".equals(parameterName)) {

@@ -61,13 +61,13 @@ public class UdbOauth {
 
     private UdbAuthLevel authLevel;
 
-    private AuthAttrLookupScope[] authAttrLookupScopes = new AuthAttrLookupScope[]{AuthAttrLookupScope.COOKIE, AuthAttrLookupScope.HEADER};
+    private AttrLookupScope[] attrLookupScopes = new AttrLookupScope[]{AttrLookupScope.COOKIE, AttrLookupScope.HEADER};
 
-    public UdbOauth(AuthAttrLookupScope[] authAttrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
+    public UdbOauth(AttrLookupScope[] attrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
         AssertUtil.assertNotNull(request, "UDB 验证，HttpServletRequest 对象不能为空！");
 
-        if (null != authAttrLookupScopes && authAttrLookupScopes.length > 0) {
-            this.authAttrLookupScopes = authAttrLookupScopes;
+        if (null != attrLookupScopes && attrLookupScopes.length > 0) {
+            this.attrLookupScopes = attrLookupScopes;
         }
 
         String oauthCookie = lookupCookieValueExt(request, "oauthCookie");
@@ -92,7 +92,7 @@ public class UdbOauth {
     }
 
     private String lookupCookieValueExt(HttpServletRequest request, String ckName) {
-        return AttrLookupUtil.lookupAttr(this.authAttrLookupScopes, request, ckName);
+        return AttrLookupUtil.lookupAttr(this.attrLookupScopes, request, ckName);
     }
 
     public UdbOauth(String udbAppId, String udbAppKey, String passport, String oauthCookieOrUdbOar, UdbAuthLevel authLevel) {
@@ -193,7 +193,7 @@ public class UdbOauth {
         return authLevel;
     }
 
-    public AuthAttrLookupScope[] getAuthAttrLookupScopes() {
-        return authAttrLookupScopes;
+    public AttrLookupScope[] getAttrLookupScopes() {
+        return attrLookupScopes;
     }
 }

@@ -37,7 +37,7 @@ public class UdbLoginedYyuidArgumentResolver extends AbstractArgumentResolver {
     protected Object resolveArgumentByAutoScope(ParamLookupScope[] lookupScopes, String name, MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, HttpServletRequest nativeRequest, WebDataBinderFactory binderFactory) {
         String parameterName = parameter.getParameterName();
         UdbAuthLevel authLevel = null;
-        AuthAttrLookupScope[] attrLookupScopes = null;
+        AttrLookupScope[] attrLookupScopes = null;
         if ("strongYyuid".equals(parameterName)) {
             authLevel = UdbAuthLevel.STRONG;
         } else if ("weakYyuid".equals(parameterName)) {
