@@ -1,10 +1,13 @@
 package com.duowan.common.utils;
 
 import com.duowan.common.utils.exception.InvalidURISyntaxException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Arvin
@@ -12,6 +15,26 @@ import java.util.*;
  * @since 2018/10/24 11:09
  */
 public class UriBuilder {
+
+    private static final String HTTP_PATTERN = "(?i)(http|https):";
+
+    private static final String USERINFO_PATTERN = "([^@\\[/?#]*)";
+
+    private static final String HOST_IPV4_PATTERN = "[^\\[/?#:]*";
+
+    private static final String HOST_IPV6_PATTERN = "\\[[\\p{XDigit}\\:\\.]*[%\\p{Alnum}]*\\]";
+
+    private static final String HOST_PATTERN = "(" + HOST_IPV6_PATTERN + "|" + HOST_IPV4_PATTERN + ")";
+
+    private static final String PORT_PATTERN = "(\\d*(?:\\{[^/]+?\\})?)";
+
+    private static final String PATH_PATTERN = "([^?#]*)";
+
+    private static final String LAST_PATTERN = "(.*)";
+
+    private static final Pattern HTTP_URL_PATTERN = Pattern.compile(
+            "^" + HTTP_PATTERN + "(//(" + USERINFO_PATTERN + "@)?" + HOST_PATTERN + "(:" + PORT_PATTERN + ")?" + ")?" +
+                    PATH_PATTERN + "(\\?" + LAST_PATTERN + ")?");
 
     private String schema;
 
@@ -48,7 +71,7 @@ public class UriBuilder {
     public static UriBuilder fromUri(URI uri) {
         UriBuilder builder = new UriBuilder(uri.getScheme(), uri.getHost());
 
-        builder.paramsMap = extractParamsAsMap(uri, builder.paramsKey);
+        builder.paramsMap = extractParamsAsMap(uri.getRawQuery(), builder.paramsKey);
         builder.port = uri.getPort() > 0 ? uri.getPort() : 80;
         builder.fragment = uri.getRawFragment();
         builder.path = uri.getRawPath();
@@ -57,16 +80,49 @@ public class UriBuilder {
     }
 
     public static UriBuilder fromHttpUrl(String httpUrl) {
+
         try {
             return fromUri(new URI(httpUrl));
         } catch (URISyntaxException e) {
-            throw new InvalidURISyntaxException(e);
+            return createBuilderFromHttpUrl(httpUrl);
         }
     }
 
-    private static Map<String, String> extractParamsAsMap(URI uri, List<String> paramsKey) {
+    private static UriBuilder createBuilderFromHttpUrl(String httpUrl) {
+        Matcher matcher = HTTP_URL_PATTERN.matcher(httpUrl);
+        if (matcher.matches()) {
+            String scheme = matcher.group(1);
+            String host = matcher.group(5);
+            if (StringUtils.isAnyBlank(scheme, host)) {
+                throw new InvalidURISyntaxException("[" + httpUrl + "] is not a valid HTTP URL");
+            }
+            UriBuilder builder = new UriBuilder(scheme, host);
+            //String userInfo = matcher.group(4);
+
+            String port = matcher.group(7);
+            if (StringUtils.isNotBlank(port)) {
+                builder.port(Integer.parseInt(port));
+            }
+            builder.path(matcher.group(8));
+
+            String queryString = matcher.group(10);
+            if (StringUtils.isBlank(queryString)) {
+                return builder;
+            }
+            String[] array = queryString.split("#");
+            if (array.length > 0) {
+                builder.params(extractParamsAsMap(array[0], builder.paramsKey));
+            }
+            if (array.length > 1) {
+                builder.fragment = array[1];
+            }
+            return builder;
+        }
+        throw new InvalidURISyntaxException("[" + httpUrl + "] is not a valid HTTP URL");
+    }
+
+    private static Map<String, String> extractParamsAsMap(String rawQuery, List<String> paramsKey) {
         Map<String, String> map = new TreeMap<>();
-        String rawQuery = uri.getRawQuery();
         if (null == rawQuery || "".equals(rawQuery.trim())) {
             return map;
         }
