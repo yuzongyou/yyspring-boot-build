@@ -212,6 +212,28 @@ public abstract class CommonUtil {
 
     }
 
+    public static String concat(Collection<?> collection, boolean ignoreNull, String separator, String replaceNullTo) {
+        if (null == collection || collection.isEmpty()) {
+            return null;
+        }
+        separator = null == separator ? "" : separator;
+        StringBuilder builder = new StringBuilder();
+        for (Object obj : collection) {
+            if (obj == null) {
+                if (!ignoreNull && replaceNullTo != null) {
+                    builder.append(replaceNullTo).append(separator);
+                }
+            } else {
+                builder.append(obj).append(separator);
+            }
+        }
+        if (builder.length() > 0) {
+            builder.setLength(builder.length() - 1);
+        }
+
+        return builder.toString();
+    }
+
     /**
      * sleep， 不会抛出异常
      *

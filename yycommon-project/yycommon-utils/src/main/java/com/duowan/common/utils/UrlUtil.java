@@ -1,8 +1,11 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.InvalidURISyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -31,11 +34,23 @@ public class UrlUtil {
         if (StringUtils.isBlank(url) || StringUtils.isBlank(paramName)) {
             return null;
         }
-        paramName = paramName + "=";
-        for (String part : url.split("[?&]")) {
-            if (part.contains(paramName)) {
-                return part.replace(paramName, "");
+        try {
+            URI uri = new URI(url);
+            String rawQuery = uri.getRawQuery();
+            for (String part : rawQuery.split("&")) {
+                String[] array = part.split("=");
+                if (array.length >= 1) {
+                    if (paramName.equals(array[0])) {
+                        if (array.length == 1) {
+                            return "";
+                        }
+                        return array[1];
+                    }
+                }
             }
+
+        } catch (URISyntaxException e) {
+            throw new InvalidURISyntaxException(e);
         }
         return null;
     }
@@ -48,28 +63,33 @@ public class UrlUtil {
      */
     public static Map<String, String> extractParamsAsMap(String url) {
         AssertUtil.assertNotBlank(url, "要提取URL参数的URL不能为空");
-        String noHashDataUrl = splitByHashData(url)[0];
-        String paramString = noHashDataUrl.replaceFirst(".*\\?", "");
-        String[] keyValues = paramString.split("&");
-
-        if (keyValues.length < 1) {
-            return new HashMap<>(0);
-        }
-        Map<String, String> map = new HashMap<>(keyValues.length);
-        for (String keyValue : keyValues) {
-            if (!keyValue.contains("=")) {
-                map.put(keyValue, null);
-            } else {
-                String[] array = keyValue.split("=");
-                if (array.length == 1) {
-                    map.put(array[0], "");
-                } else {
-                    map.put(array[0], array[1]);
-                }
+        Map<String, String> map = new HashMap<>();
+        try {
+            String rawQuery = new URI(url).getRawQuery();
+            if (null == rawQuery || "".equals(rawQuery.trim())) {
+                return map;
             }
 
+            String[] keyValues = rawQuery.split("&");
+            for (String keyValue : keyValues) {
+                if (null == keyValue || "".equals(keyValue.trim())) {
+                    continue;
+                }
+                if (!keyValue.contains("=")) {
+                    map.put(keyValue, "");
+                } else {
+                    String[] array = keyValue.split("=");
+                    if (array.length == 1) {
+                        map.put(array[0], "");
+                    } else {
+                        map.put(array[0], array[1]);
+                    }
+                }
+            }
+            return map;
+        } catch (URISyntaxException e) {
+            throw new InvalidURISyntaxException(e);
         }
-        return map;
     }
 
     /**
@@ -204,15 +224,7 @@ public class UrlUtil {
      * @return 如果url包含参数则进行替换，不存在则不进行操作
      */
     public static String replaceUrlParam(String url, String key, String newEncodeValue) {
-
-        if (url.contains("#")) {
-            String[] array = splitByHashData(url);
-            return replaceUrlParam(array[0], key, newEncodeValue) + array[1];
-        }
-
-        String regex = "(^.*[\\?&]?)(" + key + "=?[^\\?&]*)([\\?&]?.*$)";
-
-        return url.replaceAll(regex, "$1" + key + "=" + newEncodeValue + "$3");
+        return UriBuilder.fromHttpUrl(decodeUrl(url)).param(key, newEncodeValue).build();
     }
 
     /**
@@ -224,19 +236,7 @@ public class UrlUtil {
      * @return 如果url包含参数则进行替换，不存在则不进行操作
      */
     public static String appendOrReplaceUrlParam(String url, String key, String newEncodeValue) {
-
-        if (url.contains("#")) {
-            String[] array = splitByHashData(url);
-            return appendOrReplaceUrlParam(array[0], key, newEncodeValue) + array[1];
-        }
-
-        // 包含参数，替换
-        if (url.matches(".*[\\?&]?" + key + "=?[\\?&]?.*$")) {
-            return replaceUrlParam(url, key, newEncodeValue);
-        }
-
-        // 不存在， 追加
-        return appendUrlParams(url, key, newEncodeValue, false);
+        return UriBuilder.fromHttpUrl(url).param(key, newEncodeValue).build();
     }
 
     /**
@@ -269,24 +269,7 @@ public class UrlUtil {
             return url;
         }
 
-        // 切分成url + hash
-        String[] array = splitByHashData(url);
-        String pureUrl = array[0];
-        String hashData = array[1];
-
-        String subQueryString = key;
-        if (StringUtils.isNotBlank(value)) {
-            subQueryString += "=" + (encode ? encodeParamValue(value) : value);
-        }
-
-        String finalUrl;
-
-        if (pureUrl.contains("?")) {
-            finalUrl = pureUrl + "&" + subQueryString;
-        } else {
-            finalUrl = pureUrl + "?" + subQueryString;
-        }
-        return finalUrl.replaceAll("\\?+", "?").replaceAll("&+", "&") + hashData;
+        return UriBuilder.fromHttpUrl(url).param(key, (encode ? encodeParamValue(value) : value)).build();
     }
 
     /**
@@ -304,24 +287,7 @@ public class UrlUtil {
             return url;
         }
 
-        String subQueryString = toUrlParamsString(paramsMap, true, false);
-        if (StringUtils.isBlank(subQueryString)) {
-            return url;
-        }
-
-        // 切分成url + hash
-        String[] array = splitByHashData(url);
-        String pureUrl = array[0];
-        String hashData = array[1];
-
-        String finalUrl;
-
-        if (pureUrl.contains("?")) {
-            finalUrl = pureUrl + "&" + subQueryString;
-        } else {
-            finalUrl = pureUrl + "?" + subQueryString;
-        }
-        return finalUrl.replaceAll("\\?+", "?").replaceAll("&+", "&") + hashData;
+        return UriBuilder.fromHttpUrl(url).params(paramsMap).build();
     }
 
     /**
@@ -334,7 +300,7 @@ public class UrlUtil {
      */
     public static String toUrlParamsString(Map<String, String> params, boolean encode, boolean sortKeys) {
 
-        StringBuilder builder = new StringBuilder("");
+        StringBuilder builder = new StringBuilder();
 
         if (params == null || params.isEmpty()) {
             return builder.toString();
