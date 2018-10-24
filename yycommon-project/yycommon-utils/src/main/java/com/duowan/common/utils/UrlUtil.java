@@ -20,6 +20,9 @@ public class UrlUtil {
 
     private static final String HTTP_URL_ENCODE_REGEX = "(?i)https?%.*";
 
+    private static final String QUERY_PARAM_SEPARATOR = "&";
+    private static final String QUERY_PARAM_NAME_VALUE_SEPARATOR = "=";
+
     private UrlUtil() {
     }
 
@@ -37,8 +40,8 @@ public class UrlUtil {
         try {
             URI uri = new URI(url);
             String rawQuery = uri.getRawQuery();
-            for (String part : rawQuery.split("&")) {
-                String[] array = part.split("=");
+            for (String part : rawQuery.split(QUERY_PARAM_SEPARATOR)) {
+                String[] array = part.split(QUERY_PARAM_NAME_VALUE_SEPARATOR);
                 if (array.length >= 1) {
                     if (paramName.equals(array[0])) {
                         if (array.length == 1) {
@@ -70,15 +73,15 @@ public class UrlUtil {
                 return map;
             }
 
-            String[] keyValues = rawQuery.split("&");
+            String[] keyValues = rawQuery.split(QUERY_PARAM_SEPARATOR);
             for (String keyValue : keyValues) {
                 if (null == keyValue || "".equals(keyValue.trim())) {
                     continue;
                 }
-                if (!keyValue.contains("=")) {
+                if (!keyValue.contains(QUERY_PARAM_NAME_VALUE_SEPARATOR)) {
                     map.put(keyValue, "");
                 } else {
-                    String[] array = keyValue.split("=");
+                    String[] array = keyValue.split(QUERY_PARAM_NAME_VALUE_SEPARATOR);
                     if (array.length == 1) {
                         map.put(array[0], "");
                     } else {
@@ -315,14 +318,14 @@ public class UrlUtil {
             String value = params.get(key);
 
             if (StringUtils.isBlank(value)) {
-                builder.append(key).append("&");
+                builder.append(key).append(QUERY_PARAM_SEPARATOR);
             } else {
 
                 if (encode) {
                     value = encodeParamValue(value);
                 }
 
-                builder.append(key).append("=").append(value).append("&");
+                builder.append(key).append(QUERY_PARAM_NAME_VALUE_SEPARATOR).append(value).append("&");
             }
         }
 
