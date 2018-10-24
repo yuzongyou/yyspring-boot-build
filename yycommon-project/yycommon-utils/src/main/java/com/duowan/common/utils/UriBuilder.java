@@ -52,6 +52,8 @@ public class UriBuilder {
      **/
     private String path;
 
+    private String userinfo;
+
     private Map<String, String> paramsMap;
 
     private List<String> paramsKey;
@@ -75,6 +77,7 @@ public class UriBuilder {
         builder.port = uri.getPort() > 0 ? uri.getPort() : 80;
         builder.fragment = uri.getRawFragment();
         builder.path = uri.getRawPath();
+        builder.userinfo = uri.getRawUserInfo();
 
         return builder;
     }
@@ -97,7 +100,7 @@ public class UriBuilder {
                 throw new InvalidURISyntaxException("[" + httpUrl + "] is not a valid HTTP URL");
             }
             UriBuilder builder = new UriBuilder(scheme, host);
-            //String userInfo = matcher.group(4);
+            builder.userinfo(matcher.group(4));
 
             String port = matcher.group(7);
             if (StringUtils.isNotBlank(port)) {
@@ -177,6 +180,11 @@ public class UriBuilder {
         return this;
     }
 
+    public UriBuilder userinfo(String userinfo) {
+        this.userinfo = userinfo;
+        return this;
+    }
+
     public UriBuilder param(String name, String value) {
         if (null != name && !"".equals(name.trim())) {
             paramsMap.put(name, value);
@@ -208,7 +216,17 @@ public class UriBuilder {
     }
 
     public String build() {
-        StringBuilder builder = new StringBuilder(this.schema).append("://").append(host);
+        StringBuilder builder = new StringBuilder();
+
+        if (StringUtils.isBlank(this.schema)) {
+            builder.append("//");
+        } else {
+            builder.append(this.schema).append("://");
+        }
+        if (StringUtils.isNotBlank(this.userinfo)) {
+            builder.append(this.userinfo).append("@");
+        }
+        builder.append(this.host);
 
         if (port != 80 && port != -1) {
             builder.append(":").append(port);
@@ -259,6 +277,10 @@ public class UriBuilder {
 
     public String getPath() {
         return path;
+    }
+
+    public String getUserinfo() {
+        return userinfo;
     }
 
     public String getParam(String name) {
