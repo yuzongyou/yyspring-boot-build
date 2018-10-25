@@ -180,18 +180,18 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     }
 
     @Override
-    public Integer queryInteger(String sql, Integer defaultValue, Object... params) {
-        return querySingleColumn(sql, defaultValue, Integer.class, params);
+    public Integer queryInteger(String sql, Object... params) {
+        return querySingleColumn(sql, null, Integer.class, params);
     }
 
     @Override
-    public Long queryLong(String sql, Long defaultValue, Object... params) {
-        return querySingleColumn(sql, defaultValue, Long.class, params);
+    public Long queryLong(String sql, Object... params) {
+        return querySingleColumn(sql, null, Long.class, params);
     }
 
     @Override
-    public String queryString(String sql, String defaultValue, Object... params) {
-        return querySingleColumn(sql, defaultValue, String.class, params);
+    public String queryString(String sql, Object... params) {
+        return querySingleColumn(sql, null, String.class, params);
     }
 
     @Override

@@ -165,32 +165,29 @@ public interface IQuery {
     /**
      * 查询Integer
      *
-     * @param sql          sql
-     * @param defaultValue 默认值
-     * @param params       参数
+     * @param sql    sql
+     * @param params 参数
      * @return 不存在则返回null
      */
-    Integer queryInteger(String sql, Integer defaultValue, Object... params);
+    Integer queryInteger(String sql, Object... params);
 
     /**
      * 查询 Long
      *
-     * @param sql          sql
-     * @param defaultValue 默认值
-     * @param params       参数
+     * @param sql    sql
+     * @param params 参数
      * @return 不存在则返回null
      */
-    Long queryLong(String sql, Long defaultValue, Object... params);
+    Long queryLong(String sql, Object... params);
 
     /**
      * 查询 String
      *
-     * @param sql          sql
-     * @param defaultValue 默认值
-     * @param params       参数
+     * @param sql    sql
+     * @param params 参数
      * @return 不存在则返回null
      */
-    String queryString(String sql, String defaultValue, Object... params);
+    String queryString(String sql, Object... params);
 
     /**
      * 查询 单列 数据，只能返回单列单行数据
