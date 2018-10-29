@@ -75,6 +75,12 @@ public class YyErrorMvcAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(JsonResponseBodyExceptionViewResolver.class)
+    public JsonResponseBodyExceptionViewResolver jsonResponseBodyExceptionViewResolver() {
+        return new JsonResponseBodyExceptionViewResolver();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(TextViewExceptionViewResolver.class)
     public TextViewExceptionViewResolver textViewExceptionViewResolver() {
         return new TextViewExceptionViewResolver();

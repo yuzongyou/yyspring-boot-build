@@ -1,8 +1,6 @@
 package com.duowan.common.web.exception.handler;
 
 import com.duowan.common.web.view.JsonView;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
@@ -16,8 +14,6 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Arvin
  */
-@Component
-@ConditionalOnMissingBean
 public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewResolver {
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {

@@ -35,5 +35,6 @@
         <module>yyspring-boot-starter-redis</module>
         <module>yyspring-boot-starter-thrift-client</module>
         <module>yyspring-boot-starter-thrift-server</module>
+        <module>yyspring-boot-starter-swagger2</module>
     </modules>
 </project>

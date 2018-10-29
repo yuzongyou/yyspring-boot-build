@@ -2,13 +2,16 @@ package com.duowan.yyspringboot.autoconfigure.web;
 
 import com.duowan.common.web.WebContext;
 import com.duowan.common.web.YyServletContextInitializer;
+import com.duowan.common.web.converter.YyDateConverter;
 import com.duowan.common.web.converter.json.ExtendMappingJackson2HttpMessageConverter;
 import com.duowan.common.web.converter.json.JsonJavascriptAdvice;
 import com.duowan.common.web.converter.json.JsonpAdvice;
 import com.duowan.common.web.converter.json.StringHttpMessageAdvice;
 import com.duowan.common.web.filter.YyRootFilter;
+import com.duowan.common.web.formatter.YySimpleDateFormat;
 import com.duowan.common.web.view.AjaxView;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -88,6 +91,13 @@ public class YyWebMvcAutoConfiguration {
         return initializer;
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Jackson2ObjectMapperProvider jackson2ObjectMapperProvider() {
+        return new Jackson2ObjectMapperProvider() {
+        };
+    }
+
     /**
      * 自定义 HttpMessageConverter
      * https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#HttpMessageConverters
@@ -96,7 +106,7 @@ public class YyWebMvcAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(value = HttpMessageConverters.class, search = SearchStrategy.CURRENT)
-    public HttpMessageConverters customConverters() {
+    public HttpMessageConverters customConverters(Jackson2ObjectMapperProvider jackson2ObjectMapperProvider) {
 
         logger.info("创建 [HttpMessageConverters], 支持 JSONP, JAVASCRIPT, JSON");
 
@@ -108,12 +118,16 @@ public class YyWebMvcAutoConfiguration {
                 MediaType.APPLICATION_JSON_UTF8
         ));
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        // 序列化时，include规则为：不包含为空字符串，空集合，空数组或null的属性
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        objectHttpMessageConverter.setObjectMapper(objectMapper);
+        // 设置ObjectMapper
+        objectHttpMessageConverter.setObjectMapper(jackson2ObjectMapperProvider.provide());
 
         return new HttpMessageConverters(objectHttpMessageConverter);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public YyDateConverter yyDateConverter() {
+        return new YyDateConverter();
     }
 
     @Bean

@@ -21,6 +21,7 @@
         <module>yycommon-project</module>
         <module>yyproject-bom</module>
         <module>yyproject-parent</module>
+        <module>yyspring-cloud-project</module>
     </modules>
 
     <licenses>

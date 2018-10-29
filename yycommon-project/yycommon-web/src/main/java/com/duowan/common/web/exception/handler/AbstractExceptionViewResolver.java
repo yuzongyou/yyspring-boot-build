@@ -33,7 +33,7 @@ public abstract class AbstractExceptionViewResolver implements ExceptionViewReso
             if (ex instanceof CodeException) {
                 return ((CodeException) ex).getCode();
             }
-            if (isJavaxValidationImported && ex instanceof ConstraintViolationException) {
+            if (ex instanceof BindException || (isJavaxValidationImported && ex instanceof ConstraintViolationException)) {
                 return 400;
             }
         }

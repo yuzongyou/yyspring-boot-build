@@ -32,5 +32,4 @@ public class ExtendMappingJackson2HttpMessageConverter extends MappingJackson2Ht
         }
     }
 
-
 }

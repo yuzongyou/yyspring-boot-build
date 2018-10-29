@@ -213,6 +213,12 @@ public class AppContext {
 
     private static volatile boolean hadInit = false;
 
+    private static Class<?> bootstrapClass;
+
+    public static Class<?> getBootstrapClass() {
+        return bootstrapClass;
+    }
+
     /**
      * 初始化应用环境， 项目代号， 环境， 日志等
      *
@@ -223,6 +229,8 @@ public class AppContext {
         if (hadInit) {
             return ;
         }
+
+        bootstrapClass = sourceClass;
 
         hadInit = true;
 

@@ -28,6 +28,10 @@ public class AjaxView extends AbstractTextView {
         AjaxView.ajaxStatusCodeName = ajaxStatusCodeName;
     }
 
+    public String getStatusCodeName() {
+        return getAjaxStatusCodeName();
+    }
+
     /** 业务响应代码 */
     private int code = DEFAULT_CODE;
 
@@ -136,11 +140,11 @@ public class AjaxView extends AbstractTextView {
      *
      * @return 返回数据对象
      */
-    private Object buildDataObject() {
+    protected Object buildDataObject() {
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put(getAjaxStatusCodeName(), code);
+        dataMap.put(getStatusCodeName(), code);
         dataMap.put("message", message);
         dataMap.put("data", data);
 

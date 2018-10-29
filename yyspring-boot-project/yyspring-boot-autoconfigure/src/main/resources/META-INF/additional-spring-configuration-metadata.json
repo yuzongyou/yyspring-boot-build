@@ -17,6 +17,12 @@
       "defaultValue": true
     },
     {
+      "name": "yyspring.swagger2.enabled",
+      "type": "java.lang.Boolean",
+      "description": "是否启用Swagger2，默认是启用的.",
+      "defaultValue": true
+    },
+    {
       "name": "yyspring.thrift.exporter.type",
       "type": "com.duowan.yyspringboot.autoconfigure.thriftserver.ExporterType",
       "description": "Thrift Export Type, Default is null."

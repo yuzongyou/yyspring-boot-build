@@ -26,7 +26,7 @@
         <mockito.version>2.10.0</mockito.version>
 
         <slf4j.version>1.7.25</slf4j.version>
-        <guava.version>18.0</guava.version>
+        <guava.version>20.0</guava.version>
         <zxa.version>1.1.0-SNAPSHOT</zxa.version>
         <apollo.client.version>0.10.3-SNAPSHOT</apollo.client.version>
         <thrift.version>0.10.0</thrift.version>
@@ -42,8 +42,10 @@
         <jaxen.version>1.1.6</jaxen.version>
         <httpclient.version>4.5.5</httpclient.version>
         <httpcore.version>4.4.9</httpcore.version>
-        <guava.version>18.0</guava.version>
         <gson.version>2.8.2</gson.version>
+
+        <jaxb.api.version>2.3.1</jaxb.api.version>
+        <swagger2.version>2.9.2</swagger2.version>
 
         <mysql.connector.version>5.1.46</mysql.connector.version>
         <HikariCP.version>3.1.0</HikariCP.version>
@@ -65,6 +67,8 @@
 
         <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
+
+        <fegin.version>1.4.6.RELEASE</fegin.version>
 
         <flatten-maven-plugin.version>1.0.1</flatten-maven-plugin.version>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
@@ -93,6 +97,23 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring.boot.version}</version>
+            </dependency>
+
+            <!-- swagger2-->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-ui</artifactId>
+                <version>${swagger2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.api.version}</version>
             </dependency>
 
             <dependency>
@@ -614,6 +635,76 @@
                 <artifactId>yyspring-boot-starter-thrift-server</artifactId>
                 <version>${yyproject.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-boot-starter-swagger2</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-feign</artifactId>
+                <version>${fegin.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-msauth-sdk</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-msauth-feign-client</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-msauth-gateway-client</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-msauth-web-server</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-autoconfigure</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-starters</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-starter-msauth-feign-client</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-starter-msauth-gateway-client</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-starter-msauth-web-server</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yyspring-cloud-starter-msauth-server</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     <build>

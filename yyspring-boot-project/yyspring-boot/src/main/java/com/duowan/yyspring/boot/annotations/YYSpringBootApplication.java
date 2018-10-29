@@ -4,6 +4,7 @@ import com.duowan.yyspring.boot.DefaultEnvReader;
 import com.duowan.yyspring.boot.DefaultProjectNoReader;
 import com.duowan.yyspring.boot.EnvReader;
 import com.duowan.yyspring.boot.ProjectNoReader;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -58,7 +59,16 @@ public @interface YYSpringBootApplication {
      *
      * @return 返回模块代号
      */
+    @AliasFor("value")
     String moduleNo() default "";
+
+    /**
+     * 模块代号
+     *
+     * @return 返回模块代号
+     */
+    @AliasFor("moduleNo")
+    String value() default "";
 
     /**
      * 日志文件根目录，默认是 /data2/log/resin/

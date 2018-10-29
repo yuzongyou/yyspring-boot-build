@@ -1,8 +1,6 @@
 package com.duowan.common.web.exception.handler;
 
 import com.duowan.common.web.view.JsonView;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -12,8 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author Arvin
  */
-@Component
-@ConditionalOnMissingBean
 public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolver {
 
     @Override
@@ -37,6 +33,6 @@ public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolve
 
     @Override
     public int getOrder() {
-        return Integer.MAX_VALUE - 1;
+        return Integer.MAX_VALUE - 2;
     }
 }
