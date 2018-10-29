@@ -7,16 +7,16 @@ import org.springframework.http.MediaType;
  *
  * @author Arvin
  */
-public class JsonView extends AjaxView {
+public class JsonView<T> extends AjaxView<T> {
 
     public JsonView() {
     }
 
-    public JsonView(int code, String message, Object data) {
+    public JsonView(int code, String message, T data) {
         super(code, message, data);
     }
 
-    public JsonView(int code, String message, Object data, boolean needXssCheck) {
+    public JsonView(int code, String message, T data, boolean needXssCheck) {
         super(code, message, data, needXssCheck);
     }
 
@@ -28,11 +28,11 @@ public class JsonView extends AjaxView {
         super(code, message, needXssCheck);
     }
 
-    public JsonView(Object data) {
+    public JsonView(T data) {
         super(data);
     }
 
-    public JsonView(Object data, boolean needXssCheck) {
+    public JsonView(T data, boolean needXssCheck) {
         super(data, needXssCheck);
     }
 

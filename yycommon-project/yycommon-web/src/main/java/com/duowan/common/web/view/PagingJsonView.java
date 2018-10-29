@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author Arvin
  */
-public class PagingJsonView<T> extends JsonView {
+public class PagingJsonView<T> extends JsonView<Map<String, Object> > {
 
     /**
      * 创建一个分页视图 数据Map

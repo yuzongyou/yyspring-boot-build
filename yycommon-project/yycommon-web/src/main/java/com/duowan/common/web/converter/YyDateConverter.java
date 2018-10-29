@@ -1,5 +1,6 @@
 package com.duowan.common.web.converter;
 
+import com.duowan.common.utils.ConvertUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 
@@ -33,6 +34,10 @@ public class YyDateConverter implements Converter<String, Date> {
         }
 
         source = source.trim();
+
+        if (source.matches("^[0-9]+$")) {
+            return new Date(Long.parseLong(source));
+        }
 
         Date date = null;
         String pattern;

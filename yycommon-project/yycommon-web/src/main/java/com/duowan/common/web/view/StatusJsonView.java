@@ -5,16 +5,16 @@ package com.duowan.common.web.view;
  * @version 1.0
  * @since 2018/10/26 10:25
  */
-public class StatusJsonView extends JsonView {
+public class StatusJsonView<T> extends JsonView<T> {
 
     public StatusJsonView() {
     }
 
-    public StatusJsonView(int code, String message, Object data) {
+    public StatusJsonView(int code, String message, T data) {
         super(code, message, data);
     }
 
-    public StatusJsonView(int code, String message, Object data, boolean needXssCheck) {
+    public StatusJsonView(int code, String message, T data, boolean needXssCheck) {
         super(code, message, data, needXssCheck);
     }
 
@@ -26,11 +26,11 @@ public class StatusJsonView extends JsonView {
         super(code, message, needXssCheck);
     }
 
-    public StatusJsonView(Object data) {
+    public StatusJsonView(T data) {
         super(data);
     }
 
-    public StatusJsonView(Object data, boolean needXssCheck) {
+    public StatusJsonView(T data, boolean needXssCheck) {
         super(data, needXssCheck);
     }
 

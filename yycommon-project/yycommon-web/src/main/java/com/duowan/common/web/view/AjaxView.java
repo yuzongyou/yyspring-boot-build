@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author Arvin
  */
-public class AjaxView extends AbstractTextView {
+public class AjaxView<T> extends AbstractTextView {
 
     public static final int DEFAULT_CODE = 200;
 
@@ -39,7 +39,7 @@ public class AjaxView extends AbstractTextView {
     private String message;
 
     /** 业务相应数据 */
-    private Object data;
+    private T data;
 
     /** 是否需要进行 XSS 检查 */
     private boolean needXssCheck = DEFAULT_NEED_XSS_CHECK;
@@ -47,13 +47,13 @@ public class AjaxView extends AbstractTextView {
     public AjaxView() {
     }
 
-    public AjaxView(int code, String message, Object data) {
+    public AjaxView(int code, String message, T data) {
         this.code = code;
         this.message = message;
         this.data = data;
     }
 
-    public AjaxView(int code, String message, Object data, boolean needXssCheck) {
+    public AjaxView(int code, String message, T data, boolean needXssCheck) {
         this.code = code;
         this.message = message;
         this.data = data;
@@ -71,11 +71,11 @@ public class AjaxView extends AbstractTextView {
         this.needXssCheck = needXssCheck;
     }
 
-    public AjaxView(Object data) {
+    public AjaxView(T data) {
         this.data = data;
     }
 
-    public AjaxView(Object data, boolean needXssCheck) {
+    public AjaxView(T data, boolean needXssCheck) {
         this.data = data;
         this.needXssCheck = needXssCheck;
     }
@@ -100,7 +100,7 @@ public class AjaxView extends AbstractTextView {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 
