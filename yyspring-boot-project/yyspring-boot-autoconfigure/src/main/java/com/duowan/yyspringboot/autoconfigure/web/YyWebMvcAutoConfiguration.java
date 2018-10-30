@@ -3,33 +3,22 @@ package com.duowan.yyspringboot.autoconfigure.web;
 import com.duowan.common.web.WebContext;
 import com.duowan.common.web.YyServletContextInitializer;
 import com.duowan.common.web.converter.YyDateConverter;
-import com.duowan.common.web.converter.json.ExtendMappingJackson2HttpMessageConverter;
-import com.duowan.common.web.converter.json.JsonJavascriptAdvice;
-import com.duowan.common.web.converter.json.JsonpAdvice;
-import com.duowan.common.web.converter.json.StringHttpMessageAdvice;
 import com.duowan.common.web.filter.YyRootFilter;
-import com.duowan.common.web.formatter.YySimpleDateFormat;
 import com.duowan.common.web.view.AjaxView;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.mvc.method.annotation.AbstractJsonpResponseBodyAdvice;
 
 import javax.servlet.Servlet;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -41,7 +30,6 @@ import java.util.Collections;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyServletContextInitializer.class})
 @EnableConfigurationProperties({WebMvcProperties.class})
-@Import({JsonpAdvice.class, JsonJavascriptAdvice.class, StringHttpMessageAdvice.class})
 public class YyWebMvcAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(YyWebMvcAutoConfiguration.class);
@@ -93,39 +81,6 @@ public class YyWebMvcAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Jackson2ObjectMapperProvider jackson2ObjectMapperProvider() {
-        return new Jackson2ObjectMapperProvider() {
-        };
-    }
-
-    /**
-     * 自定义 HttpMessageConverter
-     * https://docs.spring.io/spring-boot/docs/1.5.8.RELEASE/reference/htmlsingle/#HttpMessageConverters
-     *
-     * @return 返回自定义的 HttpMessageConverter
-     */
-    @Bean
-    @ConditionalOnMissingBean(value = HttpMessageConverters.class, search = SearchStrategy.CURRENT)
-    public HttpMessageConverters customConverters(Jackson2ObjectMapperProvider jackson2ObjectMapperProvider) {
-
-        logger.info("创建 [HttpMessageConverters], 支持 JSONP, JAVASCRIPT, JSON");
-
-        ExtendMappingJackson2HttpMessageConverter objectHttpMessageConverter = new ExtendMappingJackson2HttpMessageConverter();
-
-        objectHttpMessageConverter.setDefaultCharset(Charset.forName("UTF-8"));
-        objectHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
-                MediaType.APPLICATION_JSON,
-                MediaType.APPLICATION_JSON_UTF8
-        ));
-
-        // 设置ObjectMapper
-        objectHttpMessageConverter.setObjectMapper(jackson2ObjectMapperProvider.provide());
-
-        return new HttpMessageConverters(objectHttpMessageConverter);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public YyDateConverter yyDateConverter() {
         return new YyDateConverter();
     }
@@ -144,5 +99,19 @@ public class YyWebMvcAutoConfiguration {
         registration.setName("yyRootFilter");
         registration.setOrder(0);
         return registration;
+    }
+
+    @Configuration
+    @ConditionalOnProperty(value = "yyspring.mvc.jsonp.enabled", matchIfMissing = true)
+    @EnableConfigurationProperties({WebMvcProperties.class})
+    public static class JsonpConfiguration {
+
+        @ControllerAdvice
+        public class YyJsonpAdvice extends AbstractJsonpResponseBodyAdvice {
+
+            public YyJsonpAdvice(WebMvcProperties mvcProperties) {
+                super(mvcProperties.getJsonpCallbackVars());
+            }
+        }
     }
 }
