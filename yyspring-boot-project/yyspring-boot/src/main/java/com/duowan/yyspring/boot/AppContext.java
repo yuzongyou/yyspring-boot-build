@@ -227,7 +227,7 @@ public class AppContext {
     public static void initialize(Class<?> sourceClass) {
 
         if (hadInit) {
-            return ;
+            return;
         }
 
         bootstrapClass = sourceClass;
@@ -263,9 +263,20 @@ public class AppContext {
 
         environment.getPropertySources().addLast(new MapPropertySource("yyApplicationProperties", applicationProperties));
 
+        // 校准时间基线
+        adapterSpringJacksonTimeZone(environment, applicationProperties);
+
         initInfo.add(JsonUtil.toPrettyJson(projectInfoMap));
 
         initAppAllKeySet();
+    }
+
+    private static void adapterSpringJacksonTimeZone(StandardEnvironment environment, Map<String, Object> applicationProperties) {
+        String timeZoneKey = "spring.jackson.time-zone";
+        String timeZone = environment.getProperty(timeZoneKey);
+        if (StringUtils.isBlank(timeZone) || "none".equalsIgnoreCase(timeZone)) {
+            System.setProperty(timeZoneKey, TimeZone.getDefault().getID());
+        }
     }
 
     private static String deduceLogDir(StandardEnvironment environment, Class<?> sourceClass, YYSpringBootApplication applicationAnn) {

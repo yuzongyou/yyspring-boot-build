@@ -1,14 +1,11 @@
 package com.duowan.common.web.converter;
 
-import com.duowan.common.utils.ConvertUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author Arvin
@@ -16,16 +13,6 @@ import java.util.List;
  * @since 2018/10/19 17:08
  */
 public class YyDateConverter implements Converter<String, Date> {
-
-    public static final List<String> DEFAULT_PATTERNS = Arrays.asList(
-            "yyyy-MM-dd HH:mm:ss",
-            "yyyy-MM-dd",
-            "yyyy/MM/dd HH:mm:ss",
-            "yyyy/MM/dd",
-            "yyyyMMdd"
-    );
-
-    private List<String> patterns = DEFAULT_PATTERNS;
 
     @Override
     public Date convert(String source) {
