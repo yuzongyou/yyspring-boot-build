@@ -1,5 +1,6 @@
 package com.duowan.yyspringcloud.autoconfigure.msauth;
 
+import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspringcloud.msauth.app.ApolloAppReader;
 import com.duowan.yyspringcloud.msauth.app.AppReader;
 import com.duowan.yyspringcloud.msauth.app.CompositeAppReader;
@@ -32,7 +33,6 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties({MsauthProperties.class})
 @ConditionalOnClass({AppReader.class})
-@ConditionalOnExpression("${yyspring.cloud.msauth.client:false} || ${yyspring.cloud.msauth.server:false}")
 public class MsauthAutoConfiguration {
 
     private static String resolveAppId(Environment environment, MsauthProperties properties) {
@@ -67,7 +67,27 @@ public class MsauthAutoConfiguration {
     }
 
     @Configuration
-    @ConditionalOnExpression("${yyspring.cloud.msauth.client:false}")
+    @EnableConfigurationProperties({MsauthProperties.class})
+    @ConditionalOnClass({GlobalFilter.class})
+    public static class MsauthClientGatewayConfiguration {
+        @Bean
+        @ConditionalOnMissingBean
+        public GatewayAddHeaderGlobalFilter gatewayAddHeaderGlobalFilter(MsauthProperties properties, AppReader appReader) {
+            GatewayAddHeaderGlobalFilter filter = new GatewayAddHeaderGlobalFilter(properties.getAppId(), appReader);
+
+            filter.setOrder(properties.getHeaderGatewayFilterOrder());
+            if (StringUtils.isNotBlank(properties.getAuthHeader())) {
+                filter.setAuthHeader(properties.getAuthHeader());
+            }
+
+            filter.setSignLiveSeconds(properties.getSignLiveSeconds());
+
+            return filter;
+        }
+    }
+
+    @Configuration
+    @ConditionalOnClass(FeignAuthHeaderRequestInterceptor.class)
     @EnableConfigurationProperties({MsauthProperties.class})
     public static class MsauthClientConfiguration {
 
@@ -91,30 +111,10 @@ public class MsauthAutoConfiguration {
             }
         }
 
-        @Configuration
-        @EnableConfigurationProperties({MsauthProperties.class})
-        @ConditionalOnClass({GlobalFilter.class})
-        public static class MsauthClientGatewayConfiguration {
-            @Bean
-            @ConditionalOnMissingBean
-            public GatewayAddHeaderGlobalFilter gatewayAddHeaderGlobalFilter(MsauthProperties properties, AppReader appReader) {
-                GatewayAddHeaderGlobalFilter filter = new GatewayAddHeaderGlobalFilter(properties.getAppId(), appReader);
-
-                filter.setOrder(properties.getHeaderGatewayFilterOrder());
-                if (StringUtils.isNotBlank(properties.getAuthHeader())) {
-                    filter.setAuthHeader(properties.getAuthHeader());
-                }
-
-                filter.setSignLiveSeconds(properties.getSignLiveSeconds());
-
-                return filter;
-            }
-        }
-
     }
 
     @Configuration
-    @ConditionalOnExpression("${yyspring.cloud.msauth.server:false}")
+    @ConditionalOnClass(SecurityApiAuthServerHandlerInterceptor.class)
     @EnableConfigurationProperties({MsauthProperties.class})
     public static class MsauthServerConfiguration {
 
@@ -126,6 +126,8 @@ public class MsauthAutoConfiguration {
 
             decider.setIncludePatterns(properties.getSecurityIncludePatterns());
             decider.setExcludePatterns(properties.getSecurityExcludePatterns());
+            decider.setDev(AppContext.isDev());
+            decider.setUncheckForDev(properties.isUncheckForDev());
 
             return decider;
         }

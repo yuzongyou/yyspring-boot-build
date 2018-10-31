@@ -30,6 +30,12 @@ public class DefaultSecurityApiDecider implements SecurityApiDecider {
      **/
     private Set<String> excludePatterns;
 
+    /** 当前是否是开发环境 **/
+    private boolean isDev = false;
+
+    /** 开发环境下是否不进行检查 **/
+    private boolean uncheckForDev = true;
+
     public Set<String> getIncludePatterns() {
         return includePatterns;
     }
@@ -46,8 +52,29 @@ public class DefaultSecurityApiDecider implements SecurityApiDecider {
         this.excludePatterns = excludePatterns;
     }
 
+    public boolean isDev() {
+        return isDev;
+    }
+
+    public void setDev(boolean dev) {
+        isDev = dev;
+    }
+
+    public boolean isUncheckForDev() {
+        return uncheckForDev;
+    }
+
+    public void setUncheckForDev(boolean uncheckForDev) {
+        this.uncheckForDev = uncheckForDev;
+    }
+
     @Override
     public boolean needSecurityProtected(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
+        // 开发环境下不需要进行检查
+        if (isDev && uncheckForDev) {
+            return false;
+        }
 
         if (handler instanceof HandlerMethod) {
             HandlerMethod hm = (HandlerMethod) handler;

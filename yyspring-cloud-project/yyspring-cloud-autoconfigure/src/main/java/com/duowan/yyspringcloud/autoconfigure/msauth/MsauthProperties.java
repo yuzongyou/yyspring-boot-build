@@ -14,16 +14,6 @@ import java.util.Set;
 public class MsauthProperties {
 
     /**
-     * 是否开启服务端拦截
-     **/
-    private boolean server = false;
-
-    /**
-     * 是否开启客户端请求增加认证header
-     **/
-    private boolean client = false;
-
-    /**
      * 要进行安全检查的URL匹配
      **/
     private Set<String> securityIncludePatterns;
@@ -62,8 +52,13 @@ public class MsauthProperties {
      **/
     private long signLiveSeconds = 600;
 
-    /** API gateway header 过滤器排序 **/
+    /**
+     * API gateway header 过滤器排序
+     **/
     private int headerGatewayFilterOrder = 0;
+
+    /** 开发环境下不需要进行安全认证，默认是不检查 **/
+    private boolean uncheckForDev = true;
 
     public String getAppId() {
         return appId;
@@ -71,22 +66,6 @@ public class MsauthProperties {
 
     public void setAppId(String appId) {
         this.appId = appId;
-    }
-
-    public boolean isServer() {
-        return server;
-    }
-
-    public void setServer(boolean server) {
-        this.server = server;
-    }
-
-    public boolean isClient() {
-        return client;
-    }
-
-    public void setClient(boolean client) {
-        this.client = client;
     }
 
     public Set<String> getSecurityIncludePatterns() {
@@ -151,5 +130,13 @@ public class MsauthProperties {
 
     public void setHeaderGatewayFilterOrder(int headerGatewayFilterOrder) {
         this.headerGatewayFilterOrder = headerGatewayFilterOrder;
+    }
+
+    public boolean isUncheckForDev() {
+        return uncheckForDev;
+    }
+
+    public void setUncheckForDev(boolean uncheckForDev) {
+        this.uncheckForDev = uncheckForDev;
     }
 }
