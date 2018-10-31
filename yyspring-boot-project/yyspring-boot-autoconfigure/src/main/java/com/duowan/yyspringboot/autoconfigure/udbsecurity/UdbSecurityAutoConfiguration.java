@@ -42,7 +42,7 @@ public class UdbSecurityAutoConfiguration {
     }
 
     @Bean
-    public MappedInterceptor mappedInterceptor(UdbSecurityProperties udbSecurityProperties,
+    public MappedInterceptor udbSecurityMappedInterceptor(UdbSecurityProperties udbSecurityProperties,
                                                @Autowired(required = false) PrivilegeInterceptor privilegeInterceptor,
                                                @Autowired(required = false) List<PatternProvider> patternProviders) {
 
