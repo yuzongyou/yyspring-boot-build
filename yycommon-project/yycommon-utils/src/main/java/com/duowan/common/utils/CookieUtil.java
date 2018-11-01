@@ -122,8 +122,14 @@ public class CookieUtil {
      * @return 返回顶级域名，如 login.yy.com to .yy.com
      */
     public static String getTopDomain(String domain) {
-        String[] str = domain.split("\\.");
-        return "." + str[str.length - 2] + "." + str[str.length - 1];
+        int index = domain.lastIndexOf('.');
+        if (index >= 0) {
+            index = domain.lastIndexOf('.', index - 1);
+        }
+        if (index >= 0) {
+            return domain.substring(index);
+        }
+        return domain;
     }
 
     /**

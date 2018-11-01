@@ -114,7 +114,8 @@ public class CookieUtilTest {
 
         assertEquals(".baidu.com", CookieUtil.getTopDomain(".baidu.com"));
         assertEquals(".baidu.com", CookieUtil.getTopDomain("www.baidu.com"));
-
+        assertEquals(".baidu.com", CookieUtil.getTopDomain("www.aa.baidu.com"));
+        assertEquals(".baidu.com:8080", CookieUtil.getTopDomain("www.aa.baidu.com:8080"));
 
     }
 }

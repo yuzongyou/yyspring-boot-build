@@ -48,6 +48,24 @@ public interface IInsert {
     int insert(String sql, List<Object> params, GenerateKeyCallback keyCallback);
 
     /**
+     * 插入并返回自增主键
+     *
+     * @param sql    要执行的sql
+     * @param params 参数
+     * @return 返回自增主键
+     */
+    long insertReturnAutoIncrLongId(String sql, Object... params);
+
+    /**
+     * 插入并返回自增主键
+     *
+     * @param sql    要执行的sql
+     * @param params 参数
+     * @return 返回自增主键
+     */
+    long insertReturnAutoIncrLongId(List<Object> params, String sql);
+
+    /**
      * 批量进行插入
      *
      * @param sql        要执行的 sql

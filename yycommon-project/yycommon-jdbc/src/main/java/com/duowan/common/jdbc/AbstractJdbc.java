@@ -6,6 +6,7 @@ import com.duowan.common.jdbc.statement.BatchInsertPreparedStatementSetter;
 import com.duowan.common.jdbc.statement.BatchInsertStatementCallback;
 import com.duowan.common.jdbc.statement.SimplePreparedStatementCreator;
 import com.duowan.common.utils.AssertUtil;
+import com.duowan.common.utils.ConvertUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Arvin
@@ -439,6 +441,25 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
             return insert(sql, keyCallback);
         }
         return insert(sql, keyCallback, params.toArray());
+    }
+
+    @Override
+    public long insertReturnAutoIncrLongId(String sql, Object... params) {
+
+        AtomicLong result = new AtomicLong();
+        GenerateKeyCallback keyCallback = (rowIndex, primaryKey) -> result.set(ConvertUtil.toLong(primaryKey));
+        insert(sql, keyCallback, params);
+        long primaryId = result.longValue();
+        AssertUtil.assertTrue(primaryId > 0L, "无法生成自增主键");
+        return primaryId;
+    }
+
+    @Override
+    public long insertReturnAutoIncrLongId(List<Object> params, String sql) {
+        if (isEmptyParams(params)) {
+            return insertReturnAutoIncrLongId(sql);
+        }
+        return insertReturnAutoIncrLongId(sql, params.toArray());
     }
 
     protected int intArrayToSum(int[] arr) {
