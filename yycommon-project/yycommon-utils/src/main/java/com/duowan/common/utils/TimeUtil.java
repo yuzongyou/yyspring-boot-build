@@ -101,7 +101,7 @@ public class TimeUtil {
      */
     public static int toMilliseconds(String timeStr) {
 
-        String regex = "(?i)^([0-9]+)([hms])?$";
+        String regex = "(?i)^([0-9]+)([dhms])?$";
         if (StringUtils.isBlank(timeStr) || !timeStr.matches(regex)) {
             throw new IllegalArgumentException("时间参数不正确：" + timeStr);
         }
@@ -154,7 +154,7 @@ public class TimeUtil {
 
     public static boolean isValidIntervals(String intervals) {
 
-        String regex = "(?i)^([0-9]+[hms]?,)*([0-9]+[hms]?)?$";
+        String regex = "(?i)^([0-9]+[dhms]?,)*([0-9]+[dhms]?)?$";
 
         if (StringUtils.isBlank(intervals) || !intervals.matches(regex) || intervals.endsWith(",")) {
             return false;
