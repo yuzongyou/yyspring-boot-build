@@ -36,6 +36,7 @@ public class RedisRegisterUtil {
             List<RedisDefinitionProvider> providerList,
             List<RedisDefinition> redisDefinitionList,
             Set<String> enabledIds,
+            Set<String> excludeIds,
             String primaryId,
             BeanDefinitionRegistry registry,
             Environment environment) {
@@ -46,6 +47,9 @@ public class RedisRegisterUtil {
 
         // 自动填充属性
         redisDefinitionList = RedisDefinitionUtil.autoFillProperties(redisDefinitionList, environment);
+
+        // 删除所有禁用的Jdbc定义列表
+        redisDefinitionList = RedisDefinitionUtil.filterExcludeRedisDefList(excludeIds, redisDefinitionList);
 
         // 提取所有启用的Jdbc定义列表
         redisDefinitionList = RedisDefinitionUtil.extractEnabledRedisDefList(enabledIds, redisDefinitionList);

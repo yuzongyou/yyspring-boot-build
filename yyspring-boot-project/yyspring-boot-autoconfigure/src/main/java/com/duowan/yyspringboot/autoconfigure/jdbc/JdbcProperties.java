@@ -23,6 +23,11 @@ public class JdbcProperties {
     private Set<String> enabledIds;
 
     /**
+     * 配置不启用的 JDBC IDS， 这个优先级要比启用的高，中间用英文逗号分隔，允许使用通配符 '*'
+     **/
+    private Set<String> excludeIds;
+
+    /**
      * 一个应用只能有一个 primary 的Jdbc 定义, 默认没有主Jdbc
      **/
     private String primaryId;
@@ -58,6 +63,14 @@ public class JdbcProperties {
 
     public void setEnabledIds(Set<String> enabledIds) {
         this.enabledIds = enabledIds;
+    }
+
+    public Set<String> getExcludeIds() {
+        return excludeIds;
+    }
+
+    public void setExcludeIds(Set<String> excludeIds) {
+        this.excludeIds = excludeIds;
     }
 
     public String getPrimaryId() {

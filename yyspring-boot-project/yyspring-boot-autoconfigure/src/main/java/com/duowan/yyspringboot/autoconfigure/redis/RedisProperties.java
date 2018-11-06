@@ -23,6 +23,11 @@ public class RedisProperties {
     private Set<String> enabledIds;
 
     /**
+     * 配置禁用的 Redis IDS， 中间用英文逗号分隔，允许使用通配符 '*'
+     **/
+    private Set<String> excludeIds;
+
+    /**
      * 一个应用只能有一个 primary 的Jdbc 定义, 默认没有主 Redis
      **/
     private String primaryId;
@@ -63,6 +68,14 @@ public class RedisProperties {
 
     public void setEnabledIds(Set<String> enabledIds) {
         this.enabledIds = enabledIds;
+    }
+
+    public Set<String> getExcludeIds() {
+        return excludeIds;
+    }
+
+    public void setExcludeIds(Set<String> excludeIds) {
+        this.excludeIds = excludeIds;
     }
 
     public String getPrimaryId() {

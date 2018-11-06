@@ -59,6 +59,7 @@ public class RedisConfigApplicationRunListener extends SpringApplicationRunListe
                 providerList,
                 lookupRedisDefList(redisProperties),
                 redisProperties.getEnabledIds(),
+                redisProperties.getExcludeIds(),
                 redisProperties.getPrimaryId(),
                 registry,
                 environment);

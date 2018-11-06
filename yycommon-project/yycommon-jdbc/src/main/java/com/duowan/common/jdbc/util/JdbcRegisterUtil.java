@@ -76,25 +76,30 @@ public abstract class JdbcRegisterUtil {
     /**
      * 注册  Bean
      *
-     * @param dbProviderList   DB 提供者列表
-     * @param poolProviderList 连接池提供者实例列表
-     * @param primaryId        主JdbcID
-     * @param enabledIds       要启用的ID列表，支持通配符 *
-     * @param jdbcDefinitionList      JDBC 定义列表
-     * @param registry         Bean 注册入口
-     * @param environment      环境
+     * @param dbProviderList     DB 提供者列表
+     * @param poolProviderList   连接池提供者实例列表
+     * @param primaryId          主JdbcID
+     * @param enabledIds         要启用的ID列表，支持通配符 *
+     * @param excludeIds         要禁用的ID列表，支持通配符 *
+     * @param jdbcDefinitionList JDBC 定义列表
+     * @param registry           Bean 注册入口
+     * @param environment        环境
      * @return 返回注册的BeanDefinition MAP
      */
     public static Map<String, BeanDefinition> registerJdbcBeanDefinitions(List<DBProvider> dbProviderList,
                                                                           List<PoolProvider> poolProviderList,
                                                                           String primaryId,
                                                                           Set<String> enabledIds,
+                                                                          Set<String> excludeIds,
                                                                           List<JdbcDefinition> jdbcDefinitionList,
                                                                           BeanDefinitionRegistry registry,
                                                                           Environment environment) {
 
         // 设置属性
         jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, environment);
+
+        // 过滤所有排序的 Jdbc 定义列表
+        jdbcDefinitionList = JdbcDefinitionUtil.filterExcludeDefList(excludeIds, jdbcDefinitionList);
 
         // 提取所有启用的Jdbc定义列表
         jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(enabledIds, jdbcDefinitionList);
@@ -111,6 +116,7 @@ public abstract class JdbcRegisterUtil {
         jdbcDefinitionList = JdbcDefinitionUtil.fillDefaultConfig(jdbcDefinitionList);
 
         if (jdbcDefinitionList == null || jdbcDefinitionList.isEmpty()) {
+            logger.info("定义了多个Jdbc，但是未启用！");
             return beanDefinitionMap;
         }
 
@@ -326,11 +332,11 @@ public abstract class JdbcRegisterUtil {
     /**
      * 注册 DataSource
      *
-     * @param registry     BeanDefinition 注册器
-     * @param jdbcDefinition      jdbc 定义
-     * @param dbProvider   dbProvider
-     * @param poolProvider 连接池提供者
-     * @param dsBeanName   dataSource BeanName
+     * @param registry       BeanDefinition 注册器
+     * @param jdbcDefinition jdbc 定义
+     * @param dbProvider     dbProvider
+     * @param poolProvider   连接池提供者
+     * @param dsBeanName     dataSource BeanName
      * @return 返回 JdbcTemplateBeanName
      */
     private static String registerJdbcTemplateBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, DBProvider dbProvider, PoolProvider poolProvider, String dsBeanName) {
@@ -352,10 +358,10 @@ public abstract class JdbcRegisterUtil {
     /**
      * 注册 DataSource
      *
-     * @param registry     BeanDefinition 注册器
-     * @param jdbcDefinition      jdbc 定义
-     * @param dbProvider   dbProvider
-     * @param poolProvider 连接池提供者
+     * @param registry       BeanDefinition 注册器
+     * @param jdbcDefinition jdbc 定义
+     * @param dbProvider     dbProvider
+     * @param poolProvider   连接池提供者
      * @return 返回 DataSourceBeanName
      */
     private static String registerDataSourceBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, DBProvider dbProvider, PoolProvider poolProvider) {

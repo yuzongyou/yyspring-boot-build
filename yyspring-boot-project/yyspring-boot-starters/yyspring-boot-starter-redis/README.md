@@ -83,6 +83,10 @@
 # 启用 Redis 的规则
     # 配置启用的 Redis IDS， 中间用英文逗号分隔，如果为空或为配置都会启用所有的 Redis
     yyspring.redis.enabled-ids=xxx
+    
+# 禁用 Redis 的规则
+    # 配置禁用的 Redis IDS， 中间用英文逗号分隔, 支持通配符 *
+    yyspring.redis.exclude-ids=xxx
 
 # 设置主Redis
     # 主Redis

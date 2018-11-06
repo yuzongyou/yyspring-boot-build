@@ -16,9 +16,31 @@ import java.util.Set;
 public abstract class RedisDefinitionUtil {
 
     /**
+     * 过滤禁用的 ID 列表
+     *
+     * @param excludeIds          要禁用的ID列表
+     * @param redisDefinitionList redisDef 定义列表
+     * @return 返回所有启用的 RedisDefinition 定义
+     */
+    public static List<RedisDefinition> filterExcludeRedisDefList(Set<String> excludeIds, List<RedisDefinition> redisDefinitionList) {
+
+        if (excludeIds == null || excludeIds.isEmpty() || null == redisDefinitionList || redisDefinitionList.isEmpty()) {
+            return redisDefinitionList;
+        }
+
+        List<RedisDefinition> resultList = new ArrayList<>();
+        for (RedisDefinition redisDefinition : redisDefinitionList) {
+            if (!isRedisDefInIdSet(excludeIds, redisDefinition)) {
+                resultList.add(redisDefinition);
+            }
+        }
+        return resultList;
+    }
+
+    /**
      * 提取启用的列表
      *
-     * @param enabledIds   要启用的ID列表
+     * @param enabledIds          要启用的ID列表
      * @param redisDefinitionList redisDef 定义列表
      * @return 返回所有启用的 RedisDefinition 定义
      */
@@ -30,7 +52,7 @@ public abstract class RedisDefinitionUtil {
 
         List<RedisDefinition> resultList = new ArrayList<>();
         for (RedisDefinition redisDefinition : redisDefinitionList) {
-            if (isRedisDefEnabled(enabledIds, redisDefinition)) {
+            if (isRedisDefInIdSet(enabledIds, redisDefinition)) {
                 resultList.add(redisDefinition);
             }
         }
@@ -40,19 +62,19 @@ public abstract class RedisDefinitionUtil {
     /**
      * 判断 redis 定义是否启用
      *
-     * @param enabledIds 启用的 RedisDefinition id ，可以使用通配符 *
-     * @param redisDefinition   RedisDefinition 定义
+     * @param redisIds        启用的 RedisDefinition id ，可以使用通配符 *
+     * @param redisDefinition RedisDefinition 定义
      * @return 返回是否启用
      */
-    private static boolean isRedisDefEnabled(Set<String> enabledIds, RedisDefinition redisDefinition) {
-        if (enabledIds == null || enabledIds.isEmpty()) {
+    private static boolean isRedisDefInIdSet(Set<String> redisIds, RedisDefinition redisDefinition) {
+        if (redisIds == null || redisIds.isEmpty()) {
             return true;
         }
-        if (enabledIds.contains(redisDefinition.getId())) {
+        if (redisIds.contains(redisDefinition.getId())) {
             return true;
         }
         // 通配符检查
-        for (String enabledId : enabledIds) {
+        for (String enabledId : redisIds) {
             if (CommonUtil.isStartWildcardMatch(redisDefinition.getId(), enabledId)) {
                 return true;
             }
@@ -64,7 +86,7 @@ public abstract class RedisDefinitionUtil {
     /**
      * 将 RedisDefinition.id = primaryId 的定义对象设置为 primary
      *
-     * @param primaryId    主ID
+     * @param primaryId           主ID
      * @param redisDefinitionList 定义列表
      * @return 返回原jdbc定义列表
      */

@@ -25,6 +25,28 @@ public abstract class JdbcDefinitionUtil {
     /**
      * 提取启用的列表
      *
+     * @param excludeIds         要禁用的ID列表
+     * @param jdbcDefinitionList jdbcDef 定义列表
+     * @return 返回所有启用的JdbcDef定义
+     */
+    public static List<JdbcDefinition> filterExcludeDefList(Set<String> excludeIds, List<JdbcDefinition> jdbcDefinitionList) {
+
+        if (excludeIds == null || excludeIds.isEmpty() || null == jdbcDefinitionList || jdbcDefinitionList.isEmpty()) {
+            return jdbcDefinitionList;
+        }
+
+        List<JdbcDefinition> resultList = new ArrayList<>();
+        for (JdbcDefinition jdbcDefinition : jdbcDefinitionList) {
+            if (!isJdbcDefInIdSet(excludeIds, jdbcDefinition)) {
+                resultList.add(jdbcDefinition);
+            }
+        }
+        return resultList;
+    }
+
+    /**
+     * 提取启用的列表
+     *
      * @param enabledIds         要启用的ID列表
      * @param jdbcDefinitionList jdbcDef 定义列表
      * @return 返回所有启用的JdbcDef定义
@@ -37,7 +59,7 @@ public abstract class JdbcDefinitionUtil {
 
         List<JdbcDefinition> resultList = new ArrayList<>();
         for (JdbcDefinition jdbcDefinition : jdbcDefinitionList) {
-            if (isJdbcDefEnabled(enabledIds, jdbcDefinition)) {
+            if (isJdbcDefInIdSet(enabledIds, jdbcDefinition)) {
                 resultList.add(jdbcDefinition);
             }
         }
@@ -47,20 +69,20 @@ public abstract class JdbcDefinitionUtil {
     /**
      * 判断jdbc定义是否启用
      *
-     * @param enabledIds     启用的JdbcDef id ，可以使用通配符 *
+     * @param jdbcIds        启用的JdbcDef id ，可以使用通配符 *
      * @param jdbcDefinition JdbcDefinition 定义
      * @return 返回是否启用
      */
-    private static boolean isJdbcDefEnabled(Set<String> enabledIds, JdbcDefinition jdbcDefinition) {
-        if (enabledIds == null || enabledIds.isEmpty()) {
+    private static boolean isJdbcDefInIdSet(Set<String> jdbcIds, JdbcDefinition jdbcDefinition) {
+        if (jdbcIds == null || jdbcIds.isEmpty()) {
             return true;
         }
-        if (enabledIds.contains(jdbcDefinition.getId())) {
+        if (jdbcIds.contains(jdbcDefinition.getId())) {
             return true;
         }
         // 通配符检查
-        for (String enabledId : enabledIds) {
-            if (CommonUtil.isStartWildcardMatch(jdbcDefinition.getId(), enabledId)) {
+        for (String jdbcId : jdbcIds) {
+            if (CommonUtil.isStartWildcardMatch(jdbcDefinition.getId(), jdbcId)) {
                 return true;
             }
         }

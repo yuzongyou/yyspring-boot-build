@@ -46,6 +46,10 @@
     # 配置启用的 JDBC IDS， 中间用英文逗号分隔，如果为空或为配置都会启用所有的 JDBC, 允许使用通配符 *
     yyspring.jdbc.enabled-ids=xxx,ttt
 
+# 禁用 JDBC 的规则
+    # 配置禁用的 JDBC IDS， 中间用英文逗号分隔，允许使用通配符 *
+    yyspring.jdbc.exclude-ids=xxx,ttt
+
 # 指定 primary Jdbc 定义
     # 一个应用只能有一个 primary 的Jdbc 定义
     yyspring.jdbc.primary-id=xxx

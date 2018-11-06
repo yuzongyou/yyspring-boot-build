@@ -63,6 +63,7 @@ public class JdbcConfigApplicationRunListener extends SpringApplicationRunListen
                 poolProviderList,
                 jdbcProperties.getPrimaryId(),
                 jdbcProperties.getEnabledIds(),
+                jdbcProperties.getExcludeIds(),
                 jdbcDefinitionList,
                 registry,
                 environment);
