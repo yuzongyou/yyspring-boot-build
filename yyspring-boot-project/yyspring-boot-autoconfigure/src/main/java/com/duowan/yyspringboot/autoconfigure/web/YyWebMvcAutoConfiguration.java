@@ -4,6 +4,7 @@ import com.duowan.common.web.WebContext;
 import com.duowan.common.web.YyServletContextInitializer;
 import com.duowan.common.web.converter.YyDateConverter;
 import com.duowan.common.web.filter.YyRootFilter;
+import com.duowan.common.web.interceptor.RequestLogHandlerInterceptor;
 import com.duowan.common.web.view.AjaxView;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractJsonpResponseBodyAdvice;
 
 import javax.servlet.Servlet;
@@ -113,5 +115,12 @@ public class YyWebMvcAutoConfiguration {
                 super(mvcProperties.getJsonpCallbackVars());
             }
         }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnClass({RequestLogHandlerInterceptor.class})
+    public MappedInterceptor logRequestInfoMappedInterceptor() {
+        return new MappedInterceptor(new String[]{"/**"}, new RequestLogHandlerInterceptor());
     }
 }

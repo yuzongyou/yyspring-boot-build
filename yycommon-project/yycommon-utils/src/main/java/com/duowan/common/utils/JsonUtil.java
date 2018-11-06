@@ -79,6 +79,16 @@ public abstract class JsonUtil {
      * @return 返回漂亮 JSON格式对象
      */
     public static String toPrettyJson(Object object) {
+        return toPrettyJson(object, true);
+    }
+    /**
+     * 输出漂亮格式的 JSON
+     *
+     * @param object 对象
+     * @param throwException 是否抛出异常
+     * @return 返回漂亮 JSON格式对象
+     */
+    public static String toPrettyJson(Object object, boolean throwException) {
 
         if (null == object) {
             return null;
@@ -87,23 +97,37 @@ public abstract class JsonUtil {
         try {
             return writer.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     public static String toJson(Object object) {
         return toJson(object, defaultObjectMapper);
     }
 
+    public static String toJson(Object object, boolean throwException) {
+        return toJson(object, defaultObjectMapper, throwException);
+    }
+
     public static String toJson(Object object, ObjectMapper objectMapper) {
+        return toJson(object, objectMapper, true);
+    }
+
+    public static String toJson(Object object, ObjectMapper objectMapper, boolean throwException) {
         if (null == objectMapper) {
             objectMapper = defaultObjectMapper;
         }
         try {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     /**
@@ -116,6 +140,10 @@ public abstract class JsonUtil {
         return toJson(object, getDateFormatObjectMapper(null));
     }
 
+    public static String toJsonWithDataFormat(Object object, boolean throwException) {
+        return toJson(object, getDateFormatObjectMapper(null), throwException);
+    }
+
     /**
      * 将时间默认格式化为： yyyy-MM-dd HH:mm:ss
      *
@@ -125,6 +153,10 @@ public abstract class JsonUtil {
      */
     public static String toJsonWithDataFormat(Object object, String dateFormat) {
         return toJson(object, getDateFormatObjectMapper(dateFormat));
+    }
+
+    public static String toJsonWithDataFormat(Object object, String dateFormat, boolean throwException) {
+        return toJson(object, getDateFormatObjectMapper(dateFormat), throwException);
     }
 
     /**
@@ -169,14 +201,22 @@ public abstract class JsonUtil {
      */
     public static <T> T toObject(String json, Class<T> valueType, boolean ignoreUnknownField) {
 
+        return toObject(json, valueType, ignoreUnknownField, true);
+    }
+
+    public static <T> T toObject(String json, Class<T> valueType, boolean ignoreUnknownField, boolean throwException) {
+
         ObjectMapper objectMapper = ignoreUnknownField ? ignoreUnknownFieldObjectMapper : defaultObjectMapper;
 
         try {
             return objectMapper.readValue(json, valueType);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     /**
@@ -189,6 +229,10 @@ public abstract class JsonUtil {
      * @return 返回对象列表
      */
     public static <T> List<T> toObjectList(String jsonArray, Class<T> valueType, boolean ignoreUnknownField) {
+        return toObjectList(jsonArray, valueType, ignoreUnknownField, true);
+    }
+
+    public static <T> List<T> toObjectList(String jsonArray, Class<T> valueType, boolean ignoreUnknownField, boolean throwException) {
         if (StringUtils.isBlank(jsonArray)) {
             return new ArrayList<>();
         }
@@ -201,8 +245,11 @@ public abstract class JsonUtil {
             return objectMapper.readValue(jsonArray, listValueType);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     /**
@@ -214,7 +261,7 @@ public abstract class JsonUtil {
      * @return 返回对象列表
      */
     public static <T> List<T> toObjectList(String jsonArray, Class<T> valueType) {
-        return toObjectList(jsonArray, valueType, true);
+        return toObjectList(jsonArray, valueType, true, true);
     }
 
     /**
@@ -227,6 +274,10 @@ public abstract class JsonUtil {
      * @return 返回对象集合
      */
     public static <T> Set<T> toObjectSet(String jsonArray, Class<T> valueType, boolean ignoreUnknownField) {
+        return toObjectSet(jsonArray, valueType, ignoreUnknownField, true);
+    }
+
+    public static <T> Set<T> toObjectSet(String jsonArray, Class<T> valueType, boolean ignoreUnknownField, boolean throwException) {
         if (StringUtils.isBlank(jsonArray)) {
             return new HashSet<>();
         }
@@ -239,8 +290,11 @@ public abstract class JsonUtil {
             return objectMapper.readValue(jsonArray, collectionValueType);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     /**
@@ -280,6 +334,12 @@ public abstract class JsonUtil {
      */
     public static <K, V> Map<K, V> toObjectMap(String json, Class<K> keyType, Class<V> valueType, boolean ignoreUnknownField) {
 
+        return toObjectMap(json, keyType, valueType, ignoreUnknownField, true);
+
+    }
+
+    public static <K, V> Map<K, V> toObjectMap(String json, Class<K> keyType, Class<V> valueType, boolean ignoreUnknownField, boolean throwException) {
+
         if (StringUtils.isBlank(json)) {
             return new HashMap<>();
         }
@@ -292,9 +352,12 @@ public abstract class JsonUtil {
             return objectMapper.readValue(json, mapType);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
 
+        return null;
     }
 
     /**
@@ -340,6 +403,10 @@ public abstract class JsonUtil {
      * @return 返回JsonNode
      */
     public static JsonNode toJsonNode(String json) {
+        return toJsonNode(json, true);
+    }
+
+    public static JsonNode toJsonNode(String json, boolean throwException) {
         if (StringUtils.isBlank(json)) {
             return null;
         }
@@ -347,8 +414,11 @@ public abstract class JsonUtil {
             return defaultObjectMapper.readTree(json);
         } catch (IOException e) {
             logger.warn(e.getMessage(), e);
-            throw new JsonException(e);
+            if (throwException) {
+                throw new JsonException(e);
+            }
         }
+        return null;
     }
 
     /**
