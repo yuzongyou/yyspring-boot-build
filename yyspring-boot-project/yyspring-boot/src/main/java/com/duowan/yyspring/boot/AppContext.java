@@ -261,6 +261,9 @@ public class AppContext {
         // 初始化应用程序属性
         initializeApplicationProperties();
 
+        // 检查Date json 响应默认值是否设置
+        adapterDateJsonFormatter(applicationProperties);
+
         environment.getPropertySources().addLast(new MapPropertySource("yyApplicationProperties", applicationProperties));
 
         // 校准时间基线
@@ -269,6 +272,17 @@ public class AppContext {
         initInfo.add(JsonUtil.toPrettyJson(projectInfoMap));
 
         initAppAllKeySet();
+    }
+
+    private static final String SPRING_JACKSON_SERIALIZATION_WRITE_DATES_AS_TIMESTAMPS = "spring.jackson.serialization.write-dates-as-timestamps";
+
+    private static void adapterDateJsonFormatter(Map<String, Object> applicationProperties) {
+
+        // 默认将时间输出为 long 类型
+        if (!applicationProperties.containsKey(SPRING_JACKSON_SERIALIZATION_WRITE_DATES_AS_TIMESTAMPS)) {
+            applicationProperties.put(SPRING_JACKSON_SERIALIZATION_WRITE_DATES_AS_TIMESTAMPS, "true");
+        }
+
     }
 
     private static void adapterSpringJacksonTimeZone(StandardEnvironment environment, Map<String, Object> applicationProperties) {
