@@ -76,9 +76,9 @@ public class FieldDef implements Comparable<FieldDef> {
     private boolean updateIgnore = false;
 
     /**
-     * 更新的时候是否忽略 null 值
+     * 更新的时候是否忽略 null 值, 默认忽略
      */
-    private boolean updateIgnoreNull = false;
+    private boolean updateIgnoreNull = true;
 
     public FieldDef(ModelDef modelDef, Field field) {
         AssertUtil.assertNotNull(modelDef, "模型定义类不能为空！");

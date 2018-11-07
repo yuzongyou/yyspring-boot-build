@@ -67,6 +67,6 @@ public @interface Column {
      * 更新的时候是否忽略 null 值
      * @return true or false
      */
-    boolean updateIgnoreNull() default false;
+    boolean updateIgnoreNull() default true;
 
 }
