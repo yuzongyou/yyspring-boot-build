@@ -1,6 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.swagger2;
 
 import com.duowan.yyspring.boot.AppContext;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,6 +20,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import springfox.documentation.swagger2.configuration.Swagger2DocumentationConfiguration;
@@ -96,25 +99,26 @@ public class Swagger2AutoConfiguration {
         @ConditionalOnMissingBean
         public Docket swagger2Docket(ApiInfo apiInfo, Swagger2Properties properties) {
 
-            return new Docket(DocumentationType.SWAGGER_2)
-                    .apiInfo(apiInfo)
-                    .select()
-                    // 自行修改为自己的包路径
-                    .apis(RequestHandlerSelectors.basePackage(resolveBasePackage(properties)))
-                    .paths(PathSelectors.any())
-                    .build();
-        }
+            Docket docket = new Docket(DocumentationType.SWAGGER_2)
+                    .apiInfo(apiInfo);
 
-        private String resolveBasePackage(Swagger2Properties properties) {
+
+            ApiSelectorBuilder builder = docket.select();
+
+            if (properties.isJustWithApiAnnotation()) {
+                builder.apis(RequestHandlerSelectors.withClassAnnotation(Api.class));
+            }
+            if (properties.isJustWithApiOperationAnnotation()) {
+                builder.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class));
+            }
             if (StringUtils.isNotBlank(properties.getBasePackage())) {
-                return properties.getBasePackage();
+                // 自行修改为自己的包路径
+                builder.apis(RequestHandlerSelectors.basePackage(properties.getBasePackage()));
             }
 
-            Class<?> clazz = AppContext.getBootstrapClass();
-            if (clazz == null) {
-                return "com.duowan";
-            }
-            return clazz.getPackage().getName();
+            builder.paths(PathSelectors.any());
+
+            return builder.build();
         }
 
     }

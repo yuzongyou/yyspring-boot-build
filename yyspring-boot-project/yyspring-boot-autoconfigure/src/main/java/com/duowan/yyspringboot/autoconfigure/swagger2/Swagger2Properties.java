@@ -10,29 +10,55 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "yyspring.swagger2")
 public class Swagger2Properties {
 
-    /** 标题 **/
+    /**
+     * 标题
+     **/
     private String title;
 
-    /** 内容描述 **/
+    /**
+     * 内容描述
+     **/
     private String description;
 
-    /** 版本号 **/
+    /**
+     * 版本号
+     **/
     private String version = "1.0";
 
-    /** 联系人 **/
+    /**
+     * 联系人
+     **/
     private String contactName;
 
-    /** 联系地址 **/
+    /**
+     * 联系地址
+     **/
     private String contactUrl;
 
-    /** 联系邮箱 **/
+    /**
+     * 联系邮箱
+     **/
     private String contactEmail;
 
-    /** 团队服务地址 **/
+    /**
+     * 团队服务地址
+     **/
     private String termsOfServiceUrl;
 
-    /** 扫描包名，默认是 根据启动类进行自动计算 **/
+    /**
+     * 扫描包名，默认为空表示所有都扫描
+     **/
     private String basePackage;
+
+    /**
+     * 只要包含了 Api 注解就扫描,默认是true
+     **/
+    private boolean justWithApiAnnotation = true;
+
+    /**
+     * 只要包含了 ApiOperation 注解就扫描,默认是false
+     **/
+    private boolean justWithApiOperationAnnotation = false;
 
     public String getTitle() {
         return title;
@@ -96,5 +122,21 @@ public class Swagger2Properties {
 
     public void setBasePackage(String basePackage) {
         this.basePackage = basePackage;
+    }
+
+    public boolean isJustWithApiAnnotation() {
+        return justWithApiAnnotation;
+    }
+
+    public void setJustWithApiAnnotation(boolean justWithApiAnnotation) {
+        this.justWithApiAnnotation = justWithApiAnnotation;
+    }
+
+    public boolean isJustWithApiOperationAnnotation() {
+        return justWithApiOperationAnnotation;
+    }
+
+    public void setJustWithApiOperationAnnotation(boolean justWithApiOperationAnnotation) {
+        this.justWithApiOperationAnnotation = justWithApiOperationAnnotation;
     }
 }
