@@ -69,7 +69,7 @@ public class YySwagger2Controller {
         this.mapper = mapper;
         this.jsonSerializer = jsonSerializer;
 
-        this.serviceId = environment.resolvePlaceholders("${spring.application.name}");
+        this.serviceId = environment.resolvePlaceholders("${yyspring.swagger2.gateway-route-path:${spring.application.name}}");
     }
 
     @RequestMapping(

@@ -32,6 +32,11 @@
       "name": "yyspring.thrift.exporter.type",
       "type": "com.duowan.yyspringboot.autoconfigure.thriftserver.ExporterType",
       "description": "Thrift Export Type, Default is null."
+    },
+    {
+      "name": "yyspring.swagger2.gateway-route-path",
+      "type": "java.lang.String",
+      "description": "API 网关路由地址，默认是使用 spring.application.name."
     }
   ]
 }
