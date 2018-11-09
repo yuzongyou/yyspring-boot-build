@@ -118,7 +118,6 @@ public class YyWebMvcAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     @ConditionalOnClass({RequestLogHandlerInterceptor.class})
     public MappedInterceptor logRequestInfoMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/**"}, new RequestLogHandlerInterceptor());
