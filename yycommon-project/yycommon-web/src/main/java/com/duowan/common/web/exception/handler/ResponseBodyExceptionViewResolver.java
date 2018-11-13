@@ -20,7 +20,7 @@ public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewReso
     }
 
     public ResponseBodyExceptionViewResolver(boolean logException) {
-        this.setLogException(true);
+        this.setLogException(logException);
     }
 
     @Override

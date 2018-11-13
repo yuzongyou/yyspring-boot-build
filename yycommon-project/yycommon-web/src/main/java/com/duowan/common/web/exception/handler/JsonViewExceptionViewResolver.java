@@ -16,7 +16,7 @@ public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolve
     }
 
     public JsonViewExceptionViewResolver(boolean logException) {
-        this.setLogException(true);
+        this.setLogException(logException);
     }
 
     @Override

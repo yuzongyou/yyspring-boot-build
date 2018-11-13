@@ -19,7 +19,7 @@ public class JsonResponseBodyExceptionViewResolver extends AbstractExceptionView
     }
 
     public JsonResponseBodyExceptionViewResolver(boolean logException) {
-        this.setLogException(true);
+        this.setLogException(logException);
     }
 
     @Override

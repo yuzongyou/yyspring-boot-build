@@ -16,7 +16,7 @@ public class AjaxViewExceptionViewResolver extends AbstractExceptionViewResolver
     }
 
     public AjaxViewExceptionViewResolver(boolean logException) {
-        this.setLogException(true);
+        this.setLogException(logException);
     }
 
     @Override

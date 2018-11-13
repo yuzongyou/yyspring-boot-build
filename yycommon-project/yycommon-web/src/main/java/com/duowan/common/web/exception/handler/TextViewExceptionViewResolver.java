@@ -16,7 +16,7 @@ public class TextViewExceptionViewResolver extends AbstractExceptionViewResolver
     }
 
     public TextViewExceptionViewResolver(boolean logException) {
-        this.setLogException(true);
+        this.setLogException(logException);
     }
 
     @Override
