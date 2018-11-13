@@ -45,6 +45,9 @@ public class WebMvcProperties {
      **/
     private String[] lookupProtocolHeaders = new String[]{"X-HTTPS-Protocol", "X-Forwarded-Scheme"};
 
+    /** ExceptionResolver 是否记录异常信息 **/
+    private boolean exceptionResolverLogException = true;
+
     public String[] getJsonpCallbackVars() {
         return jsonpCallbackVars;
     }
@@ -99,5 +102,13 @@ public class WebMvcProperties {
 
     public void setLookupProtocolHeaders(String[] lookupProtocolHeaders) {
         this.lookupProtocolHeaders = lookupProtocolHeaders;
+    }
+
+    public boolean isExceptionResolverLogException() {
+        return exceptionResolverLogException;
+    }
+
+    public void setExceptionResolverLogException(boolean exceptionResolverLogException) {
+        this.exceptionResolverLogException = exceptionResolverLogException;
     }
 }

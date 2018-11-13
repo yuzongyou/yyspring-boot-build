@@ -15,6 +15,14 @@ import javax.servlet.http.HttpServletResponse;
  * @author Arvin
  */
 public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewResolver {
+
+    public ResponseBodyExceptionViewResolver() {
+    }
+
+    public ResponseBodyExceptionViewResolver(boolean logException) {
+        this.setLogException(true);
+    }
+
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
 
@@ -37,7 +45,12 @@ public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewReso
         if (ex != null) {
             int errorCode = getErrorCode(ex);
             String errorMessage = getErrorMessage(ex);
-            logger.warn("处理请求异常，默认返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]", ex);
+            String logInfo = "处理请求异常，默认返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
+            if (logException) {
+                logger.warn(logInfo, ex);
+            } else {
+                logger.warn(logInfo);
+            }
             return new JsonView(errorCode, errorMessage);
         }
 

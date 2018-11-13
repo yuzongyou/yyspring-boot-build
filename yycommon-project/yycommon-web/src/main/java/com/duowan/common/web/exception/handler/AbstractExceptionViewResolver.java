@@ -28,6 +28,16 @@ public abstract class AbstractExceptionViewResolver implements ExceptionViewReso
         }
     }
 
+    protected boolean logException = true;
+
+    public boolean isLogException() {
+        return logException;
+    }
+
+    public void setLogException(boolean logException) {
+        this.logException = logException;
+    }
+
     protected static int getErrorCode(Exception ex) {
         if (ex != null) {
             if (ex instanceof CodeException) {

@@ -12,6 +12,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AjaxViewExceptionViewResolver extends AbstractExceptionViewResolver {
 
+    public AjaxViewExceptionViewResolver() {
+    }
+
+    public AjaxViewExceptionViewResolver(boolean logException) {
+        this.setLogException(true);
+    }
+
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
         Class<?> returnType = handlerMethod.getMethod().getReturnType();
@@ -24,7 +31,12 @@ public class AjaxViewExceptionViewResolver extends AbstractExceptionViewResolver
         if (ex != null) {
             int errorCode = getErrorCode(ex);
             String errorMessage = getErrorMessage(ex);
-            logger.warn("处理请求异常，返回 AjaxView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]", ex);
+            String logInfo = "处理请求异常，返回 AjaxView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
+            if (logException) {
+                logger.warn(logInfo, ex);
+            } else {
+                logger.warn(logInfo);
+            }
             return new AjaxView(errorCode, errorMessage);
         }
 

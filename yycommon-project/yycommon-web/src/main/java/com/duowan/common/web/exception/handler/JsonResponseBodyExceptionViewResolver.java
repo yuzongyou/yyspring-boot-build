@@ -15,6 +15,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JsonResponseBodyExceptionViewResolver extends AbstractExceptionViewResolver {
 
+    public JsonResponseBodyExceptionViewResolver() {
+    }
+
+    public JsonResponseBodyExceptionViewResolver(boolean logException) {
+        this.setLogException(true);
+    }
+
     @Override
     public boolean canHandle(HandlerMethod handlerMethod) {
         Class<?> returnType = handlerMethod.getMethod().getReturnType();
@@ -26,7 +33,12 @@ public class JsonResponseBodyExceptionViewResolver extends AbstractExceptionView
         if (ex != null) {
             int errorCode = getErrorCode(ex);
             String errorMessage = getErrorMessage(ex);
-            logger.warn("处理请求异常，默认返回 JsonResponse: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]", ex);
+            String logInfo = "处理请求异常，默认返回 JsonResponse: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
+            if (logException) {
+                logger.warn(logInfo, ex);
+            } else {
+                logger.warn(logInfo);
+            }
             return new StatusJsonView(errorCode, errorMessage);
         }
 

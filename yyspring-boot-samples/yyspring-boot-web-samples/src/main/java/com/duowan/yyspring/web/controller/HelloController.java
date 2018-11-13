@@ -50,7 +50,7 @@ public class HelloController {
     }
 
     @RequestMapping("hello2.do")
-    @LogRequestInfo(header = true, cookie = true)
+    @LogRequestInfo(header = true, cookie = true, param = true)
     public JsonView hello2(String name, String requestUri) {
         logger.info(requestUri + ": " + name);
         logger.error(requestUri + ": " + name);

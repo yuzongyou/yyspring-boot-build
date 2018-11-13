@@ -31,15 +31,18 @@ import java.util.List;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyBasicErrorController.class})
 @AutoConfigureBefore(ErrorMvcAutoConfiguration.class)
-@EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class})
+@EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class, WebMvcProperties.class})
 public class YyErrorMvcAutoConfiguration {
 
     private final ServerProperties serverProperties;
 
+    private final WebMvcProperties webMvcProperties;
+
     private final List<ErrorViewResolver> errorViewResolvers;
 
-    public YyErrorMvcAutoConfiguration(ServerProperties serverProperties, List<ErrorViewResolver> errorViewResolvers) {
+    public YyErrorMvcAutoConfiguration(ServerProperties serverProperties, WebMvcProperties webMvcProperties, List<ErrorViewResolver> errorViewResolvers) {
         this.serverProperties = serverProperties;
+        this.webMvcProperties = webMvcProperties;
         this.errorViewResolvers = errorViewResolvers;
     }
 
@@ -59,30 +62,30 @@ public class YyErrorMvcAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(AjaxViewExceptionViewResolver.class)
     public AjaxViewExceptionViewResolver ajaxViewExceptionViewResolver() {
-        return new AjaxViewExceptionViewResolver();
+        return new AjaxViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(JsonViewExceptionViewResolver.class)
     public JsonViewExceptionViewResolver jsonViewExceptionViewResolver() {
-        return new JsonViewExceptionViewResolver();
+        return new JsonViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(ResponseBodyExceptionViewResolver.class)
     public ResponseBodyExceptionViewResolver responseBodyExceptionViewResolver() {
-        return new ResponseBodyExceptionViewResolver();
+        return new ResponseBodyExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(JsonResponseBodyExceptionViewResolver.class)
     public JsonResponseBodyExceptionViewResolver jsonResponseBodyExceptionViewResolver() {
-        return new JsonResponseBodyExceptionViewResolver();
+        return new JsonResponseBodyExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(TextViewExceptionViewResolver.class)
     public TextViewExceptionViewResolver textViewExceptionViewResolver() {
-        return new TextViewExceptionViewResolver();
+        return new TextViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
     }
 }
