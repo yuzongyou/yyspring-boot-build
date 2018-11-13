@@ -714,6 +714,10 @@ public class AppContext {
                 if (StringUtils.isNoneBlank(mno)) {
                     return mno;
                 }
+                mno = applicationAnn.value();
+                if (StringUtils.isNoneBlank(mno)) {
+                    return mno;
+                }
             }
         }
         if (StringUtils.isBlank(mno)) {
