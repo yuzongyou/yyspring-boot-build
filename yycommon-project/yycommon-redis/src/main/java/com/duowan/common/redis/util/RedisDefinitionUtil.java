@@ -157,6 +157,9 @@ public abstract class RedisDefinitionUtil {
         }
 
         value = StringUtils.isBlank(value) ? defVal : value;
+        if (StringUtils.isBlank(value)) {
+            return value;
+        }
         value = environment.resolvePlaceholders(value);
         return value;
     }

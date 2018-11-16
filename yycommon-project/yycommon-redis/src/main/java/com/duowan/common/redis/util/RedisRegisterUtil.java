@@ -45,14 +45,14 @@ public class RedisRegisterUtil {
             return;
         }
 
-        // 自动填充属性
-        redisDefinitionList = RedisDefinitionUtil.autoFillProperties(redisDefinitionList, environment);
-
         // 删除所有禁用的Jdbc定义列表
         redisDefinitionList = RedisDefinitionUtil.filterExcludeRedisDefList(excludeIds, redisDefinitionList);
 
         // 提取所有启用的Jdbc定义列表
         redisDefinitionList = RedisDefinitionUtil.extractEnabledRedisDefList(enabledIds, redisDefinitionList);
+
+        // 自动填充属性
+        redisDefinitionList = RedisDefinitionUtil.autoFillProperties(redisDefinitionList, environment);
 
         // 应用 主 定义
         redisDefinitionList = RedisDefinitionUtil.applyPrimaryJdbcDefList(primaryId, redisDefinitionList);
