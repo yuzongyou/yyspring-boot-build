@@ -335,6 +335,9 @@ public abstract class JdbcDefinitionUtil {
         }
 
         value = StringUtils.isBlank(value) ? defVal : value;
+        if (StringUtils.isBlank(value)) {
+            return value;
+        }
         value = environment.resolvePlaceholders(value);
         return value;
     }

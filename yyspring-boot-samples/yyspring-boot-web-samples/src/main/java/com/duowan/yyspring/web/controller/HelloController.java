@@ -2,16 +2,21 @@ package com.duowan.yyspring.web.controller;
 
 //import com.duowan.common.ipowner.IpOwnerService;
 //import com.duowan.common.jdbc.Jdbc;
+
 import com.duowan.common.web.annotations.LogRequestInfo;
+import com.duowan.common.web.response.JsonResponse;
 import com.duowan.common.web.view.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Arvin
@@ -20,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/test")
-public class HelloController {
+public class HelloController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
@@ -70,5 +75,26 @@ public class HelloController {
 //        logger.error(requestUri + ": " + name);
 //        return new JsonView("3, " + name + ": " + requestUri);
 //    }
+
+    @RequestMapping("/requestBody")
+    public JsonView<Object> requestBody(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+
+        Map<String, Object> paramsMap = new HashMap<>();
+        fillRequestParameter(paramsMap, request, true, true);
+        paramsMap.put("requestBody", params);
+
+        return new JsonView<>(paramsMap);
+    }
+
+    @RequestMapping("/requestBody2")
+    public JsonResponse<Object> requestBody2(HttpServletRequest request, @RequestBody Map<String, Object> params) {
+
+        Map<String, Object> paramsMap = new HashMap<>();
+        fillRequestParameter(paramsMap, request, true, true);
+        paramsMap.put("requestBody", params);
+
+        return new JsonResponse<>(paramsMap);
+    }
+
 }
 

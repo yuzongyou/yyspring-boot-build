@@ -44,7 +44,7 @@ public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewReso
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Exception ex) {
         if (ex != null) {
             int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex);
+            String errorMessage = getErrorMessage(ex, request);
             String logInfo = "处理请求异常，默认返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
             if (logException) {
                 logger.warn(logInfo, ex);

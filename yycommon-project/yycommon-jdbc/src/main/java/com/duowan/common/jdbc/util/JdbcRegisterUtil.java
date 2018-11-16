@@ -95,14 +95,14 @@ public abstract class JdbcRegisterUtil {
                                                                           BeanDefinitionRegistry registry,
                                                                           Environment environment) {
 
-        // 设置属性
-        jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, environment);
-
-        // 过滤所有排序的 Jdbc 定义列表
+        // 过滤所有排除的 Jdbc 定义列表
         jdbcDefinitionList = JdbcDefinitionUtil.filterExcludeDefList(excludeIds, jdbcDefinitionList);
 
         // 提取所有启用的Jdbc定义列表
         jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(enabledIds, jdbcDefinitionList);
+
+        // 设置属性
+        jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, environment);
 
         // 应用 主 定义
         jdbcDefinitionList = JdbcDefinitionUtil.applyPrimaryJdbcDefList(primaryId, jdbcDefinitionList);
