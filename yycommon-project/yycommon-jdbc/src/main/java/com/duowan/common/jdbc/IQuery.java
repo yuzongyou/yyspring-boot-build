@@ -110,6 +110,19 @@ public interface IQuery {
     <T> List<T> queryModelList(String sql, Class<T> requireType, Object... params);
 
     /**
+     * 查询多个对象, 参数可以数数组，但是不能是List
+     *
+     * @param sql         查询sql
+     * @param pageNo      页码，必须大于0
+     * @param pageSize    每页查询数量，必须大于0
+     * @param requireType 要求的类型
+     * @param params      参数
+     * @param <T>         返回类型
+     * @return 不存在则返回空list
+     */
+    <T> List<T> queryModelListForPaging(String sql, int pageNo, int pageSize, Class<T> requireType, Object... params);
+
+    /**
      * 查询多个对象, 参数是List
      *
      * @param sql         查询sql
@@ -227,6 +240,19 @@ public interface IQuery {
     /**
      * 查询 单列 数据，只能返回单列数据
      *
+     * @param sql         查询语句
+     * @param pageNo      页码，必须大于0
+     * @param pageSize    每页查询数量，必须大于0
+     * @param requireType 列类型
+     * @param params      参数
+     * @param <T>         结果类型
+     * @return 不存在则返回空list
+     */
+    <T> List<T> querySingleColumnListForPaging(String sql, int pageNo, int pageSize, Class<T> requireType, Object... params);
+
+    /**
+     * 查询 单列 数据，只能返回单列数据
+     *
      * @param paramList   参数
      * @param requireType 列类型
      * @param sql         查询语句
@@ -236,6 +262,19 @@ public interface IQuery {
     <T> List<T> querySingleColumnList(List<Object> paramList, Class<T> requireType, String sql);
 
     /**
+     * 查询 单列 数据，只能返回单列数据
+     *
+     * @param pageNo      页码，必须大于0
+     * @param pageSize    每页查询数量，必须大于0
+     * @param paramList   参数
+     * @param requireType 列类型
+     * @param sql         查询语句
+     * @param <T>         结果类型
+     * @return 不存在则返回空list
+     */
+    <T> List<T> querySingleColumnListForPaging(int pageNo, int pageSize, List<Object> paramList, Class<T> requireType, String sql);
+
+    /**
      * 查询字符串列表
      *
      * @param sql    sql
@@ -243,6 +282,17 @@ public interface IQuery {
      * @return 返回字符串列表，不存在则返回空列表
      */
     List<String> queryStringList(String sql, Object... params);
+
+    /**
+     * 查询字符串列表
+     *
+     * @param sql      sql
+     * @param pageNo   页码，必须大于0
+     * @param pageSize 每页查询数量，必须大于0
+     * @param params   参数
+     * @return 返回字符串列表，不存在则返回空列表
+     */
+    List<String> queryStringListForPaging(String sql, int pageNo, int pageSize, Object... params);
 
     /**
      * 查询Integer列表
@@ -256,11 +306,33 @@ public interface IQuery {
     /**
      * 查询Integer列表
      *
+     * @param sql      sql
+     * @param pageNo   页码，必须大于0
+     * @param pageSize 每页查询数量，必须大于0
+     * @param params   参数
+     * @return 返回字符串列表，不存在则返回空列表
+     */
+    List<Integer> queryIntegerListForPaging(String sql, int pageNo, int pageSize, Object... params);
+
+    /**
+     * 查询Long列表
+     *
      * @param sql    sql
      * @param params 参数
      * @return 返回字符串列表，不存在则返回空列表
      */
     List<Long> queryLongList(String sql, Object... params);
+
+    /**
+     * 查询Long列表并分页
+     *
+     * @param sql      sql
+     * @param pageNo   页码，必须大于0
+     * @param pageSize 每页查询数量，必须大于0
+     * @param params   参数
+     * @return 返回字符串列表，不存在则返回空列表
+     */
+    List<Long> queryLongListForPaging(String sql, int pageNo, int pageSize, Object... params);
 
     /**
      * 查询分页数据对象
@@ -366,4 +438,5 @@ public interface IQuery {
      * @return 数据列表
      */
     <T> List<T> queryModelList(Class<T> requiredType, Object queryCondition, int pageNo, int pageSize);
+
 }

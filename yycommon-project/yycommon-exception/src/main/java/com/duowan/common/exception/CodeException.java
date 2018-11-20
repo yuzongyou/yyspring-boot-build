@@ -11,11 +11,12 @@ public class CodeException extends RuntimeException {
     private int code = 500;
 
     public CodeException() {
-        super("未知异常！");
+        super();
     }
 
     public CodeException(int code) {
-        super("未知异常！");
+        super();
+        this.code = code;
     }
 
     public CodeException(String message) {

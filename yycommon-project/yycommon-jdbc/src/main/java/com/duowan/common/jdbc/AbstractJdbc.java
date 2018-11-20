@@ -169,6 +169,14 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     }
 
     @Override
+    public <T> List<T> queryModelListForPaging(String sql, int pageNo, int pageSize, Class<T> requireType, Object... params) {
+
+        String pagingSql = buildPagingSql(sql, pageNo, pageSize);
+
+        return queryModelList(pagingSql, requireType, params);
+    }
+
+    @Override
     public <T> List<T> queryModelList(String sql, List<Object> paramList, Class<T> requireType) {
         BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(requireType);
         if (logger.isDebugEnabled()) {
@@ -274,6 +282,11 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     }
 
     @Override
+    public <T> List<T> querySingleColumnListForPaging(String sql, int pageNo, int pageSize, Class<T> requireType, Object... params) {
+        return querySingleColumnList(buildPagingSql(sql, pageNo, pageSize), requireType, params);
+    }
+
+    @Override
     public <T> List<T> querySingleColumnList(List<Object> paramList, Class<T> requireType, String sql) {
         if (logger.isDebugEnabled()) {
             logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
@@ -285,8 +298,18 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     }
 
     @Override
+    public <T> List<T> querySingleColumnListForPaging(int pageNo, int pageSize, List<Object> paramList, Class<T> requireType, String sql) {
+        return querySingleColumnList(paramList, requireType, buildPagingSql(sql, pageNo, pageSize));
+    }
+
+    @Override
     public List<String> queryStringList(String sql, Object... params) {
         return querySingleColumnList(sql, String.class, params);
+    }
+
+    @Override
+    public List<String> queryStringListForPaging(String sql, int pageNo, int pageSize, Object... params) {
+        return queryStringList(buildPagingSql(sql, pageNo, pageSize), params);
     }
 
     @Override
@@ -295,8 +318,18 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     }
 
     @Override
+    public List<Integer> queryIntegerListForPaging(String sql, int pageNo, int pageSize, Object... params) {
+        return queryIntegerList(buildPagingSql(sql, pageNo, pageSize), params);
+    }
+
+    @Override
     public List<Long> queryLongList(String sql, Object... params) {
         return querySingleColumnList(sql, Long.class, params);
+    }
+
+    @Override
+    public List<Long> queryLongListForPaging(String sql, int pageNo, int pageSize, Object... params) {
+        return queryLongList(buildPagingSql(sql, pageNo, pageSize), params);
     }
 
     @Override
