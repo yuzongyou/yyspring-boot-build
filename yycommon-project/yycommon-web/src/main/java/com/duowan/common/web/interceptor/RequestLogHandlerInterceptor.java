@@ -4,14 +4,15 @@ import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.web.annotations.LogRequestInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Arvin
@@ -21,10 +22,6 @@ import java.util.*;
 public class RequestLogHandlerInterceptor implements HandlerInterceptor {
 
     private static final String REQ_INFO_KEY = "RequestLogHandlerInterceptor.REQ_INFO";
-
-    private static final String PATTERN_ALL = "*";
-    private static final String PATTERN_SPLIT = ",";
-    private static final Set<String> EMPTY_SET = new HashSet<>(0);
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,11 +63,13 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
 
         Map<String, Object> logMap = new HashMap<>();
 
-        fillParam(logRequestInfo, logMap, request);
+        LogReqMetadata metadata = LogReqMetadata.get(request, logRequestInfo);
 
-        fillHeader(logRequestInfo, logMap, request);
+        fillParam(metadata, logMap, request);
 
-        fillCookie(logRequestInfo, logMap, request);
+        fillHeader(metadata, logMap, request);
+
+        fillCookie(metadata, logMap, request);
 
         if (!logMap.isEmpty()) {
             request.setAttribute(REQ_INFO_KEY, new ReqInfo(System.currentTimeMillis(), logMap));
@@ -78,32 +77,18 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
 
     }
 
-    private void fillCookie(LogRequestInfo logRequestInfo, Map<String, Object> logMap, HttpServletRequest request) {
+    private void fillCookie(LogReqMetadata metadata, Map<String, Object> logMap, HttpServletRequest request) {
 
-        String excludeParams = logRequestInfo.excludeCookies();
-        if (PATTERN_ALL.equals(excludeParams)) {
+        if (metadata.isExcludeCookieAll()) {
             return;
-        }
-        String includeParams = logRequestInfo.includeCookies();
-        boolean includeAll = PATTERN_ALL.equals(includeParams);
-
-        Set<String> excludeNames = toParamNameSet(excludeParams);
-        Set<String> includeNames = null;
-        if (!includeAll) {
-            includeNames = toParamNameSet(includeParams);
         }
 
         Map<String, Object> map = new HashMap<>();
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
-
                 String name = cookie.getName();
-
-                if (excludeNames.contains(name)) {
-                    continue;
-                }
-                if (includeAll || includeNames.contains(name)) {
+                if (metadata.includeCookie(name)) {
                     map.put(name, cookie.getValue());
                 }
 
@@ -115,29 +100,17 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
 
     }
 
-    private void fillHeader(LogRequestInfo logRequestInfo, Map<String, Object> logMap, HttpServletRequest request) {
+    private void fillHeader(LogReqMetadata metadata, Map<String, Object> logMap, HttpServletRequest request) {
 
-        String excludeParams = logRequestInfo.excludeHeaders();
-        if (PATTERN_ALL.equals(excludeParams)) {
+        if (metadata.isExcludeParamAll()) {
             return;
-        }
-        String includeParams = logRequestInfo.includeHeaders();
-        boolean includeAll = PATTERN_ALL.equals(includeParams);
-
-        Set<String> excludeNames = toParamNameSet(excludeParams);
-        Set<String> includeNames = null;
-        if (!includeAll) {
-            includeNames = toParamNameSet(includeParams);
         }
 
         Map<String, Object> map = new HashMap<>();
         Enumeration<String> names = request.getHeaderNames();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
-            if (excludeNames.contains(name)) {
-                continue;
-            }
-            if (includeAll || includeNames.contains(name)) {
+            if (metadata.includeHeader(name)) {
                 String value = request.getHeader(name);
                 map.put(name, value);
             }
@@ -148,26 +121,10 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
 
     }
 
-    private Set<String> toParamNameSet(String params) {
-        if (StringUtils.isEmpty(params)) {
-            return EMPTY_SET;
-        }
-        return new HashSet<>(Arrays.asList(params.split(PATTERN_SPLIT)));
-    }
+    private void fillParam(LogReqMetadata metadata, Map<String, Object> logMap, HttpServletRequest request) {
 
-    private void fillParam(LogRequestInfo logRequestInfo, Map<String, Object> logMap, HttpServletRequest request) {
-
-        String excludeParams = logRequestInfo.excludeParams();
-        if (PATTERN_ALL.equals(excludeParams)) {
+        if (metadata.isExcludeParamAll()) {
             return;
-        }
-        String includeParams = logRequestInfo.includeParams();
-        boolean includeAll = PATTERN_ALL.equals(includeParams);
-
-        Set<String> excludeNames = toParamNameSet(excludeParams);
-        Set<String> includeNames = null;
-        if (!includeAll) {
-            includeNames = toParamNameSet(includeParams);
         }
 
         Map<String, Object> map = new HashMap<>();
@@ -175,10 +132,7 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
         while (names.hasMoreElements()) {
             String name = names.nextElement();
 
-            if (excludeNames.contains(name)) {
-                continue;
-            }
-            if (includeAll || includeNames.contains(name)) {
+            if (metadata.includeParam(name)) {
                 String value = request.getParameter(name);
                 map.put(name, value);
             }
