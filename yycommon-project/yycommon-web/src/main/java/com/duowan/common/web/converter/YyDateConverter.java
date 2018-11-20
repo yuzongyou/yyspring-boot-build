@@ -66,6 +66,14 @@ public class YyDateConverter implements Converter<String, Date> {
                 return date;
             }
         }
+
+        {
+            try {
+                return new Date(source);
+            } catch (Exception ignored) {
+            }
+        }
+
         throw new IllegalArgumentException("无法将字符串[" + source + "] 转换成 java.uti.Date 对象");
     }
 
