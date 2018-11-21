@@ -12,8 +12,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
  */
 public class HcPutContext extends AbstractHcHttpTextResponseContext<HcPutContext, HttpPut> {
 
-    public HcPutContext(String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
-        super(url, httpClient, defaultRequestConfig);
+    public HcPutContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
+        super(logEnabled, url, httpClient, defaultRequestConfig);
     }
 
     @Override

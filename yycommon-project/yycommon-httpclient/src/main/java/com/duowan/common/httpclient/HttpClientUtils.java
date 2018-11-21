@@ -25,6 +25,7 @@ import org.apache.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,6 +55,8 @@ public class HttpClientUtils {
          **/
         private static RequestConfig DEFAULT_REQUEST_CONFIG = null;
 
+        private static boolean LOG_ENABLED;
+
         static {
             initialize();
         }
@@ -77,6 +80,7 @@ public class HttpClientUtils {
             );
 
             HcConfig hcConfig = HcUtil.getConfig();
+            LOG_ENABLED = hcConfig.isLogEnabled();
 
             // DNS 解析器
             DnsResolver dnsResolver = SystemDefaultDnsResolver.INSTANCE;
@@ -151,19 +155,351 @@ public class HttpClientUtils {
         return Holder.DEFAULT_REQUEST_CONFIG;
     }
 
+    public static boolean isLogEnabled() {
+        return Holder.LOG_ENABLED;
+    }
+
     public static HcGetContext get(String url) throws HttpInvokeException {
-        return new HcGetContext(url, getHttpClient(), getDefaultRequestConfig());
+        return new HcGetContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
     }
 
     public static HcPostContext post(String url) throws HttpInvokeException {
-        return new HcPostContext(url, getHttpClient(), getDefaultRequestConfig());
+        return new HcPostContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
     }
 
     public static HcDeleteContext delete(String url) throws HttpInvokeException {
-        return new HcDeleteContext(url, getHttpClient(), getDefaultRequestConfig());
+        return new HcDeleteContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
     }
 
     public static HcPutContext put(String url) throws HttpInvokeException {
-        return new HcPutContext(url, getHttpClient(), getDefaultRequestConfig());
+        return new HcPutContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
+    }
+
+    public static HcGetContext get(boolean logEnabled, String url) throws HttpInvokeException {
+        return new HcGetContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
+    }
+
+    public static HcPostContext post(boolean logEnabled, String url) throws HttpInvokeException {
+        return new HcPostContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
+    }
+
+    public static HcDeleteContext delete(boolean logEnabled, String url) throws HttpInvokeException {
+        return new HcDeleteContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
+    }
+
+    public static HcPutContext put(boolean logEnabled, String url) throws HttpInvokeException {
+        return new HcPutContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
+    }
+
+    public static String getText(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asText();
+    }
+
+    public static String getText(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asText();
+    }
+
+    public static String getText(String url, Map<String, String> paramMap) {
+        return get(url).param(paramMap).responseText().asText();
+    }
+
+    public static String getText(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return get(logEnabled, url).param(paramMap).responseText().asText();
+    }
+
+    public static String getText(String url) {
+        return get(url).responseText().asText();
+    }
+
+    public static String getText(boolean logEnablde, String url) {
+        return get(logEnablde, url).responseText().asText();
+    }
+
+    public static <T> T getObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+
+    }
+
+    public static <T> T getObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+
+    }
+
+    public static <T> T getObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap) {
+        return get(url).param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T getObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap) {
+        return get(logEnabled, url).param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T getObjectForStdJsonResp(Class<T> requireType, String url) {
+        return get(url).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T getObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url) {
+        return get(logEnabled, url).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T getObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObject(requireType);
+
+    }
+
+    public static <T> T getObject(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObject(requireType);
+
+    }
+
+    public static <T> T getObject(Class<T> requireType, String url, Map<String, String> paramMap) {
+        return get(url).param(paramMap).responseText().asObject(requireType);
+    }
+
+    public static <T> T getObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap) {
+        return get(logEnabled, url).param(paramMap).responseText().asObject(requireType);
+    }
+
+    public static <T> T getObject(Class<T> requireType, String url) {
+        return get(url).responseText().asObject(requireType);
+    }
+
+    public static <T> T getObject(boolean logEnabled, Class<T> requireType, String url) {
+        return get(logEnabled, url).responseText().asObject(requireType);
+    }
+
+    public static Map<String, Object> getMap(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMap();
+
+    }
+
+    public static Map<String, Object> getMap(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMap();
+
+    }
+
+    public static Map<String, Object> getMap(String url, Map<String, String> paramMap) {
+        return get(url).param(paramMap).responseText().asMap();
+    }
+
+    public static Map<String, Object> getMap(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return get(logEnabled, url).param(paramMap).responseText().asMap();
+    }
+
+    public static Map<String, Object> getMap(String url) {
+        return get(url).responseText().asMap();
+    }
+
+    public static Map<String, Object> getMap(boolean logEnabled, String url) {
+        return get(logEnabled, url).responseText().asMap();
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMapForStdJsonResp();
+
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMapForStdJsonResp();
+
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(String url, Map<String, String> paramMap) {
+        return get(url).param(paramMap).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return get(logEnabled, url).param(paramMap).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(String url) {
+        return get(url).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> getMapForStdJsonResp(boolean logEnabled, String url) {
+        return get(logEnabled, url).responseText().asMapForStdJsonResp();
+    }
+
+    public static String postText(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asText();
+    }
+
+    public static String postText(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asText();
+    }
+
+    public static String postText(String url, Map<String, String> paramMap) {
+        return post(url).param(paramMap).responseText().asText();
+    }
+
+    public static String postText(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return post(logEnabled, url).param(paramMap).responseText().asText();
+    }
+
+    public static String postText(String url) {
+        return post(url).responseText().asText();
+    }
+
+    public static String postText(boolean logEnablde, String url) {
+        return post(logEnablde, url).responseText().asText();
+    }
+
+    public static <T> T postObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+
+    }
+
+    public static <T> T postObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+
+    }
+
+    public static <T> T postObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap) {
+        return post(url).param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T postObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap) {
+        return post(logEnabled, url).param(paramMap).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T postObjectForStdJsonResp(Class<T> requireType, String url) {
+        return post(url).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T postObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url) {
+        return post(logEnabled, url).responseText().asObjectForStdJsonResp(requireType);
+    }
+
+    public static <T> T postObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObject(requireType);
+
+    }
+
+    public static <T> T postObject(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asObject(requireType);
+
+    }
+
+    public static <T> T postObject(Class<T> requireType, String url, Map<String, String> paramMap) {
+        return post(url).param(paramMap).responseText().asObject(requireType);
+    }
+
+    public static <T> T postObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap) {
+        return post(logEnabled, url).param(paramMap).responseText().asObject(requireType);
+    }
+
+    public static <T> T postObject(Class<T> requireType, String url) {
+        return post(url).responseText().asObject(requireType);
+    }
+
+    public static <T> T postObject(boolean logEnabled, Class<T> requireType, String url) {
+        return post(logEnabled, url).responseText().asObject(requireType);
+    }
+
+    public static Map<String, Object> postMap(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMap();
+
+    }
+
+    public static Map<String, Object> postMap(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMap();
+
+    }
+
+    public static Map<String, Object> postMap(String url, Map<String, String> paramMap) {
+        return post(url).param(paramMap).responseText().asMap();
+    }
+
+    public static Map<String, Object> postMap(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return post(logEnabled, url).param(paramMap).responseText().asMap();
+    }
+
+    public static Map<String, Object> postMap(String url) {
+        return post(url).responseText().asMap();
+    }
+
+    public static Map<String, Object> postMap(boolean logEnabled, String url) {
+        return post(logEnabled, url).responseText().asMap();
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(logEnabled, url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMapForStdJsonResp();
+
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
+
+        HcGetContext context = get(url);
+        context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
+        return context.param(paramMap).responseText().asMapForStdJsonResp();
+
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(String url, Map<String, String> paramMap) {
+        return post(url).param(paramMap).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap) {
+        return post(logEnabled, url).param(paramMap).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(String url) {
+        return post(url).responseText().asMapForStdJsonResp();
+    }
+
+    public static Map<String, Object> postMapForStdJsonResp(boolean logEnabled, String url) {
+        return post(logEnabled, url).responseText().asMapForStdJsonResp();
     }
 }

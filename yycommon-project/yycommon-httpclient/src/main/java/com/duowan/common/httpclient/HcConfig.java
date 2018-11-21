@@ -25,6 +25,7 @@ public class HcConfig {
     public static final String KEY_CONTENT_COMPRESSION_ENABLED = "hc.request.config.default.contentCompressionEnabled";
     public static final String KEY_CONNECTION_MANAGER_SHARED = "hc.connectionManagerShared";
     public static final String KEY_RETRY_TIMES = "hc.retryTimes";
+    public static final String KEY_LOG_ENABLED = "hc.logEnabled";
 
     private String[] envVarNames = new String[]{"ENV", "DWENV"};
 
@@ -61,6 +62,9 @@ public class HcConfig {
     private boolean relativeRedirectsAllowed = true;
     private boolean authenticationEnabled = true;
     private boolean contentCompressionEnabled = true;
+
+    /** 是否开启日志 **/
+    private boolean logEnabled = false;
 
     /**
      * 重试次数
@@ -222,6 +226,14 @@ public class HcConfig {
 
     public void setContentCompressionEnabled(boolean contentCompressionEnabled) {
         this.contentCompressionEnabled = contentCompressionEnabled;
+    }
+
+    public boolean isLogEnabled() {
+        return logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled) {
+        this.logEnabled = logEnabled;
     }
 
     public int getRetryTimes() {

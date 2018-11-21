@@ -87,6 +87,7 @@ public class HcUtil {
             hcConfig.setContentCompressionEnabled(lookupBooleanProperty(properties, hcConfig.isContentCompressionEnabled(), HcConfig.KEY_CONTENT_COMPRESSION_ENABLED));
             hcConfig.setConnectionManagerShared(lookupBooleanProperty(properties, hcConfig.isConnectionManagerShared(), HcConfig.KEY_CONNECTION_MANAGER_SHARED));
             hcConfig.setRetryTimes(lookupIntProperty(properties, hcConfig.getRetryTimes(), HcConfig.KEY_RETRY_TIMES));
+            hcConfig.setLogEnabled(lookupBooleanProperty(properties, hcConfig.isLogEnabled(), HcConfig.KEY_LOG_ENABLED));
 
         }
 

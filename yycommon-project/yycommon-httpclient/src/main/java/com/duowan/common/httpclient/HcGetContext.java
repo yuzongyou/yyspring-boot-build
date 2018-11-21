@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class HcGetContext extends AbstractHcHttpTextResponseContext<HcGetContext, HttpGet> {
 
-    public HcGetContext(String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
-        super(url, httpClient, defaultRequestConfig);
+    public HcGetContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
+        super(logEnabled, url, httpClient, defaultRequestConfig);
     }
 
     @Override

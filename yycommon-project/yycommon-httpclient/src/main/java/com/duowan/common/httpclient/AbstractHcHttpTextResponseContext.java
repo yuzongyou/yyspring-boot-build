@@ -11,8 +11,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
  */
 public abstract class AbstractHcHttpTextResponseContext<S extends AbstractHcHttpTextResponseContext, T extends HttpRequestBase> extends AbstractHcRequestContext<S, T> {
 
-    public AbstractHcHttpTextResponseContext(String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
-        super(url, httpClient, defaultRequestConfig);
+    public AbstractHcHttpTextResponseContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
+        super(logEnabled, url, httpClient, defaultRequestConfig);
     }
 
     public HttpTextResponse responseText() {

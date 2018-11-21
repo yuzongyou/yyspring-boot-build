@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -35,6 +36,8 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     private String url;
 
+    private boolean logEnabled = false;
+
     private CloseableHttpClient httpClient;
 
     private Charset charset = DEFAULT_CHARSET;
@@ -61,11 +64,12 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
     private List<PreRequestInterceptor<S>> preRequestInterceptors;
 
     @SuppressWarnings({"unchecked"})
-    public AbstractHcRequestContext(String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
+    public AbstractHcRequestContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
         if (StringUtils.isBlank(url)) {
             throw new HttpInvokeException("GET request url should not be null!");
         }
         self = (S) this;
+        this.logEnabled = logEnabled;
         this.httpClient = httpClient;
         this.defaultRequestConfig = defaultRequestConfig;
         extractUrl(url);
@@ -121,6 +125,14 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     public Charset getCharset() {
         return charset;
+    }
+
+    public boolean isLogEnabled() {
+        return logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled) {
+        this.logEnabled = logEnabled;
     }
 
     public RequestConfig.Builder config() {
@@ -270,7 +282,7 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
                 httpRequest.setConfig(customRequestConfigBuilder.build());
             }
 
-            if (logger.isDebugEnabled()) {
+            if (logEnabled) {
                 logHttpRequestInfo(httpRequest);
             }
 
@@ -282,15 +294,23 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     protected void logHttpRequestInfo(T httpRequest) {
 
-        logger.debug(httpRequest.getRequestLine().toString());
+        logger.info(httpRequest.getRequestLine().toString());
         Header[] headers = httpRequest.getAllHeaders();
         if (null != headers) {
             for (Header header : headers) {
-                logger.debug(header.getName() + ": " + header.getValue());
+                logger.info("Header: " + header.getName() + ": " + header.getValue());
             }
         }
 
-        logger.debug(httpRequest.getConfig().toString());
+        if (!(httpRequest instanceof HttpGet)) {
+            if (null != paramsMap && !paramsMap.isEmpty()) {
+                for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+                    logger.info("Param: " + entry.getKey() + ": " + entry.getValue());
+                }
+            }
+        }
+
+        logger.info(httpRequest.getConfig().toString());
     }
 
     protected UrlEncodedFormEntity buildFormEntity() {
@@ -352,14 +372,6 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     public void setDefaultRequestConfig(RequestConfig defaultRequestConfig) {
         this.defaultRequestConfig = defaultRequestConfig;
-    }
-
-    public RequestConfig.Builder getCustomRequestConfigBuilder() {
-        return customRequestConfigBuilder;
-    }
-
-    public void setCustomRequestConfigBuilder(RequestConfig.Builder customRequestConfigBuilder) {
-        this.customRequestConfigBuilder = customRequestConfigBuilder;
     }
 
     /**

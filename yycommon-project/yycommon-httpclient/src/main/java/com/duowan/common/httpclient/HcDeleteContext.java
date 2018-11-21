@@ -16,8 +16,8 @@ import java.io.IOException;
  */
 public class HcDeleteContext extends AbstractHcHttpTextResponseContext<HcDeleteContext, HttpDelete> {
 
-    public HcDeleteContext(String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
-        super(url, httpClient, defaultRequestConfig);
+    public HcDeleteContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
+        super(logEnabled, url, httpClient, defaultRequestConfig);
     }
 
     @Override

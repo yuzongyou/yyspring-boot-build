@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * @author Arvin
@@ -90,6 +91,29 @@ public class HttpTextResponse extends AbstractHttpResponse {
         int status = jsonObject.getIntValue("status");
         if (status == 200) {
             return JSON.toJavaObject(jsonObject.getJSONObject("data"), requireType);
+        }
+        throw new HttpResponseConvertException(status, jsonObject.getString("message"));
+    }
+
+    public Map<String, Object> asMap() {
+        String json = asTrimText();
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+
+        return JSON.parseObject(json).getInnerMap();
+    }
+
+    public Map<String, Object> asMapForStdJsonResp() {
+        String json = asTrimText();
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+
+        JSONObject jsonObject = JSON.parseObject(json);
+        int status = jsonObject.getIntValue("status");
+        if (status == 200) {
+            return jsonObject.getJSONObject("data").getInnerMap();
         }
         throw new HttpResponseConvertException(status, jsonObject.getString("message"));
     }
