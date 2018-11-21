@@ -39,6 +39,7 @@
         <module>yycommon-okhttp3</module>
         <module>yycommon-wxmp-sdk</module>
         <module>yycommon-codec</module>
+        <module>yycommon-httpclient</module>
     </modules>
 
 </project>

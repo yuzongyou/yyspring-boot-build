@@ -191,6 +191,13 @@
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient-cache</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
@@ -410,6 +417,12 @@
             <dependency>
                 <groupId>com.duowan</groupId>
                 <artifactId>yycommon-utils</artifactId>
+                <version>${yyproject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-httpclient</artifactId>
                 <version>${yyproject.version}</version>
             </dependency>
 
