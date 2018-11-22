@@ -1,5 +1,6 @@
 package com.duowan.common.redis.util;
 
+import com.duowan.common.redis.RedisDefinitionContext;
 import com.duowan.common.redis.model.RedisDefinition;
 import com.duowan.common.redis.provider.def.RedisDefinitionProvider;
 import com.duowan.common.redis.register.RedisRegister;
@@ -9,6 +10,7 @@ import com.duowan.common.utils.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.core.env.Environment;
 
 import java.util.*;
@@ -23,13 +25,13 @@ public class RedisRegisterUtil {
     /**
      * 注册RedisBean
      *
-     * @param registerList 注册器列表
-     * @param providerList 提供者列表
+     * @param registerList        注册器列表
+     * @param providerList        提供者列表
      * @param redisDefinitionList Redis定义列表
-     * @param enabledIds   要启用的ID列表，支持通配符 *
-     * @param primaryId    主Redis 实例的ID
-     * @param registry     注册器
-     * @param environment  环境
+     * @param enabledIds          要启用的ID列表，支持通配符 *
+     * @param primaryId           主Redis 实例的ID
+     * @param registry            注册器
+     * @param environment         环境
      */
     public static void registerRedisBeanDefinitions(
             List<RedisRegister> registerList,
@@ -86,6 +88,14 @@ public class RedisRegisterUtil {
             register.registerRedis(redisDefinition, environment, registry);
 
             logger.info("自动注册Redis数据源：" + redisDefinition);
+        }
+
+        {
+            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
+            beanDefinition.setBeanClass(RedisDefinitionContext.class);
+            beanDefinition.setPrimary(true);
+            beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, redisDefinitionList);
+            registry.registerBeanDefinition(RedisDefinitionContext.class.getName(), beanDefinition);
         }
 
     }
