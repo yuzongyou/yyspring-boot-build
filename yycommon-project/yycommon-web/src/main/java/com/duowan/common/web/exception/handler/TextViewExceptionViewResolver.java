@@ -30,7 +30,7 @@ public class TextViewExceptionViewResolver extends AbstractExceptionViewResolver
 
         if (ex != null) {
             int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex, request);
+            String errorMessage = getErrorMessage(ex);
             String logInfo = "处理请求异常，返回 TextView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
             if (logException) {
                 logger.warn(logInfo, ex);
