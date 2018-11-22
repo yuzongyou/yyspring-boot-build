@@ -30,7 +30,7 @@ public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolve
 
         if (ex != null) {
             int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex, request);
+            String errorMessage = getErrorMessage(ex);
             String logInfo = "处理请求异常，返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
             if (logException) {
                 logger.warn(logInfo, ex);
