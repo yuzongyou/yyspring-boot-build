@@ -1,5 +1,7 @@
 package com.duowan.yyspringboot.autoconfigure.springcache;
 
+import com.duowan.common.redis.RedisDefinitionContext;
+import com.duowan.common.redis.model.RedisDefinition;
 import com.duowan.common.redis.model.RiseRedisDefinition;
 import com.duowan.common.redis.model.SentinelRedisDefinition;
 import com.duowan.common.redis.model.StdRedisDefinition;
@@ -45,6 +47,8 @@ public class SpringCacheAutoConfiguration {
 
     @Autowired
     private RedisProperties redisProperties;
+    @Autowired
+    private RedisDefinitionContext redisDefinitionContext;
 
     @Bean
     public RedisCacheManager redisCacheManager(RedisTemplate redisTemplate) {
@@ -70,13 +74,19 @@ public class SpringCacheAutoConfiguration {
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         String cacheId = redisProperties.getCacheId();
-        StdRedisDefinition stdRedisDefinition = getRedisDefinition(cacheId, redisProperties);
-        if (stdRedisDefinition == null) {
+        RedisDefinition redisDefinition = getRedisDefinition(cacheId);
+        if (redisDefinition == null) {
             throw new RuntimeException("请配置缓存redis");
         }
-        logger.info("redis缓存配置：{}", stdRedisDefinition.toString());
-        RedisStandaloneConfiguration standaloneConfig = getStandaloneConfig(stdRedisDefinition);
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(standaloneConfig);
+        logger.info("redis缓存配置：{}", redisDefinition.toString());
+        JedisConnectionFactory jedisConnectionFactory = null;
+        if (redisDefinition instanceof StdRedisDefinition) {
+            RedisStandaloneConfiguration standaloneConfig = getStandaloneConfig((StdRedisDefinition) redisDefinition);
+            jedisConnectionFactory = new JedisConnectionFactory(standaloneConfig);
+        } else if (redisDefinition instanceof SentinelRedisDefinition) {
+            RedisSentinelConfiguration sentinelConfig = getRedisSentinelConfiguration((SentinelRedisDefinition) redisDefinition);
+            jedisConnectionFactory = new JedisConnectionFactory(sentinelConfig);
+        }
 
         return jedisConnectionFactory;
     }
@@ -92,20 +102,11 @@ public class SpringCacheAutoConfiguration {
         return redisTemplate;
     }
 
-    private StdRedisDefinition getRedisDefinition(String cacheId, RedisProperties redisProperties) {
+    private RedisDefinition getRedisDefinition(String cacheId) {
         // 获取数据源配置
-        StdRedisDefinition stdRedisDefinition = null;
-        Map<String, StdRedisDefinition> stdRedisDefinitionMap = redisProperties.getStandards();
-        if (stdRedisDefinitionMap != null && stdRedisDefinitionMap.containsKey(cacheId)) {
-            stdRedisDefinition = stdRedisDefinitionMap.get(cacheId);
-        } else {
-            Map<String, RiseRedisDefinition> rises = redisProperties.getRises();
-            if (rises != null) {
-                stdRedisDefinition = rises.get(cacheId);
-            }
-        }
+        RedisDefinition redisDefinition = redisDefinitionContext.getRedisDefinition(cacheId);
 
-        return stdRedisDefinition;
+        return redisDefinition;
     }
 
     private RedisStandaloneConfiguration getStandaloneConfig(StdRedisDefinition stdRedisDefinition) {
@@ -119,16 +120,7 @@ public class SpringCacheAutoConfiguration {
         return standaloneConfig;
     }
 
-    private SentinelRedisDefinition getSentinelRedisDefinition(String cacheId, RedisProperties redisProperties) {
-        Map<String, SentinelRedisDefinition> sentinels = redisProperties.getSentinels();
-        if (sentinels != null && sentinels.containsKey(cacheId)) {
-            return sentinels.get(cacheId);
-        }
-
-        return null;
-    }
-
-    public RedisSentinelConfiguration getRedisSentinelConfiguration(SentinelRedisDefinition sentinel) {
+    private RedisSentinelConfiguration getRedisSentinelConfiguration(SentinelRedisDefinition sentinel) {
         RedisSentinelConfiguration redisSentinelConfiguration =
                 new RedisSentinelConfiguration(sentinel.getMasterName(), sentinel.getSentinelSet());
         redisSentinelConfiguration.setDatabase(Integer.valueOf(sentinel.getDatabase()));
