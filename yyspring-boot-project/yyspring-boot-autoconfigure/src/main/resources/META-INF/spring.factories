@@ -27,4 +27,5 @@ com.duowan.yyspringboot.autoconfigure.redis.RedisAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.timer.TimerScheduleAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.thriftclient.ThriftClientAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.thriftserver.ThriftServiceExporterAutoConfiguration,\
-com.duowan.yyspringboot.autoconfigure.swagger2.Swagger2AutoConfiguration
+com.duowan.yyspringboot.autoconfigure.swagger2.Swagger2AutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.springcache.SpringCacheAutoConfiguration

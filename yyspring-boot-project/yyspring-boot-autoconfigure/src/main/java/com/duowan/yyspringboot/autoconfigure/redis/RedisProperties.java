@@ -33,6 +33,16 @@ public class RedisProperties {
     private String primaryId;
 
     /**
+     * 缓存的redis id
+     */
+    private String cacheId;
+
+    /**
+     * 全局缓存过期时间，小于等于0表示不过期，单位秒
+     */
+    private Long cacheExpiredTime;
+
+    /**
      * 升龙数据源别名MAP
      **/
     private Map<String, String> riseAlias;
@@ -61,6 +71,23 @@ public class RedisProperties {
      * RedisDefinitionProvider 定义类全路径
      **/
     private Set<String> providerClasses;
+
+
+    public Long getCacheExpiredTime() {
+        return cacheExpiredTime;
+    }
+
+    public void setCacheExpiredTime(Long cacheExpiredTime) {
+        this.cacheExpiredTime = cacheExpiredTime;
+    }
+
+    public String getCacheId() {
+        return cacheId;
+    }
+
+    public void setCacheId(String cacheId) {
+        this.cacheId = cacheId;
+    }
 
     public Set<String> getEnabledIds() {
         return enabledIds;
