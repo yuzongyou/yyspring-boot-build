@@ -64,7 +64,7 @@ public class HcConfig {
     private boolean contentCompressionEnabled = true;
 
     /** 是否开启日志 **/
-    private boolean logEnabled = false;
+    private boolean logEnabled = true;
 
     /**
      * 重试次数
