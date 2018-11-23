@@ -72,6 +72,16 @@ public abstract class JsonUtil {
         return objectMapper;
     }
 
+    private static void handleException(Exception e, boolean throwException) {
+        if (null == e) {
+            return;
+        }
+        logger.warn("Json Handler error: " + e.getMessage(), e);
+        if (throwException) {
+            throw new JsonException(e);
+        }
+    }
+
     /**
      * 输出漂亮格式的 JSON
      *
@@ -81,10 +91,11 @@ public abstract class JsonUtil {
     public static String toPrettyJson(Object object) {
         return toPrettyJson(object, true);
     }
+
     /**
      * 输出漂亮格式的 JSON
      *
-     * @param object 对象
+     * @param object         对象
      * @param throwException 是否抛出异常
      * @return 返回漂亮 JSON格式对象
      */
@@ -96,10 +107,8 @@ public abstract class JsonUtil {
 
         try {
             return writer.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
@@ -122,10 +131,8 @@ public abstract class JsonUtil {
         }
         try {
             return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
@@ -210,11 +217,8 @@ public abstract class JsonUtil {
 
         try {
             return objectMapper.readValue(json, valueType);
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
@@ -243,11 +247,8 @@ public abstract class JsonUtil {
 
         try {
             return objectMapper.readValue(jsonArray, listValueType);
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
@@ -288,11 +289,8 @@ public abstract class JsonUtil {
 
         try {
             return objectMapper.readValue(jsonArray, collectionValueType);
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
@@ -350,11 +348,8 @@ public abstract class JsonUtil {
 
         try {
             return objectMapper.readValue(json, mapType);
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
 
         return null;
@@ -412,11 +407,8 @@ public abstract class JsonUtil {
         }
         try {
             return defaultObjectMapper.readTree(json);
-        } catch (IOException e) {
-            logger.warn(e.getMessage(), e);
-            if (throwException) {
-                throw new JsonException(e);
-            }
+        } catch (Exception e) {
+            handleException(e, throwException);
         }
         return null;
     }
