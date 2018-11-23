@@ -51,11 +51,15 @@ public class SpringCacheAutoConfiguration {
     private RedisDefinitionContext redisDefinitionContext;
 
     @Bean
-    public RedisCacheManager redisCacheManager(RedisTemplate redisTemplate) {
-        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(redisTemplate.getConnectionFactory());
+    @ConditionalOnMissingBean(RedisCacheManager.class)
+    public RedisCacheManager redisCacheManager() {
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter.nonLockingRedisCacheWriter(jedisConnectionFactory());
 
         RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(redisTemplate.getValueSerializer()))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair
+                                .fromSerializer(new GenericJackson2JsonRedisSerializer())
+                )
                 .computePrefixWith(name -> name + ":");
 
         if (redisProperties.getCacheExpiredTime() > 0) {
@@ -66,12 +70,6 @@ public class SpringCacheAutoConfiguration {
         return new YyRedisCacheManager(redisCacheWriter, redisCacheConfiguration);
     }
 
-    @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer();
-    }
-
-    @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         String cacheId = redisProperties.getCacheId();
         RedisDefinition redisDefinition = getRedisDefinition(cacheId);
@@ -89,17 +87,6 @@ public class SpringCacheAutoConfiguration {
         }
 
         return jedisConnectionFactory;
-    }
-
-    @Bean
-    public RedisTemplate redisTemplate(GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer,
-                                       JedisConnectionFactory jedisConnectionFactory) {
-        RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setHashValueSerializer(genericJackson2JsonRedisSerializer);
-        redisTemplate.setValueSerializer(genericJackson2JsonRedisSerializer);
-        redisTemplate.setConnectionFactory(jedisConnectionFactory);
-
-        return redisTemplate;
     }
 
     private RedisDefinition getRedisDefinition(String cacheId) {
