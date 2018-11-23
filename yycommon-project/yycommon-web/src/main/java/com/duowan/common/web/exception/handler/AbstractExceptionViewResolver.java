@@ -52,6 +52,11 @@ public abstract class AbstractExceptionViewResolver implements ExceptionViewReso
 
     protected static String getErrorMessage(Exception ex) {
         if (ex != null) {
+
+            if (ex instanceof CodeException) {
+                return ex.getMessage();
+            }
+
             if (isJavaxValidationImported) {
                 if (ex instanceof ConstraintViolationException) {
                     ConstraintViolationException exception = (ConstraintViolationException) ex;
