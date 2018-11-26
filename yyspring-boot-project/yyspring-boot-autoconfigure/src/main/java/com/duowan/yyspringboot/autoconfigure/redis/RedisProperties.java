@@ -35,7 +35,12 @@ public class RedisProperties {
     /**
      * 缓存的redis id
      */
-    private String cacheId;
+    private Set<String> cacheIds;
+
+    /**
+     * 一个应用只能有一个 primary 的Cache Redis 定义, 多个cache Redis时需指定
+     **/
+    private String primaryCacheId;
 
     /**
      * 全局缓存过期时间，小于等于0表示不过期，单位秒
@@ -72,6 +77,13 @@ public class RedisProperties {
      **/
     private Set<String> providerClasses;
 
+    public String getPrimaryCacheId() {
+        return primaryCacheId;
+    }
+
+    public void setPrimaryCacheId(String primaryCacheId) {
+        this.primaryCacheId = primaryCacheId;
+    }
 
     public Long getCacheExpiredTime() {
         return cacheExpiredTime;
@@ -81,12 +93,12 @@ public class RedisProperties {
         this.cacheExpiredTime = cacheExpiredTime;
     }
 
-    public String getCacheId() {
-        return cacheId;
+    public Set<String> getCacheIds() {
+        return cacheIds;
     }
 
-    public void setCacheId(String cacheId) {
-        this.cacheId = cacheId;
+    public void setCacheIds(Set<String> cacheIds) {
+        this.cacheIds = cacheIds;
     }
 
     public Set<String> getEnabledIds() {
