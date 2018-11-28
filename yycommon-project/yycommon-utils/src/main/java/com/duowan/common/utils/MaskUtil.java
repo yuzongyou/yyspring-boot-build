@@ -47,7 +47,7 @@ public class MaskUtil {
         return mask(prefix, headLen, tailLen, MAX_HEAD_LEN, MAX_TAIL_LEN) + suffix;
     }
 
-    private static String mask(String value, int headLen, int tailLen, int maxHeadLen, int maxTailLen) {
+    public static String mask(String value, int headLen, int tailLen, int maxHeadLen, int maxTailLen) {
         if (null == value || "".equals(value.trim())) {
             return value;
         }

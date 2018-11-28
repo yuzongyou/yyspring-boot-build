@@ -156,8 +156,10 @@ public class MysqlInsertBuilder extends AbstractSqlBuilder<MysqlInsertBuilder> i
                 pkValue = JdbcHelper.generateUUID();
                 ReflectUtil.setFieldValue(model, fd.getField(), pkValue);
                 appendColumn(fieldsBuilder, valuesBuilder, fd, pkValue);
+            } else {
+                appendColumn(fieldsBuilder, valuesBuilder, fd, pkValue);
             }
-            return;
+            return ;
         }
 
         AssertUtil.assertNotNull(pkValue, "主键值不能为空！");
@@ -177,6 +179,9 @@ public class MysqlInsertBuilder extends AbstractSqlBuilder<MysqlInsertBuilder> i
             valuesBuilder.append("null,");
         } else {
             valuesBuilder.append("?,");
+            if (fd.getFieldType().isEnum()) {
+                columnValue = String.valueOf(columnValue);
+            }
             addParamByColumnDefinition(fd, columnValue);
         }
 
