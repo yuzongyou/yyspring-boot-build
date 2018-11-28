@@ -51,7 +51,7 @@ public class XHttpClientTest {
                 .param("account", account)
                 .param("sign", EncryptUtil.toMd5LowerCase(account + appId + appKey))
                 .responseText()
-                .asTrimText();
+                .asObjectForStdJsonResp(String.class);
 
         System.out.println(responseText);
     }

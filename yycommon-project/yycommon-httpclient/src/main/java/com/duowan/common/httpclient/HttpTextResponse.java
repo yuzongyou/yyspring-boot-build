@@ -2,6 +2,7 @@ package com.duowan.common.httpclient;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.duowan.common.converter.ConverterContext;
 import com.duowan.common.exception.HttpInvokeException;
 import com.duowan.common.exception.HttpResponseConvertException;
 import com.duowan.common.util.Util;
@@ -90,7 +91,21 @@ public class HttpTextResponse extends AbstractHttpResponse {
         JSONObject jsonObject = JSON.parseObject(json);
         int status = jsonObject.getIntValue("status");
         if (status == 200) {
-            return JSON.toJavaObject(jsonObject.getJSONObject("data"), requireType);
+            return ConverterContext.convertOneObject(requireType, jsonObject, "data");
+        }
+        throw new HttpResponseConvertException(status, jsonObject.getString("message"));
+    }
+
+    public <T> T[] asArrayForStdJsonResp(Class<T> requireType) {
+        String json = asTrimText();
+        if (Util.isBlank(json)) {
+            return null;
+        }
+
+        JSONObject jsonObject = JSON.parseObject(json);
+        int status = jsonObject.getIntValue("status");
+        if (status == 200) {
+            return ConverterContext.convertToArray(requireType, jsonObject, "data");
         }
         throw new HttpResponseConvertException(status, jsonObject.getString("message"));
     }
