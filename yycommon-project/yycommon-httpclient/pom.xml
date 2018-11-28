@@ -39,6 +39,12 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
+            <artifactId>yycommon-utils</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 

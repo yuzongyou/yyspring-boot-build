@@ -150,7 +150,11 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
         if (null == this.preRequestInterceptors) {
             this.preRequestInterceptors = new ArrayList<>();
         }
-        this.preRequestInterceptors.addAll(Arrays.asList(preRequestInterceptors));
+        for (PreRequestInterceptor<S> interceptor : preRequestInterceptors) {
+            if (null != interceptor) {
+                this.preRequestInterceptors.add(interceptor);
+            }
+        }
         return self;
     }
 
