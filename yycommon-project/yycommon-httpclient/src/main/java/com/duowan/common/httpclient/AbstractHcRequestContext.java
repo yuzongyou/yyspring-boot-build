@@ -1,7 +1,7 @@
 package com.duowan.common.httpclient;
 
 import com.duowan.common.exception.HttpInvokeException;
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.util.Util;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -65,7 +65,7 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     @SuppressWarnings({"unchecked"})
     public AbstractHcRequestContext(boolean logEnabled, String url, CloseableHttpClient httpClient, RequestConfig defaultRequestConfig) {
-        if (StringUtils.isBlank(url)) {
+        if (Util.isBlank(url)) {
             throw new HttpInvokeException("GET request url should not be null!");
         }
         self = (S) this;

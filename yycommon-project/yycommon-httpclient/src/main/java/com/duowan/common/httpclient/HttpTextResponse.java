@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.duowan.common.exception.HttpInvokeException;
 import com.duowan.common.exception.HttpResponseConvertException;
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.util.Util;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
@@ -58,7 +58,7 @@ public class HttpTextResponse extends AbstractHttpResponse {
 
     public <T> T asObject(Class<T> requireType) {
         String json = asTrimText();
-        if (StringUtils.isBlank(json)) {
+        if (Util.isBlank(json)) {
             return null;
         }
 
@@ -83,7 +83,7 @@ public class HttpTextResponse extends AbstractHttpResponse {
      */
     public <T> T asObjectForStdJsonResp(Class<T> requireType) {
         String json = asTrimText();
-        if (StringUtils.isBlank(json)) {
+        if (Util.isBlank(json)) {
             return null;
         }
 
@@ -97,23 +97,23 @@ public class HttpTextResponse extends AbstractHttpResponse {
 
     public Map<String, Object> asMap() {
         String json = asTrimText();
-        if (StringUtils.isBlank(json)) {
+        if (Util.isBlank(json)) {
             return null;
         }
 
-        return JSON.parseObject(json).getInnerMap();
+        return JSON.parseObject(json);
     }
 
     public Map<String, Object> asMapForStdJsonResp() {
         String json = asTrimText();
-        if (StringUtils.isBlank(json)) {
+        if (Util.isBlank(json)) {
             return null;
         }
 
         JSONObject jsonObject = JSON.parseObject(json);
         int status = jsonObject.getIntValue("status");
         if (status == 200) {
-            return jsonObject.getJSONObject("data").getInnerMap();
+            return jsonObject.getJSONObject("data");
         }
         throw new HttpResponseConvertException(status, jsonObject.getString("message"));
     }

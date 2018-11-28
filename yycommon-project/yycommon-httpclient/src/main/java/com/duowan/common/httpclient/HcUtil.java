@@ -1,6 +1,6 @@
 package com.duowan.common.httpclient;
 
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.util.Util;
 
 import java.io.IOException;
 import java.net.URL;
@@ -99,7 +99,7 @@ public class HcUtil {
         }
 
         private static String[] getStringArray(String value, String[] defaultArray) {
-            if (StringUtils.isBlank(value)) {
+            if (Util.isBlank(value)) {
                 return defaultArray;
             }
             return value.split(",");
@@ -128,15 +128,15 @@ public class HcUtil {
         private static String lookupProperty(Properties properties, String defaultValue, String... keys) {
             for (String key : keys) {
                 String value = System.getProperty(key);
-                if (StringUtils.isBlank(value)) {
+                if (Util.isBlank(value)) {
                     value = System.getenv(key);
                 }
-                if (StringUtils.isBlank(value)) {
+                if (Util.isBlank(value)) {
                     if (null != properties) {
                         value = properties.getProperty(key);
                     }
                 }
-                if (StringUtils.isNotBlank(value)) {
+                if (Util.isNotBlank(value)) {
                     return value;
                 }
             }

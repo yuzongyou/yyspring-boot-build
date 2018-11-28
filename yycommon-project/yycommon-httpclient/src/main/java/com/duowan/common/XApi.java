@@ -1,7 +1,7 @@
 package com.duowan.common;
 
 import com.duowan.common.exception.InvalidHttpUrlException;
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.util.Util;
 
 /**
  * @author Arvin
@@ -18,7 +18,7 @@ public class XApi {
 
     private String resolveBaseUrl(String baseUrl) {
 
-        if (StringUtils.isBlank(baseUrl)) {
+        if (Util.isBlank(baseUrl)) {
             throw new InvalidHttpUrlException("Api base url should not be null");
         }
 
