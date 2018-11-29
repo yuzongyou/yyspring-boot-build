@@ -2,6 +2,7 @@ package com.duowan.common.httpclient;
 
 import com.duowan.common.XApi;
 import com.duowan.common.exception.HttpInvokeException;
+import com.duowan.common.util.Util;
 
 import java.util.Map;
 
@@ -29,12 +30,16 @@ public class XHttpClient {
     private PreRequestInterceptor<HcDeleteContext> customDeletePreInterceptor;
     private PreRequestInterceptor<HcPutContext> customPutPreInterceptor;
 
+    public XHttpClient() {
+        this(null, null);
+    }
+
     public XHttpClient(String baseUrl) {
         this(baseUrl, null);
     }
 
     public XHttpClient(String baseUrl, final PreRequestInterceptor<AbstractHcRequestContext> preRequestInterceptor) {
-        xApi = new XApi(baseUrl);
+        xApi = Util.isBlank(baseUrl) ? null : new XApi(baseUrl);
         this.setPreRequestInterceptor(preRequestInterceptor);
     }
 
@@ -62,7 +67,7 @@ public class XHttpClient {
     }
 
     public String getApiUrl(String api) {
-        return xApi.getApiUrl(api);
+        return null == xApi ? api : xApi.getApiUrl(api);
     }
 
     public PreRequestInterceptor<HcPostContext> getPostPreInterceptor() {
@@ -98,35 +103,35 @@ public class XHttpClient {
     }
 
     public HcGetContext get(String url) throws HttpInvokeException {
-        return get(logEnabled, xApi.getApiUrl(url));
+        return get(logEnabled, url);
     }
 
     public HcPostContext post(String url) throws HttpInvokeException {
-        return post(logEnabled, xApi.getApiUrl(url));
+        return post(logEnabled, url);
     }
 
     public HcDeleteContext delete(String url) throws HttpInvokeException {
-        return delete(logEnabled, xApi.getApiUrl(url));
+        return delete(logEnabled, url);
     }
 
     public HcPutContext put(String url) throws HttpInvokeException {
-        return put(logEnabled, xApi.getApiUrl(url));
+        return put(logEnabled, url);
     }
 
     public HcGetContext get(boolean logEnabled, String url) throws HttpInvokeException {
-        return HttpClientUtils.get(logEnabled, url).addPreInterceptor(getGetPreInterceptor());
+        return HttpClientUtils.get(logEnabled, getApiUrl(url)).addPreInterceptor(getGetPreInterceptor());
     }
 
     public HcPostContext post(boolean logEnabled, String url) throws HttpInvokeException {
-        return HttpClientUtils.post(logEnabled, url).addPreInterceptor(getPostPreInterceptor());
+        return HttpClientUtils.post(logEnabled, getApiUrl(url)).addPreInterceptor(getPostPreInterceptor());
     }
 
     public HcDeleteContext delete(boolean logEnabled, String url) throws HttpInvokeException {
-        return HttpClientUtils.delete(logEnabled, url).addPreInterceptor(getDeletePreInterceptor());
+        return HttpClientUtils.delete(logEnabled, getApiUrl(url)).addPreInterceptor(getDeletePreInterceptor());
     }
 
     public HcPutContext put(boolean logEnabled, String url) throws HttpInvokeException {
-        return HttpClientUtils.put(logEnabled, url).addPreInterceptor(getPutPreInterceptor());
+        return HttpClientUtils.put(logEnabled, getApiUrl(url)).addPreInterceptor(getPutPreInterceptor());
     }
 
     public String getText(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
