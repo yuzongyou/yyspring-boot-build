@@ -216,6 +216,7 @@
                     <artifactId>lettuce-core</artifactId>
                 </exclusion>
             </exclusions>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>

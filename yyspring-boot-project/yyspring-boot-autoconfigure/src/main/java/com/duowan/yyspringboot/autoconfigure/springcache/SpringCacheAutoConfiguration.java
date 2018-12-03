@@ -4,6 +4,8 @@ import com.duowan.common.redis.RedisDefinitionContext;
 import com.duowan.common.redis.model.RedisDefinition;
 import com.duowan.common.redis.model.SentinelRedisDefinition;
 import com.duowan.common.redis.model.StdRedisDefinition;
+import com.duowan.yyspringboot.autoconfigure.redis.RedisAutoConfiguration;
+import com.duowan.yyspringboot.autoconfigure.redis.RedisConfigApplicationRunListener;
 import com.duowan.yyspringboot.autoconfigure.redis.RedisProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -42,6 +45,7 @@ import java.util.Set;
 @EnableConfigurationProperties(RedisProperties.class)
 @ConditionalOnProperty(prefix = RedisProperties.PROPERTIES_PREFIX, name = "cache-ids")
 @EnableCaching
+@AutoConfigureAfter(value = {RedisAutoConfiguration.class, RedisConfigApplicationRunListener.class})
 public class SpringCacheAutoConfiguration implements ApplicationContextAware {
     private Logger logger = LoggerFactory.getLogger(SpringCacheAutoConfiguration.class);
 
