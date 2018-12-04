@@ -17,7 +17,10 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.Cache;
+import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +49,7 @@ import java.util.Set;
 @ConditionalOnProperty(prefix = RedisProperties.PROPERTIES_PREFIX, name = "cache-ids")
 @EnableCaching
 @AutoConfigureAfter(value = {RedisAutoConfiguration.class, RedisConfigApplicationRunListener.class})
-public class SpringCacheAutoConfiguration implements ApplicationContextAware {
+public class SpringCacheAutoConfiguration extends CachingConfigurerSupport implements ApplicationContextAware {
     private Logger logger = LoggerFactory.getLogger(SpringCacheAutoConfiguration.class);
 
     @Autowired
@@ -136,6 +139,30 @@ public class SpringCacheAutoConfiguration implements ApplicationContextAware {
         return redisCacheConfiguration;
     }
 
+    @Override
+    public CacheErrorHandler errorHandler() {
+        return new CacheErrorHandler() {
 
+            @Override
+            public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
+                logger.warn("获取缓存异常:{}", exception.getMessage());
+            }
+
+            @Override
+            public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
+                logger.warn("更新缓存异常:{}", exception.getMessage());
+            }
+
+            @Override
+            public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
+                logger.warn("清除缓存异常:{}", exception.getMessage());
+            }
+
+            @Override
+            public void handleCacheClearError(RuntimeException exception, Cache cache) {
+                logger.warn("清除缓存异常:{}", exception.getMessage());
+            }
+        };
+    }
 }
 
