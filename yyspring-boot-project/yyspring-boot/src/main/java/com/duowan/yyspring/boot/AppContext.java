@@ -417,6 +417,12 @@ public class AppContext {
             String[] customDirs = applicationAnn.resourceLookupDirs();
             if (customDirs.length > 0) {
                 for (String path : customDirs) {
+
+                    try {
+                        path = appEnvironment.resolvePlaceholders(path);
+                    } catch (Exception ignored) {
+                    }
+
                     if (path.matches("(?i)^classpath:.*")) {
                         lookupDirs.add(path);
                     } else {
