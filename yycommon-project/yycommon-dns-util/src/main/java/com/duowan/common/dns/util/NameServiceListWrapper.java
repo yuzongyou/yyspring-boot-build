@@ -34,7 +34,7 @@ public class NameServiceListWrapper implements NameService {
     public NameServiceListWrapper(NameServiceInterceptor interceptor, List<NameService> nameServiceList) {
         assert (null != nameServiceList && !nameServiceList.isEmpty());
 
-        this.interceptor = interceptor == null ? null : interceptor;
+        this.interceptor = interceptor;
         this.nameServiceList = nameServiceList;
 
         maxIndex = this.nameServiceList.size() - 1;

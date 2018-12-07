@@ -47,4 +47,5 @@ public class OsUtil {
         }
         return osName.startsWith(osNamePrefix);
     }
+
 }
