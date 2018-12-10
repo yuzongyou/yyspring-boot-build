@@ -6,6 +6,7 @@ import com.duowan.common.utils.UrlUtil;
 import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.UdbLoginBox;
 import com.duowan.udb.security.UdbSecurityConstants;
+import com.duowan.udb.security.annotations.IgnoredUdbCheck;
 import com.duowan.udb.util.CookieUtils;
 import com.duowan.udb.util.codec.AESHelper;
 import com.duowan.universal.login.BasicCredentials;
@@ -35,6 +36,7 @@ import java.util.Set;
  * @author dw_xiajiqiu1
  */
 @Controller
+@IgnoredUdbCheck
 public class UdbSecurityController {
 
     private static final Logger logger = LoggerFactory.getLogger(UdbSecurityController.class);
