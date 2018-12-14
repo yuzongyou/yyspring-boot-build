@@ -251,12 +251,16 @@ public class UdbSecurityController {
         if (StringUtils.isEmpty(referer)) {
             referer = RequestUtil.getReferer(request);
         }
-        if (StringUtils.isNotBlank(referer)) {
-            return referer;
+        if (StringUtils.isBlank(referer)) {
+            referer = RequestUtil.getBasicUrl(request);
+        }
+
+        if (referer.contains("/udb/logout.do")) {
+            return RequestUtil.getBasicUrl(request);
         }
 
         // 获取项目根路径
-        return RequestUtil.getBasicUrl(request);
+        return referer;
     }
 
     protected String getTopDomain(String serverName) {

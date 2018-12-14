@@ -61,10 +61,11 @@ public class UdbLoginBox {
         // TODO 这里要验证 redirectUrl 的合法性以及XSS
 
         String deleteCookieURL = YYSecCenterOpenWSInvoker.getOAuthCookieDeleteURL(udbAppId, udbAppKey);
-        logger.info("deleteCookieURL:" + deleteCookieURL);
         StringBuilder builder = new StringBuilder();
 
         redirectUrl = StringUtils.isBlank(redirectUrl) ? "http://udb.duowan.com/" : redirectUrl;
+        logger.info("deleteCookieURL:" + deleteCookieURL);
+        logger.info("AfterDeleteCookieURL:" + redirectUrl);
         builder.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
         builder.append("<html>");
         builder.append("<head>");
