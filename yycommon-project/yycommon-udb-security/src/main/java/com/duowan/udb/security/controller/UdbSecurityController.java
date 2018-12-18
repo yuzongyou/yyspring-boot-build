@@ -6,6 +6,7 @@ import com.duowan.common.utils.UrlUtil;
 import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.UdbLoginBox;
 import com.duowan.udb.security.UdbSecurityConstants;
+import com.duowan.udb.security.annotations.IgnoredUdbCheck;
 import com.duowan.udb.util.CookieUtils;
 import com.duowan.udb.util.codec.AESHelper;
 import com.duowan.universal.login.BasicCredentials;
@@ -35,6 +36,7 @@ import java.util.Set;
  * @author dw_xiajiqiu1
  */
 @Controller
+@IgnoredUdbCheck
 public class UdbSecurityController {
 
     private static final Logger logger = LoggerFactory.getLogger(UdbSecurityController.class);
@@ -249,12 +251,16 @@ public class UdbSecurityController {
         if (StringUtils.isEmpty(referer)) {
             referer = RequestUtil.getReferer(request);
         }
-        if (StringUtils.isNotBlank(referer)) {
-            return referer;
+        if (StringUtils.isBlank(referer)) {
+            referer = RequestUtil.getBasicUrl(request);
+        }
+
+        if (referer.contains("/udb/logout.do")) {
+            return RequestUtil.getBasicUrl(request);
         }
 
         // 获取项目根路径
-        return RequestUtil.getBasicUrl(request);
+        return referer;
     }
 
     protected String getTopDomain(String serverName) {

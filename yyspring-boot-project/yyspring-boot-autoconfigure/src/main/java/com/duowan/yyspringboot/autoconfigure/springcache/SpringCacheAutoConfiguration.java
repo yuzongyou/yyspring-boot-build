@@ -131,7 +131,7 @@ public class SpringCacheAutoConfiguration extends CachingConfigurerSupport imple
                 )
                 .computePrefixWith(name -> name + ":");
 
-        if (redisProperties.getCacheExpiredTime() > 0) {
+        if (redisProperties.getCacheExpiredTime() != null && redisProperties.getCacheExpiredTime() > 0) {
             Duration ttl = Duration.ofSeconds(redisProperties.getCacheExpiredTime());
             redisCacheConfiguration = redisCacheConfiguration.entryTtl(ttl);
         }

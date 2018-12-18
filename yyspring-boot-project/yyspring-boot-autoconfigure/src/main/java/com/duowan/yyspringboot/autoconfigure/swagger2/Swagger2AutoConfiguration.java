@@ -5,10 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
@@ -31,9 +28,9 @@ import springfox.documentation.swagger2.configuration.Swagger2DocumentationConfi
  * @since 2018/10/19 18:03
  */
 @Configuration
+@ConditionalOnProperty(value = "yyspring.swagger2.enabled", matchIfMissing = true)
 public class Swagger2AutoConfiguration {
 
-    @ConditionalOnExpression("${yyspring.swagger2.enabled:true}")
     @ConditionalOnClass({ApiInfo.class, Docket.class})
     @ConditionalOnWebApplication
     @EnableConfigurationProperties(Swagger2Properties.class)
