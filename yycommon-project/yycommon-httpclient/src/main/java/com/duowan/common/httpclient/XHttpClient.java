@@ -291,13 +291,13 @@ public class XHttpClient {
     }
 
     public String postText(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asText();
     }
 
     public String postText(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asText();
     }
@@ -320,7 +320,7 @@ public class XHttpClient {
 
     public <T> T postObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
 
@@ -328,7 +328,7 @@ public class XHttpClient {
 
     public <T> T postObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
 
@@ -352,7 +352,7 @@ public class XHttpClient {
 
     public <T> T postObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObject(requireType);
 
@@ -360,7 +360,7 @@ public class XHttpClient {
 
     public <T> T postObject(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObject(requireType);
 
@@ -384,7 +384,7 @@ public class XHttpClient {
 
     public Map<String, Object> postMap(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMap();
 
@@ -392,7 +392,7 @@ public class XHttpClient {
 
     public Map<String, Object> postMap(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMap();
 
@@ -416,7 +416,7 @@ public class XHttpClient {
 
     public Map<String, Object> postMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMapForStdJsonResp();
 
@@ -424,7 +424,7 @@ public class XHttpClient {
 
     public Map<String, Object> postMapForStdJsonResp(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMapForStdJsonResp();
 
