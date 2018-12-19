@@ -9,6 +9,10 @@ import com.duowan.common.utils.RequestUtil;
  */
 public class WebContext {
 
+    private WebContext() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * JSONP 回调函数名称列表
      */

@@ -16,7 +16,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
 
     private AtomicInteger nextServerCyclicCounter;
 
-    private static Logger log = LoggerFactory.getLogger(RoundRobinRule.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RoundRobinRule.class);
 
     public RoundRobinRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
@@ -29,7 +29,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
 
     public ThriftServerNode choose(LoadBalancer lb, Object key) {
         if (lb == null) {
-            log.warn("no load balancer");
+            LOGGER.warn("no load balancer");
             return null;
         }
 
@@ -42,7 +42,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
             int serverCount = allServers.size();
 
             if ((upCount == 0) || (serverCount == 0)) {
-                log.warn("No up thrift servers available from load balancer: " + lb);
+                LOGGER.warn("No up thrift servers available from load balancer: {}", lb);
                 return null;
             }
 
@@ -64,7 +64,7 @@ public class RoundRobinRule extends AbstractLoadBalancerRule {
         }
 
         if (count >= 10) {
-            log.warn("No available alive thrift servers after 10 tries from load balancer: " + lb);
+            LOGGER.warn("No available alive thrift servers after 10 tries from load balancer: {}", lb);
         }
         return server;
     }

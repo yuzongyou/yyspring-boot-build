@@ -9,15 +9,18 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class FloatArrayConverter extends AbstractArrayConverter {
 
+    private static final Float[] EMPTY_ARRAY = new Float[0];
+
     public FloatArrayConverter() {
         super(Float.class);
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     protected <T> T[] getArrayObject(JSONObject jsonObject, String dataKey) {
         String content = jsonObject.getString(dataKey);
         if (null == content) {
-            return null;
+            return (T[]) EMPTY_ARRAY;
         }
         String[] strArr = content.split(",");
         Float[] arr = new Float[strArr.length];

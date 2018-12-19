@@ -1,5 +1,6 @@
 package com.duowan.common.thrift.server.util;
 
+import com.duowan.common.thrift.server.exception.ThriftServerException;
 import org.apache.thrift.TProcessor;
 
 import java.lang.reflect.Constructor;
@@ -11,6 +12,10 @@ import java.lang.reflect.Constructor;
  */
 public class ThriftUtil {
 
+    private ThriftUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static TProcessor createThriftServiceProcessor(Class<?> thriftServiceClass, Class<?> ifaceClass, Object service) {
 
         Class<? extends TProcessor> processorClass = getProcessorClass(thriftServiceClass);
@@ -20,7 +25,7 @@ public class ThriftUtil {
 
             return (TProcessor) constructor.newInstance(service);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ThriftServerException(e);
         }
 
     }

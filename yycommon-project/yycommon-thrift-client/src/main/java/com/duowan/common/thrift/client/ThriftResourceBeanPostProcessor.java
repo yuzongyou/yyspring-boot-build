@@ -16,9 +16,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * @author Arvin
@@ -32,12 +30,12 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
     private ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
 
         Object target = bean;
 
@@ -54,32 +52,29 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
     }
 
     private void injectBeanByMethod(Class<?> targetClass, final Object targetBean) {
-        ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
-            @Override
-            public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-                ThriftResource thriftResource = AnnotationUtils.findAnnotation(method, ThriftResource.class);
+        ReflectionUtils.doWithMethods(targetClass, method -> {
+            ThriftResource thriftResource = AnnotationUtils.findAnnotation(method, ThriftResource.class);
 
-                if (thriftResource == null) {
-                    return;
-                }
+            if (thriftResource == null) {
+                return;
+            }
 
-                Class<?>[] paramTypes = method.getParameterTypes();
-                if (paramTypes == null || paramTypes.length != 1) {
-                    return;
-                }
+            Class<?>[] paramTypes = method.getParameterTypes();
+            if (paramTypes.length != 1) {
+                return;
+            }
 
-                Class<?> fieldType = paramTypes[0];
-                Object refBean = lookupThriftBean(thriftResource, fieldType, null);
-                if (refBean == null) {
-                    return;
-                }
+            Class<?> fieldType = paramTypes[0];
+            Object refBean = lookupThriftBean(thriftResource, fieldType, null);
+            if (refBean == null) {
+                return;
+            }
 
-                ReflectionUtils.makeAccessible(method);
-                try {
-                    method.invoke(targetBean, refBean);
-                } catch (InvocationTargetException e) {
-                    throw new ThriftClientInjectException("通过方法注入[" + refBean + "] 失败： " + e.getMessage(), e);
-                }
+            ReflectionUtils.makeAccessible(method);
+            try {
+                method.invoke(targetBean, refBean);
+            } catch (InvocationTargetException e) {
+                throw new ThriftClientInjectException("通过方法注入[" + refBean + "] 失败： " + e.getMessage(), e);
             }
         });
 
@@ -87,25 +82,22 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
 
     private void injectBeanByField(Class<?> targetClass, final Object targetBean) {
 
-        ReflectionUtils.doWithFields(targetClass, new ReflectionUtils.FieldCallback() {
-            @Override
-            public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
-                ThriftResource thriftResource = AnnotationUtils.findAnnotation(field, ThriftResource.class);
-                if (thriftResource == null) {
-                    return;
-                }
-
-                Class<?> fieldType = field.getType();
-
-                Object refBean = lookupThriftBean(thriftResource, fieldType, field.getName());
-                if (refBean == null) {
-                    return;
-                }
-
-                ReflectionUtils.makeAccessible(field);
-                ReflectionUtils.setField(field, targetBean, refBean);
-
+        ReflectionUtils.doWithFields(targetClass, field -> {
+            ThriftResource thriftResource = AnnotationUtils.findAnnotation(field, ThriftResource.class);
+            if (thriftResource == null) {
+                return;
             }
+
+            Class<?> fieldType = field.getType();
+
+            Object refBean = lookupThriftBean(thriftResource, fieldType, field.getName());
+            if (refBean == null) {
+                return;
+            }
+
+            ReflectionUtils.makeAccessible(field);
+            ReflectionUtils.setField(field, targetBean, refBean);
+
         });
     }
 
@@ -114,17 +106,17 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
             throw new ThriftClientInjectException("@ThriftResource 必须作用在接口上面，不允许使用非接口，请使用Iface或者AsyncIface接口！");
         }
 
-        Object refBean = null;
+        Object refBean;
 
         ClientType clientType = parseClientType(fieldType);
         if (clientType == null) {
-            log.warn(fieldName + " 不支持 ThriftResource 注解！");
+            log.warn("{} 不支持 ThriftResource 注解！", fieldName);
             return null;
         }
 
         Class<?> serviceClass = parseServiceClass(fieldType);
         if (null == serviceClass) {
-            log.warn(fieldName + " 不支持 ThriftResource 注解, 找不到Thrift对应 ServiceClass！");
+            log.warn("{} 不支持 ThriftResource 注解, 找不到Thrift对应 ServiceClass！", fieldName);
             return null;
         }
         String router = thriftResource.router();
@@ -134,9 +126,6 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
         }
         refBean = tryLookupThriftBean(refBeanName, fieldType, fieldName);
 
-        if (refBean == null) {
-            throw new ThriftClientInjectException(fieldName + " 注入Bean失败，无法找到指定的Bean！");
-        }
         return refBean;
     }
 
@@ -165,7 +154,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
         if (null != bean) {
             return bean;
         }
-        throw new RuntimeException("Bean[" + beanName + "] not found!");
+        throw new ThriftClientInjectException("Bean[" + beanName + "] not found!");
     }
 
     private Object getBeanByName(String beanName) {
@@ -218,7 +207,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
         if (AopUtils.isCglibProxy(target)) {
             TargetSource targetSource = ((Advised) target).getTargetSource();
             if (log.isDebugEnabled()) {
-                log.debug("Target object {} uses cglib proxy");
+                log.debug("Target object {} uses cglib proxy", target);
             }
 
             try {
@@ -231,7 +220,7 @@ public class ThriftResourceBeanPostProcessor implements BeanPostProcessor, Appli
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
         return bean;
     }
 }

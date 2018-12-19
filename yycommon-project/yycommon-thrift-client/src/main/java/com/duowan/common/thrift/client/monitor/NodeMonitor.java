@@ -2,7 +2,6 @@ package com.duowan.common.thrift.client.monitor;
 
 import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
-import org.apache.thrift.transport.TTransport;
 
 /**
  * Thrift Server Node 监控

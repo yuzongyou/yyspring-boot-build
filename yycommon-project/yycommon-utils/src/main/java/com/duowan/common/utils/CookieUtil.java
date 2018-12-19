@@ -19,17 +19,17 @@ public class CookieUtil {
     /**
      * 永不过期
      **/
-    public static int MAX_AGE_FOREVER = -1;
+    public static final int MAX_AGE_FOREVER = -1;
 
     /**
      * 一天过期
      **/
-    public static int MAX_AGE_ONE_DAY = 24 * 60 * 60;
+    public static final int MAX_AGE_ONE_DAY = 24 * 60 * 60;
 
     /**
      * 一周过期
      **/
-    public static int MAX_AGE_ONE_WEEK = 7 * 24 * 60 * 60;
+    public static final int MAX_AGE_ONE_WEEK = 7 * 24 * 60 * 60;
 
     private CookieUtil() {
     }

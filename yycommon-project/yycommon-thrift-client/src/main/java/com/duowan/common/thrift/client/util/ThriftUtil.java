@@ -13,6 +13,10 @@ import org.apache.thrift.async.TAsyncClient;
  */
 public class ThriftUtil {
 
+    private ThriftUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Class<? extends TServiceClient> getTServiceClientClass(String serviceClass) {
         return getServiceInnerClass(getServiceClass(serviceClass), TServiceClient.class, "$Client");
     }

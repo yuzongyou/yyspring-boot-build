@@ -7,6 +7,10 @@ package com.duowan.common.utils;
  */
 public class MaskUtil {
 
+    private MaskUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
     public static final int MAX_HEAD_LEN = 4;
     public static final int MAX_TAIL_LEN = 4;
 
@@ -40,7 +44,7 @@ public class MaskUtil {
             return email;
         }
 
-        int index = email.indexOf("@");
+        int index = email.indexOf('@');
         String prefix = email.substring(0, index);
         String suffix = email.substring(index);
 
@@ -74,19 +78,5 @@ public class MaskUtil {
         }
 
         return builder.toString();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(maskMobile("13680370512", 2, 2));
-        System.out.println(maskMobile("13680370512", 0, 2));
-        System.out.println(maskMobile("13680370512", 0, 2));
-        System.out.println(maskMobile("13680370512", 0, 3));
-        System.out.println(maskMobile("13680370512", 0, 4));
-        System.out.println(maskMobile("13680370512", 4, 0));
-        System.out.println(maskMobile("123", 4, 0));
-        System.out.println(maskMobile("123", 3, 3));
-
-        System.out.println(maskEmail("xiajiqiu1@yy.com", 3, 3));
-        System.out.println(maskEmail("a@yy.com", 3, 3));
     }
 }

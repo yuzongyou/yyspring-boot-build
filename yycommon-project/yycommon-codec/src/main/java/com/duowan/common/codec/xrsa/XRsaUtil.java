@@ -1,14 +1,12 @@
 package com.duowan.common.codec.xrsa;
 
+import com.duowan.common.codec.exception.CodecException;
 import org.apache.commons.codec.binary.Base64;
 import sun.misc.BASE64Encoder;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.Signature;
+import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.HashMap;
@@ -21,6 +19,10 @@ import java.util.Map;
  */
 public class XRsaUtil {
 
+    private XRsaUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String CHARSET = "UTF-8";
     public static final String RSA_ALGORITHM = "RSA";
     public static final String RSA_ALGORITHM_SIGN = "SHA256WithRSA";
@@ -28,7 +30,7 @@ public class XRsaUtil {
     private static final String PUBLIC_KEY = "RSAPublicKey";
     private static final String PRIVATE_KEY = "RSAPrivateKey";
 
-    public static XRsaKeyPair generateKey() throws Exception {
+    public static XRsaKeyPair generateKey() {
         Map<String, Object> keyMap = initKey();
         return new XRsaKeyPair(new XRsaPublicKey(getPublicKey(keyMap)), new XRsaPrivateKey(getPrivateKey(keyMap)));
     }
@@ -65,21 +67,25 @@ public class XRsaUtil {
     /**
      * 初始化密钥
      */
-    private static Map<String, Object> initKey() throws Exception {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(RSA_ALGORITHM);
-        keyPairGenerator.initialize(1024);
+    private static Map<String, Object> initKey() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(RSA_ALGORITHM);
+            keyPairGenerator.initialize(2048);
 
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        //公钥
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            //公钥
+            RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
-        //私钥
-        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            //私钥
+            RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
 
-        Map<String, Object> keyMap = new HashMap<>(2);
-        keyMap.put(PRIVATE_KEY, privateKey);
-        keyMap.put(PUBLIC_KEY, publicKey);
-        return keyMap;
+            Map<String, Object> keyMap = new HashMap<>(2);
+            keyMap.put(PRIVATE_KEY, privateKey);
+            keyMap.put(PUBLIC_KEY, publicKey);
+            return keyMap;
+        } catch (Exception e) {
+            throw new CodecException(e);
+        }
     }
 
     public static String encryptByPrivateKey(String data, XRsaPrivateKey privateKey, XRsaPublicKey publicKey) {
@@ -96,7 +102,7 @@ public class XRsaUtil {
             cipher.init(Cipher.ENCRYPT_MODE, rsaKey);
             return Base64.encodeBase64URLSafeString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(CHARSET), keySize));
         } catch (Exception e) {
-            throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
+            throw new CodecException("加密字符串错误：" + data, e);
         }
     }
 
@@ -114,7 +120,7 @@ public class XRsaUtil {
             cipher.init(Cipher.DECRYPT_MODE, rsaKey);
             return new String(rsaSplitCodec(cipher, Cipher.DECRYPT_MODE, Base64.decodeBase64(data), keySize), CHARSET);
         } catch (Exception e) {
-            throw new RuntimeException("解密字符串[" + data + "]时遇到异常", e);
+            throw new CodecException("解密字符串错误： " + data, e);
         }
     }
 
@@ -126,7 +132,7 @@ public class XRsaUtil {
             signature.update(data.getBytes(CHARSET));
             return Base64.encodeBase64URLSafeString(signature.sign());
         } catch (Exception e) {
-            throw new RuntimeException("签名字符串[" + data + "]时遇到异常", e);
+            throw new CodecException("签名字符串错误：" + data, e);
         }
     }
 
@@ -137,7 +143,7 @@ public class XRsaUtil {
             signature.update(data.getBytes(CHARSET));
             return signature.verify(Base64.decodeBase64(sign));
         } catch (Exception e) {
-            throw new RuntimeException("验签字符串[" + data + "]时遇到异常", e);
+            throw new CodecException("验签字符串错误：" + data, e);
         }
     }
 
@@ -164,7 +170,7 @@ public class XRsaUtil {
             }
             return out.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
+            throw new CodecException("加解密阀值为[" + maxBlock + "]的数据时发生异常", e);
         }
     }
 }

@@ -6,16 +6,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Arvin
  */
-public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolver {
+public class JsonViewExceptionViewResolver extends AbstractExceptionViewResolver {
 
-    public JsonViewExceptionViewResolver() {
+    public JsonViewExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList) {
+        super(errorMessageReaderList);
     }
 
-    public JsonViewExceptionViewResolver(boolean logException) {
+    public JsonViewExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList, boolean logException) {
+        super(errorMessageReaderList);
         this.setLogException(logException);
     }
 
@@ -29,15 +32,9 @@ public class JsonViewExceptionViewResolver extends  AbstractExceptionViewResolve
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Exception ex) {
 
         if (ex != null) {
-            int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex);
-            String logInfo = "处理请求异常，返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
-            if (logException) {
-                logger.warn(logInfo, ex);
-            } else {
-                logger.warn(logInfo);
-            }
-            return new JsonView(errorCode, errorMessage);
+
+            ErrorMessage errorMessage = getErrorMessage(ex);
+            return new JsonView(errorMessage.getErrorCode(), errorMessage.getMessage());
         }
 
         return null;

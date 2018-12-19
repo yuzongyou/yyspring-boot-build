@@ -52,7 +52,7 @@ public class IpOwnerServiceImpl implements IpOwnerService {
                 String[] values = seeker.find(ip.trim());
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("ip --> provinceAndCity, [" + ip + "] = " + Arrays.toString(values));
+                    logger.debug("ip --> provinceAndCity, [{}] = {}", ip, Arrays.toString(values));
                 }
                 ipInfo = IpOwnerInfoUtil.fillByProvinceAndCityResult(new IpOwnerInfo(), values);
             } else {
@@ -68,7 +68,7 @@ public class IpOwnerServiceImpl implements IpOwnerService {
                 String[] values = seeker.find(ip.trim());
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("ip --> district, [" + ip + "] = " + Arrays.toString(values));
+                    logger.debug("ip --> district, [{}] = {}", ip, Arrays.toString(values));
                 }
                 ipInfo = IpOwnerInfoUtil.fillByDistrictResult(ipInfo, values);
             } else {

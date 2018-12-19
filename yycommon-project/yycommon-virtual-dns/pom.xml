@@ -18,6 +18,12 @@
             <groupId>com.duowan</groupId>
             <artifactId>yycommon-dns-util</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

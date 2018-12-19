@@ -2,6 +2,8 @@ package com.duowan.common.thrift.server;
 
 import com.duowan.common.thrift.server.exporter.ThriftServiceExporter;
 import com.duowan.common.thrift.server.exporter.ThriftServiceWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -9,7 +11,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Arvin
@@ -17,6 +21,8 @@ import java.util.*;
  * @since 2018/9/21 17:48
  */
 public class ThriftServiceExporterScheduler implements ApplicationContextAware, EnvironmentAware, InitializingBean {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftServiceExporterScheduler.class);
 
     private ThriftServiceExporter exporter;
 
@@ -63,7 +69,10 @@ public class ThriftServiceExporterScheduler implements ApplicationContextAware, 
                 list.add(searcher);
                 return list;
             }
-        } catch (BeansException ignored) {
+        } catch (BeansException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         try {
@@ -75,14 +84,14 @@ public class ThriftServiceExporterScheduler implements ApplicationContextAware, 
             }
 
             return new ArrayList<>(exporterMap.values());
-        } catch (BeansException ignored) {
+        } catch (BeansException e) {
             return new ArrayList<>();
         }
 
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

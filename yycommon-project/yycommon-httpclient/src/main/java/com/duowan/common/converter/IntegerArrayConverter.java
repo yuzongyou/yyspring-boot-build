@@ -9,15 +9,18 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class IntegerArrayConverter extends AbstractArrayConverter {
 
+    private static final Integer[] EMPTY_ARRAY = new Integer[0];
+
     public IntegerArrayConverter() {
         super(Integer.class);
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     protected <T> T[] getArrayObject(JSONObject jsonObject, String dataKey) {
         String content = jsonObject.getString(dataKey);
         if (null == content) {
-            return null;
+            return (T[]) EMPTY_ARRAY;
         }
         String[] strArr = content.split(",");
         Integer[] arr = new Integer[strArr.length];

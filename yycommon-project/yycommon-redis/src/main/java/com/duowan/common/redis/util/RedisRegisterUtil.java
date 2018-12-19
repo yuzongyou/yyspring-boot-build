@@ -20,7 +20,11 @@ import java.util.*;
  */
 public class RedisRegisterUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisRegisterUtil.class);
+    private RedisRegisterUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisRegisterUtil.class);
 
     /**
      * 注册RedisBean
@@ -87,7 +91,7 @@ public class RedisRegisterUtil {
 
             register.registerRedis(redisDefinition, environment, registry);
 
-            logger.info("自动注册Redis数据源：" + redisDefinition);
+            LOGGER.info("自动注册Redis数据源：{}", redisDefinition);
         }
 
         {
@@ -154,12 +158,12 @@ public class RedisRegisterUtil {
     /**
      * RedisDefinition.id --> RedisDefinition
      */
-    private static Map<String, RedisDefinition> REDIS_DEF_MAP = new HashMap<>();
+    private static Map<String, RedisDefinition> redisDefMap = new HashMap<>();
 
     /**
      * 主 定义
      */
-    private static volatile RedisDefinition PRIMARY_REDIS_DEF = null;
+    private static volatile RedisDefinition primaryRedisDef = null;
 
     /**
      * 检查是否有重复的
@@ -167,23 +171,23 @@ public class RedisRegisterUtil {
     private static List<RedisDefinition> checkRedisDefList(List<RedisDefinition> redisDefinitionList) {
 
         if (null == redisDefinitionList || redisDefinitionList.isEmpty()) {
-            return redisDefinitionList;
+            return new ArrayList<>(0);
         }
 
         for (RedisDefinition redisDefinition : redisDefinitionList) {
-            AssertUtil.assertFalse(REDIS_DEF_MAP.containsKey(redisDefinition.getId()), "RedisDefinition[id=" + redisDefinition.getId() + "]重复定义！");
+            AssertUtil.assertFalse(redisDefMap.containsKey(redisDefinition.getId()), "RedisDefinition[id=" + redisDefinition.getId() + "]重复定义！");
 
             if (redisDefinition.isPrimary()) {
-                if (null == PRIMARY_REDIS_DEF) {
-                    PRIMARY_REDIS_DEF = redisDefinition;
+                if (null == primaryRedisDef) {
+                    primaryRedisDef = redisDefinition;
                 } else {
-                    AssertUtil.assertTrue(PRIMARY_REDIS_DEF.getId().equals(redisDefinition.getId()),
-                            "不能定义多个 primary RedisDefinition 目前定义了[" + PRIMARY_REDIS_DEF.getId() + "," + redisDefinition.getId() + "]");
+                    AssertUtil.assertTrue(primaryRedisDef.getId().equals(redisDefinition.getId()),
+                            "不能定义多个 primary RedisDefinition 目前定义了[" + primaryRedisDef.getId() + "," + redisDefinition.getId() + "]");
                 }
 
             }
 
-            REDIS_DEF_MAP.put(redisDefinition.getId(), redisDefinition);
+            redisDefMap.put(redisDefinition.getId(), redisDefinition);
         }
 
         return redisDefinitionList;

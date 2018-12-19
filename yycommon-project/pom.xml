@@ -36,7 +36,6 @@
         <module>yycommon-thrift-client</module>
         <module>yycommon-thrift-server</module>
         <module>yycommon-udb-sdk</module>
-        <module>yycommon-okhttp3</module>
         <module>yycommon-wxmp-sdk</module>
         <module>yycommon-codec</module>
         <module>yycommon-httpclient</module>

@@ -55,4 +55,14 @@ public class XHttpClientTest {
 
         System.out.println(responseText);
     }
+
+    @Test
+    public void testGw() {
+        XHttpClient client = new XHttpClient("http://dev-fcm.duowan.com/");
+        client.setLogEnabled(false);
+
+        for (int i = 0; i < 10; ++i) {
+            System.out.println(client.get("lt/myip").responseText().asTrimText());
+        }
+    }
 }

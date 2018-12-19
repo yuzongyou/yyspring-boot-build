@@ -1,11 +1,12 @@
 package com.duowan.common.web.converter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
 import org.springframework.core.convert.converter.Converter;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Arvin
@@ -13,6 +14,22 @@ import java.util.Date;
  * @since 2018/10/19 17:08
  */
 public class YyDateConverter implements Converter<String, Date> {
+
+    private static final List<DateConverter> DATE_CONVERTERS = loadDateConverterList();
+
+    private static List<DateConverter> loadDateConverterList() {
+
+        List<DateConverter> list = new ArrayList<>();
+        int order = Ordered.HIGHEST_PRECEDENCE;
+        list.add(new LongDateConverter(order++));
+        list.add(new PatternDateConverter("yyyy-MM-dd HH:mm:ss", order++));
+        list.add(new PatternDateConverter("yyyy/MM/dd HH:mm:ss", order++));
+        list.add(new PatternDateConverter("yyyy-MM-dd", order++));
+        list.add(new PatternDateConverter("yyyy/MM/dd", order++));
+        list.add(new ConstructorDateConverter(order));
+
+        return list;
+    }
 
     @Override
     public Date convert(String source) {
@@ -22,66 +39,14 @@ public class YyDateConverter implements Converter<String, Date> {
 
         source = source.trim();
 
-        if (source.matches("^[0-9]+$")) {
-            return new Date(Long.parseLong(source));
-        }
 
-        Date date = null;
-        String pattern;
-        {
-            pattern = "yyyy-MM-dd HH:mm:ss";
-            if (source.length() == pattern.length() && source.contains("-")) {
-                date = parseDate(pattern, source);
-            }
+        for (DateConverter converter : DATE_CONVERTERS) {
+            Date date = converter.convert(source);
             if (null != date) {
                 return date;
-            }
-        }
-        {
-            pattern = "yyyy/MM/dd HH:mm:ss";
-            if (source.length() == pattern.length() && source.contains("/")) {
-                date = parseDate(pattern, source);
-            }
-            if (null != date) {
-                return date;
-            }
-        }
-
-        {
-            pattern = "yyyy-MM-dd";
-            if (source.length() == pattern.length() && source.contains("-")) {
-                date = parseDate(pattern, source);
-            }
-            if (null != date) {
-                return date;
-            }
-        }
-
-        {
-            pattern = "yyyy/MM/dd";
-            if (source.length() == pattern.length() && source.contains("/")) {
-                date = parseDate(pattern, source);
-            }
-            if (null != date) {
-                return date;
-            }
-        }
-
-        {
-            try {
-                return new Date(source);
-            } catch (Exception ignored) {
             }
         }
 
         throw new IllegalArgumentException("无法将字符串[" + source + "] 转换成 java.uti.Date 对象");
-    }
-
-    private Date parseDate(String pattern, String source) {
-        try {
-            return new SimpleDateFormat(pattern).parse(source);
-        } catch (ParseException ignored) {
-            return null;
-        }
     }
 }

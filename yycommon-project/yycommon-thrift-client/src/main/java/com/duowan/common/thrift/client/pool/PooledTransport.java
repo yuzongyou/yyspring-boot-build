@@ -84,7 +84,7 @@ public class PooledTransport {
                 ClientKey key = buildClientKey(router, clientType);
                 Object client = TClientFactory.createClientByClientType(transport, clientType, factory, clientConfig);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Create thrift client " + key + " from node{" + serverNode + "} and transport{" + transport + "}");
+                    logger.debug("Create thrift client {} from node {} and transport {}", key, serverNode, transport);
                 }
                 this.clientMap.put(key, client);
             }

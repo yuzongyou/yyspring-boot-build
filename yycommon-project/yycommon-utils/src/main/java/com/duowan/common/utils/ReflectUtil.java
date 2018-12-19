@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,15 @@ import java.util.Set;
  */
 public abstract class ReflectUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
+    private ReflectUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReflectUtil.class);
 
     public static List<Class<?>> getAllSuperclasses(final Class<?> cls, boolean includeSelf) {
         if (cls == null) {
-            return null;
+            return new ArrayList<>();
         }
         final List<Class<?>> classes = new ArrayList<>();
         Class<?> superclass = cls.getSuperclass();
@@ -48,7 +53,7 @@ public abstract class ReflectUtil {
      */
     public static List<Field> getNoneStaticDeclaredFields(Class<?> clazz, Class<?> fieldType) {
         if (null == clazz) {
-            return new ArrayList<Field>();
+            return new ArrayList<>();
         }
         List<Field> fields = new ArrayList<>();
 
@@ -62,9 +67,7 @@ public abstract class ReflectUtil {
                     if (Modifier.isStatic(field.getModifiers())) {
                         continue;
                     }
-                    if (null == fieldType) {
-                        fields.add(field);
-                    } else if (field.getType().equals(fieldType)) {
+                    if (null == fieldType || field.getType().equals(fieldType)) {
                         fields.add(field);
                     }
                 }
@@ -143,7 +146,10 @@ public abstract class ReflectUtil {
         for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
                 return superClass.getDeclaredField(fieldName);
-            } catch (NoSuchFieldException ignored) {
+            } catch (NoSuchFieldException e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
             }
         }
         return null;
@@ -169,7 +175,10 @@ public abstract class ReflectUtil {
             } else {
                 field.set(obj, value);
             }
-        } catch (IllegalAccessException ignored) {
+        } catch (IllegalAccessException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 
@@ -190,7 +199,10 @@ public abstract class ReflectUtil {
         }
         try {
             field.set(obj, value);
-        } catch (IllegalAccessException ignored) {
+        } catch (IllegalAccessException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 
@@ -268,13 +280,13 @@ public abstract class ReflectUtil {
 
         List<T> instanceList = new ArrayList<>();
         Set<String> packages = splitPackageNames(packageNames);
-        if (packages == null || packages.isEmpty()) {
+        if (packages.isEmpty()) {
             return instanceList;
         }
 
         for (String packageName : packages) {
             List<T> subInstanceList = scanAndInstanceByDefaultConstructorWithSinglePackage(superClass, packageName);
-            if (null != subInstanceList && !subInstanceList.isEmpty()) {
+            if (!subInstanceList.isEmpty()) {
                 instanceList.addAll(subInstanceList);
             }
         }
@@ -292,7 +304,7 @@ public abstract class ReflectUtil {
     public static Set<String> splitPackageNames(String packageNames) {
 
         if (StringUtils.isBlank(packageNames)) {
-            return null;
+            return new HashSet<>();
         }
         Set<String> packages = new HashSet<>();
         String[] array = packageNames.split("[\\s,，\\|;]+");
@@ -376,7 +388,7 @@ public abstract class ReflectUtil {
             Class<?> clazz = Class.forName(className);
             return newInstanceByDefaultConstructor(superClass, clazz);
         } catch (Exception e) {
-            logger.warn("实例化类[" + className + "]失败： " + e.getMessage());
+            LOGGER.warn("实例化类[{}]失败： {}", className, e.getMessage());
             return null;
         }
     }
@@ -409,7 +421,7 @@ public abstract class ReflectUtil {
             Constructor<?> constructor = clazz.getConstructor();
 
             if (constructor == null) {
-                throw new RuntimeException("指定的类[" + clazz.getName() + "] 没有一个默认的无参构造函数！");
+                throw new UtilsException("指定的类[" + clazz.getName() + "] 没有一个默认的无参构造函数！");
             }
 
             if (!constructor.isAccessible()) {
@@ -419,8 +431,8 @@ public abstract class ReflectUtil {
             return superClass.cast(constructor.newInstance());
 
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
+            throw new UtilsException(e.getMessage(), e);
         }
     }
 
@@ -431,7 +443,7 @@ public abstract class ReflectUtil {
         try {
             return classLoader.loadClass(className);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new UtilsException(e);
         }
     }
 

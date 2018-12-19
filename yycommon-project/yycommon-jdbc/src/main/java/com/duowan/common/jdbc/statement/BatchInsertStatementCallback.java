@@ -47,7 +47,7 @@ public class BatchInsertStatementCallback implements PreparedStatementCallback<I
      * @throws DataAccessException 数据访问异常
      */
     @Override
-    public Integer doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
+    public Integer doInPreparedStatement(PreparedStatement ps) throws SQLException {
         try {
             int total = 0;
             int batchSize = pss.getBatchSize();
@@ -80,8 +80,7 @@ public class BatchInsertStatementCallback implements PreparedStatementCallback<I
 
             // 设置主键
             if (generateKeyCallback != null) {
-                ResultSet keyRs = ps.getGeneratedKeys();
-                if (keyRs != null) {
+                try (ResultSet keyRs = ps.getGeneratedKeys()) {
                     if (keyRs.next()) {
                         generateKeyCallback.call(i + 1, keyRs.getObject(1));
                     }
@@ -109,8 +108,7 @@ public class BatchInsertStatementCallback implements PreparedStatementCallback<I
 
         // 设置主键
         if (generateKeyCallback != null) {
-            ResultSet keyRs = ps.getGeneratedKeys();
-            if (keyRs != null) {
+            try (ResultSet keyRs = ps.getGeneratedKeys()) {
                 int i = 1;
                 while (keyRs.next()) {
                     generateKeyCallback.call(i++, keyRs.getObject(1));

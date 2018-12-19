@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.duowan.common.converter.ConverterContext;
 import com.duowan.common.exception.HttpInvokeException;
 import com.duowan.common.exception.HttpResponseConvertException;
+import com.duowan.common.util.HttpClientConstants;
 import com.duowan.common.util.Util;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -18,6 +20,8 @@ import java.util.Map;
  * @since 2018/11/21 14:18
  */
 public class HttpTextResponse extends AbstractHttpResponse {
+
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private String responseText;
 
@@ -52,7 +56,7 @@ public class HttpTextResponse extends AbstractHttpResponse {
     public String[] asStringArray(String separator) {
         String text = asText();
         if (null == text) {
-            return null;
+            return EMPTY_STRING_ARRAY;
         }
         return text.split(separator);
     }
@@ -89,25 +93,26 @@ public class HttpTextResponse extends AbstractHttpResponse {
         }
 
         JSONObject jsonObject = JSON.parseObject(json);
-        int status = jsonObject.getIntValue("status");
-        if (status == 200) {
-            return ConverterContext.convertOneObject(requireType, jsonObject, "data");
+        int status = jsonObject.getIntValue(HttpClientConstants.KEY_STATUS);
+        if (status == HttpClientConstants.STATUS_CODE_SUCCESS) {
+            return ConverterContext.convertOneObject(requireType, jsonObject, HttpClientConstants.KEY_DATA);
         }
-        throw new HttpResponseConvertException(status, jsonObject.getString("message"));
+        throw new HttpResponseConvertException(status, jsonObject.getString(HttpClientConstants.KEY_MESSAGE));
     }
 
+    @SuppressWarnings({"unchecked"})
     public <T> T[] asArrayForStdJsonResp(Class<T> requireType) {
         String json = asTrimText();
         if (Util.isBlank(json)) {
-            return null;
+            return (T[]) Array.newInstance(requireType, 0);
         }
 
         JSONObject jsonObject = JSON.parseObject(json);
-        int status = jsonObject.getIntValue("status");
-        if (status == 200) {
-            return ConverterContext.convertToArray(requireType, jsonObject, "data");
+        int status = jsonObject.getIntValue(HttpClientConstants.KEY_STATUS);
+        if (status == HttpClientConstants.STATUS_CODE_SUCCESS) {
+            return ConverterContext.convertToArray(requireType, jsonObject, HttpClientConstants.KEY_DATA);
         }
-        throw new HttpResponseConvertException(status, jsonObject.getString("message"));
+        throw new HttpResponseConvertException(status, jsonObject.getString(HttpClientConstants.KEY_MESSAGE));
     }
 
     public Map<String, Object> asMap() {
@@ -126,11 +131,11 @@ public class HttpTextResponse extends AbstractHttpResponse {
         }
 
         JSONObject jsonObject = JSON.parseObject(json);
-        int status = jsonObject.getIntValue("status");
-        if (status == 200) {
-            return jsonObject.getJSONObject("data");
+        int status = jsonObject.getIntValue(HttpClientConstants.KEY_STATUS);
+        if (status == HttpClientConstants.STATUS_CODE_SUCCESS) {
+            return jsonObject.getJSONObject(HttpClientConstants.KEY_DATA);
         }
-        throw new HttpResponseConvertException(status, jsonObject.getString("message"));
+        throw new HttpResponseConvertException(status, jsonObject.getString(HttpClientConstants.KEY_MESSAGE));
     }
 
 }

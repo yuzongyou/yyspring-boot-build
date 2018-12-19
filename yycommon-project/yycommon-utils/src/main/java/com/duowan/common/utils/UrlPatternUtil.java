@@ -9,7 +9,11 @@ import java.util.Set;
  *
  * @author Arvin
  */
-public abstract class UrlPatternUtil {
+public class UrlPatternUtil {
+
+    private UrlPatternUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 是否匹配， 支持通配符 * 和 正则表达式 匹配
@@ -29,10 +33,7 @@ public abstract class UrlPatternUtil {
         }
 
         for (String pattern : patterns) {
-            if (uri.equals(pattern)) {
-                return true;
-            }
-            if ("*".equals(pattern)) {
+            if (uri.equals(pattern) || "*".equals(pattern)) {
                 return true;
             }
             if (pattern.contains("*")) {
@@ -41,11 +42,8 @@ public abstract class UrlPatternUtil {
                     return true;
                 }
             }
-            try {
-                if (uri.matches(pattern)) {
-                    return true;
-                }
-            } catch (Exception ignored) {
+            if (uri.matches(pattern)) {
+                return true;
             }
         }
         return false;

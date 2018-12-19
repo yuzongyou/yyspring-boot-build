@@ -9,6 +9,10 @@ import java.lang.reflect.Field;
  */
 public class ReflectUtil {
 
+    private ReflectUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 获取属性实例
      *

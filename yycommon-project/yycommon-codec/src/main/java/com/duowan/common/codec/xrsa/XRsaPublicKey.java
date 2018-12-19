@@ -1,5 +1,6 @@
 package com.duowan.common.codec.xrsa;
 
+import com.duowan.common.codec.exception.CodecException;
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.KeyFactory;
@@ -27,7 +28,7 @@ public class XRsaPublicKey {
             X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(Base64.decodeBase64(publicKey));
             this.publicKey = (RSAPublicKey) keyFactory.generatePublic(x509KeySpec);
         } catch (Exception e) {
-            throw new RuntimeException("不支持的密钥", e);
+            throw new CodecException("不支持的密钥", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.duowan.common.codec.xrsa;
 
+import com.duowan.common.codec.exception.CodecException;
 import org.apache.commons.codec.binary.Base64;
 
 import java.security.KeyFactory;
@@ -28,7 +29,7 @@ public class XRsaPrivateKey {
             PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKey));
             this.privateKey = (RSAPrivateKey) keyFactory.generatePrivate(pkcs8KeySpec);
         } catch (Exception e) {
-            throw new RuntimeException("不支持的密钥", e);
+            throw new CodecException("不支持的密钥", e);
         }
     }
 

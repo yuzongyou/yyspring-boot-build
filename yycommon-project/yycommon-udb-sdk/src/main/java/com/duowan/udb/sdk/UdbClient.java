@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.duowan.common.exception.CodeException;
 import com.duowan.common.utils.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -18,7 +18,11 @@ import java.util.*;
  */
 public class UdbClient {
 
-    private static final Log logger = LogFactory.getLog(UdbClient.class);
+    private UdbClient() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UdbClient.class);
 
     /**
      * 根据微信 UnionId 获取用户 yyuid
@@ -77,11 +81,10 @@ public class UdbClient {
                 throw new CodeException(code, error);
             }
         } finally {
-            logger.info("unionId => yyuid: udbAppId=" + udbAppId + ", udbAppKey=" +
-                    udbAppKey + ", source=" +
-                    source + ", thirdSubSys=" +
-                    thirdSubSys + ", unionId=" +
-                    unionId + ", resp=" + StringUtils.trim(responseText) + ", url=" + url);
+            String trimResponseText = StringUtils.trim(responseText);
+            LOGGER.info("unionId => yyuid: udbAppId={}, udbAppKey={}, source={}, thirdSubSys={}, unionId={}, resp={}, url={}",
+                    udbAppId, udbAppKey, source, thirdSubSys, unionId, trimResponseText, url
+            );
         }
 
     }
@@ -100,6 +103,8 @@ public class UdbClient {
      */
     private static final String OAUTH_TYPE_ACCESS_TOKEN = "1";
 
+    private static final String KEY_RCODE = "rcode";
+
     /**
      * 使用微信 AccessToken 进行登录
      *
@@ -114,11 +119,11 @@ public class UdbClient {
 
         String udbLoginUrl = buildUdbXtokenLoginUrl(OAUTH_TYPE_ACCESS_TOKEN, accessToken, udbAppId, wxAppId, source, thirdSubSys);
 
-        logger.info("LOGIN-WX-UDB-TOKEN: " + udbLoginUrl);
+        LOGGER.info("LOGIN-WX-UDB-TOKEN: {}", udbLoginUrl);
 
         String response = HttpUtil.doPost(udbLoginUrl);
 
-        logger.info("LOGIN-WX-UDB-TOKEN-RESP: accessToken=" + accessToken + ", " + response);
+        LOGGER.info("LOGIN-WX-UDB-TOKEN-RESP: accessToken={}, {}", accessToken, response);
 
         return responseToLoginResult(accessToken, response);
 
@@ -128,7 +133,7 @@ public class UdbClient {
 
         Map<String, Object> map = JsonUtil.toObjectMap(response);
 
-        RCode rcode = RCode.get(ConvertUtil.toInteger(map.get("rcode"), RCode.ERR_ARG.getId()));
+        RCode rcode = RCode.get(ConvertUtil.toInteger(map.get(KEY_RCODE), RCode.ERR_ARG.getId()));
 
         boolean isSuccess = RCode.SUCCESS.equals(rcode);
 
@@ -148,7 +153,7 @@ public class UdbClient {
     }
 
     private static final Set<String> IGNORE_UDB_COOKIE_NAMES = new HashSet<>(Arrays.asList(
-            "sign", "tl", "rcode", "msg", "appid"
+            "sign", "tl", KEY_RCODE, "msg", "appid"
     ));
 
     /**
@@ -192,7 +197,7 @@ public class UdbClient {
      * @return 返回登录url
      */
     private static String buildUdbXtokenLoginUrl(String oauthType, String codeOrToken, String udbAppId, String wxAppId, String source, String thirdSubSys) {
-        Map<String, String> paramMap = new HashMap<String, String>(7);
+        Map<String, String> paramMap = new HashMap<>(7);
         paramMap.put("source", source);
         paramMap.put("third_sub_sys", thirdSubSys);
         paramMap.put("udb_appid", udbAppId);
@@ -202,8 +207,7 @@ public class UdbClient {
         paramMap.put("oauth_type", StringUtils.isBlank(oauthType) ? OAUTH_TYPE_ACCESS_CODE : OAUTH_TYPE_ACCESS_TOKEN);
 
         String urlParam = UrlUtil.toUrlParamsString(paramMap, true, false);
-        String url = UDB_LOGIN_URL + "?" + urlParam;
-        return url;
+        return UDB_LOGIN_URL + "?" + urlParam;
     }
 
     /**
@@ -267,7 +271,7 @@ public class UdbClient {
 
             String url = String.format(GET_AES_KEY_URL_TMPL, udbAppId);
 
-            logger.info("执行远程查询UDB AESKEY， appid=" + udbAppId + ", url=" + url);
+            LOGGER.info("执行远程查询UDB AESKEY， appid={}, url={}", udbAppId, url);
 
             String responseText = HttpUtil.doGet(url);
 
@@ -334,13 +338,15 @@ public class UdbClient {
         String responseText = null;
 
         try {
-            logger.info("UdbWxmpLogin start: " + paramString);
+            LOGGER.info("UdbWxmpLogin start: {}", paramString);
 
             responseText = HttpUtil.doPost(UDB_LOGIN_BY_WXMP_URL, paramsMap, null, 5000, 5000);
 
             return wxmpResponseToLoginResult(code, responseText);
         } finally {
-            logger.info("UdbWxmpLogin end: 耗时 " + (System.currentTimeMillis() - begTime) + " 毫秒 " + paramString + ", resp: " + CommonUtil.trim(responseText));
+            String trimResposneText = CommonUtil.trim(responseText);
+            LOGGER.info("UdbWxmpLogin end: 耗时 {} 毫秒 {}, resp={}",
+                    System.currentTimeMillis() - begTime, paramString, trimResposneText);
         }
 
     }
@@ -349,7 +355,7 @@ public class UdbClient {
 
         Map<String, Object> map = JsonUtil.toObjectMap(response);
 
-        RCode rcode = RCode.get(ConvertUtil.toInteger(map.get("rcode"), RCode.ERR_WXMP_WXUNKNOWN.getId()));
+        RCode rcode = RCode.get(ConvertUtil.toInteger(map.get(KEY_RCODE), RCode.ERR_WXMP_WXUNKNOWN.getId()));
 
         boolean isSuccess = RCode.SUCCESS.equals(rcode);
 

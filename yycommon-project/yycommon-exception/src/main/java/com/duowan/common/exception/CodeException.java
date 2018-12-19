@@ -8,10 +8,10 @@ public class CodeException extends RuntimeException {
     /**
      * 异常代码
      */
-    private int code = 500;
+    private final int code;
 
     public CodeException() {
-        super();
+        this(500);
     }
 
     public CodeException(int code) {
@@ -20,7 +20,7 @@ public class CodeException extends RuntimeException {
     }
 
     public CodeException(String message) {
-        super(message);
+        this(500, message);
     }
 
     public CodeException(int code, String message) {
@@ -29,7 +29,7 @@ public class CodeException extends RuntimeException {
     }
 
     public CodeException(String message, Throwable cause) {
-        super(message, cause);
+        this(500, message, cause);
     }
 
     public CodeException(int code, String message, Throwable cause) {
@@ -38,7 +38,7 @@ public class CodeException extends RuntimeException {
     }
 
     public CodeException(Throwable cause) {
-        super(cause);
+        this(500, cause);
     }
 
     public CodeException(int code, Throwable cause) {
@@ -47,7 +47,7 @@ public class CodeException extends RuntimeException {
     }
 
     public CodeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        this(500, message, cause, enableSuppression, writableStackTrace);
     }
 
     public CodeException(int code, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

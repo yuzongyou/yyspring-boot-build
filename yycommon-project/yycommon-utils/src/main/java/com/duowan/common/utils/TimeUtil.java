@@ -12,6 +12,10 @@ import java.util.List;
  */
 public class TimeUtil {
 
+    private TimeUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String UNIT_DAY = "d";
     public static final String UNIT_HOUR = "h";
     public static final String UNIT_MINUTE = "m";
@@ -156,11 +160,7 @@ public class TimeUtil {
 
         String regex = "(?i)^([0-9]+[dhms]?,)*([0-9]+[dhms]?)?$";
 
-        if (StringUtils.isBlank(intervals) || !intervals.matches(regex) || intervals.endsWith(",")) {
-            return false;
-        }
-
-        return true;
+        return !StringUtils.isBlank(intervals) && intervals.matches(regex) && !intervals.endsWith(",");
     }
 
     /**

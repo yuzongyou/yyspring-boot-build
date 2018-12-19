@@ -7,6 +7,10 @@ package com.duowan.common.dns.util;
  */
 public class JdkUtil {
 
+    private JdkUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static boolean isJava6;
     private static boolean isJava7;
     private static boolean isJava8;

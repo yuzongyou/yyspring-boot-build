@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class AttrLookupUtil {
 
+    private AttrLookupUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String lookupAttr(AttrLookupScope[] lookupScopes, HttpServletRequest request, String name) {
 
         if (null == lookupScopes || lookupScopes.length < 1) {

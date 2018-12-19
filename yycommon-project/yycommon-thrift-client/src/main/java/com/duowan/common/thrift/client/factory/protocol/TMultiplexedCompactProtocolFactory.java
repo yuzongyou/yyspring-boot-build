@@ -2,7 +2,6 @@ package com.duowan.common.thrift.client.factory.protocol;
 
 import com.duowan.common.thrift.client.ClientType;
 import com.duowan.common.thrift.client.config.TClientConfig;
-import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;

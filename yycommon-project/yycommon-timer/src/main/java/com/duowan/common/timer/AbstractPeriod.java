@@ -27,6 +27,7 @@ public abstract class AbstractPeriod implements Period {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             logger.error("周期Sleep出错： " + e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
     }
 

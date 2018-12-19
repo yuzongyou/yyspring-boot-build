@@ -1,6 +1,5 @@
 package com.duowan.common.httpclient;
 
-import com.duowan.common.exception.HttpInvokeException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -37,25 +36,24 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpClientUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpClientUtils.class);
+    private HttpClientUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientUtils.class);
 
     private static class Holder {
         /**
-         * 连接管理器
-         **/
-        private static PoolingHttpClientConnectionManager manager = null;
-
-        /**
          * http client 客户端
          **/
-        private static CloseableHttpClient HTTP_CLIENT_INSTANCE = null;
+        private static CloseableHttpClient closeableHttpClient = null;
 
         /**
          * 默认的请求配置信息
          **/
-        private static RequestConfig DEFAULT_REQUEST_CONFIG = null;
+        private static RequestConfig defaultRequestConfig = null;
 
-        private static boolean LOG_ENABLED;
+        private static boolean logEnabled;
 
         static {
             initialize();
@@ -80,13 +78,13 @@ public class HttpClientUtils {
             );
 
             HcConfig hcConfig = HcUtil.getConfig();
-            LOG_ENABLED = hcConfig.isLogEnabled();
+            logEnabled = hcConfig.isLogEnabled();
 
             // DNS 解析器
             DnsResolver dnsResolver = SystemDefaultDnsResolver.INSTANCE;
 
             // 创建连接池管理器
-            manager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, connFactory, dnsResolver);
+            PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager(socketFactoryRegistry, connFactory, dnsResolver);
 
             // 设置默认 socket 配置
             SocketConfig defaultSocketConfig = SocketConfig.custom().setTcpNoDelay(true).build();
@@ -102,7 +100,7 @@ public class HttpClientUtils {
             manager.setValidateAfterInactivity(hcConfig.getValidateAfterInactivity());
 
             // 默认的请求配置信息
-            DEFAULT_REQUEST_CONFIG = RequestConfig.custom()
+            defaultRequestConfig = RequestConfig.custom()
                     // 连接超时时间， 2秒
                     .setConnectTimeout(hcConfig.getConnectTimeout())
                     // 设置等待数据超时时间， 5秒
@@ -112,7 +110,7 @@ public class HttpClientUtils {
                     .build();
 
             // 创建 httpclient
-            HTTP_CLIENT_INSTANCE = HttpClients.custom()
+            closeableHttpClient = HttpClients.custom()
                     .setConnectionManager(manager)
                     // 连接池是否是共享模式
                     .setConnectionManagerShared(hcConfig.isConnectionManagerShared())
@@ -122,7 +120,7 @@ public class HttpClientUtils {
                     // 连接存活时间，如果不设置则根据长连接信息确定
                     .setConnectionTimeToLive(60, TimeUnit.SECONDS)
                     // 默认请求配置
-                    .setDefaultRequestConfig(DEFAULT_REQUEST_CONFIG)
+                    .setDefaultRequestConfig(defaultRequestConfig)
                     // 连接重用策略，即是否能 keepAlive
                     .setConnectionReuseStrategy(DefaultConnectionReuseStrategy.INSTANCE)
                     // 长连接配置， 获取长连接需要多少时间
@@ -132,62 +130,59 @@ public class HttpClientUtils {
                     .build();
 
             // JVM 停止或重启时，关闭连接池释放连接
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (null != HTTP_CLIENT_INSTANCE) {
-                            HTTP_CLIENT_INSTANCE.close();
-                        }
-                    } catch (Exception e) {
-                        logger.warn("释放 HttpClient 连接失败： " + e.getMessage(), e);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    if (null != closeableHttpClient) {
+                        closeableHttpClient.close();
                     }
+                } catch (Exception e) {
+                    LOGGER.warn("释放 HttpClient 连接失败： " + e.getMessage(), e);
                 }
             }));
         }
     }
 
     public static CloseableHttpClient getHttpClient() {
-        return Holder.HTTP_CLIENT_INSTANCE;
+        return Holder.closeableHttpClient;
     }
 
     public static RequestConfig getDefaultRequestConfig() {
-        return Holder.DEFAULT_REQUEST_CONFIG;
+        return Holder.defaultRequestConfig;
     }
 
     public static boolean isLogEnabled() {
-        return Holder.LOG_ENABLED;
+        return Holder.logEnabled;
     }
 
-    public static HcGetContext get(String url) throws HttpInvokeException {
-        return new HcGetContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
+    public static HcGetContext get(String url) {
+        return new HcGetContext(Holder.logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcPostContext post(String url) throws HttpInvokeException {
-        return new HcPostContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
+    public static HcPostContext post(String url) {
+        return new HcPostContext(Holder.logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcDeleteContext delete(String url) throws HttpInvokeException {
-        return new HcDeleteContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
+    public static HcDeleteContext delete(String url) {
+        return new HcDeleteContext(Holder.logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcPutContext put(String url) throws HttpInvokeException {
-        return new HcPutContext(Holder.LOG_ENABLED, url, getHttpClient(), getDefaultRequestConfig());
+    public static HcPutContext put(String url) {
+        return new HcPutContext(Holder.logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcGetContext get(boolean logEnabled, String url) throws HttpInvokeException {
+    public static HcGetContext get(boolean logEnabled, String url) {
         return new HcGetContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcPostContext post(boolean logEnabled, String url) throws HttpInvokeException {
+    public static HcPostContext post(boolean logEnabled, String url) {
         return new HcPostContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcDeleteContext delete(boolean logEnabled, String url) throws HttpInvokeException {
+    public static HcDeleteContext delete(boolean logEnabled, String url) {
         return new HcDeleteContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
-    public static HcPutContext put(boolean logEnabled, String url) throws HttpInvokeException {
+    public static HcPutContext put(boolean logEnabled, String url) {
         return new HcPutContext(logEnabled, url, getHttpClient(), getDefaultRequestConfig());
     }
 
@@ -348,13 +343,13 @@ public class HttpClientUtils {
     }
 
     public static String postText(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asText();
     }
 
     public static String postText(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asText();
     }
@@ -377,7 +372,7 @@ public class HttpClientUtils {
 
     public static <T> T postObjectForStdJsonResp(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
 
@@ -385,7 +380,7 @@ public class HttpClientUtils {
 
     public static <T> T postObjectForStdJsonResp(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObjectForStdJsonResp(requireType);
 
@@ -409,7 +404,7 @@ public class HttpClientUtils {
 
     public static <T> T postObject(boolean logEnabled, Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObject(requireType);
 
@@ -417,7 +412,7 @@ public class HttpClientUtils {
 
     public static <T> T postObject(Class<T> requireType, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asObject(requireType);
 
@@ -441,7 +436,7 @@ public class HttpClientUtils {
 
     public static Map<String, Object> postMap(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMap();
 
@@ -449,7 +444,7 @@ public class HttpClientUtils {
 
     public static Map<String, Object> postMap(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMap();
 
@@ -473,7 +468,7 @@ public class HttpClientUtils {
 
     public static Map<String, Object> postMapForStdJsonResp(boolean logEnabled, String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(logEnabled, url);
+        HcPostContext context = post(logEnabled, url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMapForStdJsonResp();
 
@@ -481,7 +476,7 @@ public class HttpClientUtils {
 
     public static Map<String, Object> postMapForStdJsonResp(String url, Map<String, String> paramMap, int connTimeout, int readTimeout) {
 
-        HcGetContext context = get(url);
+        HcPostContext context = post(url);
         context.config().setConnectTimeout(connTimeout).setConnectionRequestTimeout(readTimeout);
         return context.param(paramMap).responseText().asMapForStdJsonResp();
 

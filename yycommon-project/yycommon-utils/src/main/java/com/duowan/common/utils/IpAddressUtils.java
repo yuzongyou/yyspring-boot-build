@@ -22,9 +22,10 @@ public final class IpAddressUtils {
 
     private static final Pattern IP_PATTERN = Pattern.compile("^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}$");
     private static final Pattern PRIVATE_IP_PATTERN = Pattern.compile("127\\.0\\.0\\.1");
-    private static final Logger logger = LoggerFactory.getLogger(IpAddressUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IpAddressUtils.class);
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
-    // private static String localIp = doGetLocalIp();// 线上机器是将两个网卡绑定在一起的，故这种方式获取到的是127IP
+    /** 线上机器是将两个网卡绑定在一起的，故这种方式获取到的是127IP **/
     private static String localIp = getLocalIP(true);
 
     /**
@@ -91,34 +92,33 @@ public final class IpAddressUtils {
                 ip = getLinuxIpAddress();
             }
         } catch (UnknownHostException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
-        logger.info("The LocalIpAddress (1) Is {}", ip);
+        LOGGER.info("The LocalIpAddress (1) Is {}", ip);
         return ip;
     }
 
     private static String getLinuxIpAddress() {
         String ip = null;
         try {
-            Enumeration<NetworkInterface> interfaces = (Enumeration<NetworkInterface>) NetworkInterface.getNetworkInterfaces();
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
-                NetworkInterface ni = (NetworkInterface) interfaces.nextElement();
-//				if (ni.getName().equals("eth0")) {
+                NetworkInterface ni = interfaces.nextElement();
                 Enumeration<InetAddress> addresses = ni.getInetAddresses();
                 while (addresses.hasMoreElements()) {
-                    InetAddress address = (InetAddress) addresses.nextElement();
-                    if (address instanceof Inet6Address)
+                    InetAddress address = addresses.nextElement();
+                    if (address instanceof Inet6Address) {
                         continue;
+                    }
                     ip = address.getHostAddress();
-                    if (null == ip || !isIP(ip) || !isLoopbackIP(ip))
+                    if (null == ip || !isIP(ip) || !isLoopbackIP(ip)) {
                         continue;
+                    }
                     return ip;
                 }
-//					break;
-//				}
             }
         } catch (SocketException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return ip;
     }
@@ -136,18 +136,16 @@ public final class IpAddressUtils {
         try {
             return InetAddress.getByAddress(rawIP, addr);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
 
     public static byte[] textToNumericFormatV4(String paramString) {
         if (paramString.length() == 0) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
 
         byte[] arrayOfByte = new byte[4];
-        // String[] arrayOfString = paramString.split("\\.", -1);
         String[] arrayOfString = StringUtils.split(paramString, ".");
         try {
             long l;
@@ -156,7 +154,7 @@ public final class IpAddressUtils {
                 case 1:
                     l = Long.parseLong(arrayOfString[0]);
                     if ((l < 0L) || (l > 4294967295L))
-                        return null;
+                        return EMPTY_BYTE_ARRAY;
                     arrayOfByte[0] = (byte) (int) (l >> 24 & 0xFF);
                     arrayOfByte[1] = (byte) (int) ((l & 0xFFFFFF) >> 16 & 0xFF);
                     arrayOfByte[2] = (byte) (int) ((l & 0xFFFF) >> 8 & 0xFF);
@@ -165,11 +163,11 @@ public final class IpAddressUtils {
                 case 2:
                     l = Integer.parseInt(arrayOfString[0]);
                     if ((l < 0L) || (l > 255L))
-                        return null;
+                        return EMPTY_BYTE_ARRAY;
                     arrayOfByte[0] = (byte) (int) (l & 0xFF);
                     l = Integer.parseInt(arrayOfString[1]);
                     if ((l < 0L) || (l > 16777215L))
-                        return null;
+                        return EMPTY_BYTE_ARRAY;
                     arrayOfByte[1] = (byte) (int) (l >> 16 & 0xFF);
                     arrayOfByte[2] = (byte) (int) ((l & 0xFFFF) >> 8 & 0xFF);
                     arrayOfByte[3] = (byte) (int) (l & 0xFF);
@@ -178,12 +176,12 @@ public final class IpAddressUtils {
                     for (i = 0; i < 2; ++i) {
                         l = Integer.parseInt(arrayOfString[i]);
                         if ((l < 0L) || (l > 255L))
-                            return null;
+                            return EMPTY_BYTE_ARRAY;
                         arrayOfByte[i] = (byte) (int) (l & 0xFF);
                     }
                     l = Integer.parseInt(arrayOfString[2]);
                     if ((l < 0L) || (l > 65535L))
-                        return null;
+                        return EMPTY_BYTE_ARRAY;
                     arrayOfByte[2] = (byte) (int) (l >> 8 & 0xFF);
                     arrayOfByte[3] = (byte) (int) (l & 0xFF);
                     break;
@@ -191,15 +189,15 @@ public final class IpAddressUtils {
                     for (i = 0; i < 4; ++i) {
                         l = Integer.parseInt(arrayOfString[i]);
                         if ((l < 0L) || (l > 255L))
-                            return null;
+                            return EMPTY_BYTE_ARRAY;
                         arrayOfByte[i] = (byte) (int) (l & 0xFF);
                     }
                     break;
                 default:
-                    return null;
+                    return EMPTY_BYTE_ARRAY;
             }
         } catch (NumberFormatException localNumberFormatException) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         return arrayOfByte;
     }
@@ -219,7 +217,7 @@ public final class IpAddressUtils {
 
     private static String getLocalIP(boolean innerNet) {
         String ip = doGetLocalIP(innerNet);
-        logger.info("The LocalIpAddress (2) Is {}", ip);
+        LOGGER.info("The LocalIpAddress (2) Is {}", ip);
         return ip;
     }
 
@@ -238,20 +236,19 @@ public final class IpAddressUtils {
                 while (address.hasMoreElements()) {
                     InetAddress ip = address.nextElement();
                     String ipStr = ip.getHostAddress();
-                    if (ip.isAnyLocalAddress() //
+                    if (ip.isAnyLocalAddress()
                             || ip.isLinkLocalAddress() //
                             || ip.isLoopbackAddress() //
                             || ip.isMCNodeLocal() //
                             || ip.isMCLinkLocal() //
-                            || ip.isMCNodeLocal() //
                             || ip.isMCOrgLocal() //
                             || ip.isMCSiteLocal() //
                             || ip.isMulticastAddress() //
                             || ipStr.contains(":")) {// 以上都是：先把特殊的IP过滤掉
-                        continue;
                     } else if (ip.isSiteLocalAddress()) {// 内网IP
-                        if (innerNet)
+                        if (innerNet) {
                             return ipStr;
+                        }
                     } else {// 外网IP
                         return ipStr;
                     }

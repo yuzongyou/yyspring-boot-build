@@ -1,6 +1,8 @@
 package com.duowan.common.thrift.server.exporter;
 
 import org.apache.thrift.server.TServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Arvin
@@ -8,6 +10,8 @@ import org.apache.thrift.server.TServer;
  * @since 2018/9/21 14:30
  */
 public class ThriftExportThread extends Thread {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftExportThread.class);
 
     private final TServer server;
 
@@ -32,7 +36,10 @@ public class ThriftExportThread extends Thread {
         try {
             this.alive = false;
             server.stop();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 }

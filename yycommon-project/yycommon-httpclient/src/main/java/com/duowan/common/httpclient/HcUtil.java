@@ -1,6 +1,8 @@
 package com.duowan.common.httpclient;
 
 import com.duowan.common.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,7 +15,17 @@ import java.util.Properties;
  */
 public class HcUtil {
 
+    private HcUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HcUtil.class);
+
     private static class Holder {
+
+        private Holder() {
+            throw new IllegalStateException("Holder class");
+        }
 
         private static final HcConfig HC_CONFIG = loadHcConfig();
 
@@ -46,7 +58,9 @@ public class HcUtil {
                 fillHcConfig(hcConfig, properties);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
             }
 
             // 应用特定环境的配置
@@ -65,7 +79,9 @@ public class HcUtil {
                     properties.load(url.openStream());
                     fillHcConfig(hcConfig, properties);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(e.getMessage(), e);
+                    }
                 }
             }
 
@@ -131,10 +147,8 @@ public class HcUtil {
                 if (Util.isBlank(value)) {
                     value = System.getenv(key);
                 }
-                if (Util.isBlank(value)) {
-                    if (null != properties) {
-                        value = properties.getProperty(key);
-                    }
+                if (Util.isBlank(value) && null != properties) {
+                    value = properties.getProperty(key);
                 }
                 if (Util.isNotBlank(value)) {
                     return value;

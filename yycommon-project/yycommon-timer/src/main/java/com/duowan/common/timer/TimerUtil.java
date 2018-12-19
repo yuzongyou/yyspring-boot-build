@@ -18,7 +18,11 @@ import java.util.Map;
  */
 public class TimerUtil {
 
-    protected static final Logger logger = LoggerFactory.getLogger("TIMERLOG." + TimerUtil.class);
+    private TimerUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger("TIMERLOG." + TimerUtil.class);
 
     /**
      * 定时器Timer调度状态， 定时器标识 --> 是否调度
@@ -37,10 +41,10 @@ public class TimerUtil {
      * @param timer 定时器
      * @return 返回调度任务进行的线程列表
      */
-    public synchronized static List<Thread> scheduleTimerExecute(final Timer timer) {
+    public static synchronized List<Thread> scheduleTimerExecute(final Timer timer) {
 
         if (!timer.isEnabled()) {
-            logger.info("当前服务器[" + ServerUtil.getServerIp() + "]不启用定时器[" + timer.getClass().getSimpleName() + "]。");
+            LOGGER.info("当前服务器[{}]不启用定时器[{}]。", ServerUtil.getServerIp(), timer.getClass().getSimpleName());
             return new ArrayList<>();
         }
 
@@ -48,7 +52,7 @@ public class TimerUtil {
 
         Boolean hadScheduled = timerScheduledMap.get(timerId);
         if (hadScheduled != null && hadScheduled) {
-            logger.info("定时器[" + timerId + "]已被调度过，不进行重新调度！");
+            LOGGER.info("定时器[{}]已被调度过，不进行重新调度！", timerId);
             return timerThreadMap.get(timerId);
         }
 
@@ -93,7 +97,7 @@ public class TimerUtil {
     private static void executeTimer(Timer timer) {
         try {
 
-            logger.info("定时器[" + getTimerId(timer) + "]开始调度执行！");
+            LOGGER.info("定时器[{}]开始调度执行！", getTimerId(timer));
 
             final Delay delay = timer.getDelay();
             if (delay != null && delay.getDelayMillis() > 0) {
@@ -109,20 +113,26 @@ public class TimerUtil {
                 }
 
                 boolean isContinue = period.sleep();
-                try {
 
-                    timer.start();
+                doTimerStart(timer);
 
-                } catch (Throwable e) {
-                    logger.error(e.getMessage(), e);
-                }
                 if (!isContinue) {
                     break;
                 }
             }
 
         } catch (Exception e) {
-            logger.error("定时器[" + timer.getClass() + "]启动失败： " + e.getMessage(), e);
+            LOGGER.error("定时器[" + timer.getClass() + "]启动失败： " + e.getMessage(), e);
+        }
+    }
+
+    private static void doTimerStart(Timer timer) {
+        try {
+
+            timer.start();
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
     }
 }

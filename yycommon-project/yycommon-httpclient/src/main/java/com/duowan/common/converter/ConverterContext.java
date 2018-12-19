@@ -13,6 +13,10 @@ import java.util.List;
  */
 public class ConverterContext {
 
+    private ConverterContext() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static List<Converter> oneObjectConverterList = new ArrayList<>();
     private static List<ArrayConverter> arrayObjectConverterList = new ArrayList<>();
 

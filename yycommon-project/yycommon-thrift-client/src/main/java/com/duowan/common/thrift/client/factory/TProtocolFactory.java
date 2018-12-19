@@ -5,8 +5,6 @@ import com.duowan.common.thrift.client.config.TClientConfig;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TTransport;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

@@ -3,7 +3,11 @@ package com.duowan.common.utils;
 /**
  * @author Arvin
  */
-public abstract class PathUtil {
+public class PathUtil {
+
+    private PathUtil() {
+        
+    }
 
     /**
      * 合理化路径， 将 \\ 转成 /

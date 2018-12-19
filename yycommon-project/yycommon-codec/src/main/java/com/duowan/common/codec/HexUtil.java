@@ -7,13 +7,19 @@ package com.duowan.common.codec;
  */
 public class HexUtil {
 
+    private HexUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+
     public static byte[] hex2byte(String strhex) {
         if (strhex == null) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         int l = strhex.length();
         if (l % 2 != 0) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         byte[] b = new byte[l / 2];
         for (int i = 0; i != l / 2; i++) {
@@ -22,7 +28,7 @@ public class HexUtil {
         return b;
     }
 
-    public static String byte2hex(byte b[]) {
+    public static String byte2hex(byte[] b) {
         StringBuilder sb = new StringBuilder();
         for (int n = 0; n < b.length; n++) {
             String stmp = Integer.toHexString(b[n] & 0xff);

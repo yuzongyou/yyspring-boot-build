@@ -1,6 +1,6 @@
 package com.duowan.common.jdbc;
 
-import  com.duowan.common.jdbc.annotations.Column;
+import com.duowan.common.jdbc.annotations.Column;
 import com.duowan.common.utils.AssertUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;

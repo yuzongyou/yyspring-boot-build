@@ -6,7 +6,6 @@ import com.duowan.common.thrift.server.exporter.TThreadPoolServerExporter;
 import com.duowan.common.thrift.server.exporter.ThriftServiceExporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -27,12 +26,11 @@ public class ThriftExporterBeanFactoryPostProcessor implements BeanDefinitionReg
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     }
 
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 
         if (registry instanceof DefaultListableBeanFactory) {
             DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) registry;
@@ -94,7 +92,7 @@ public class ThriftExporterBeanFactoryPostProcessor implements BeanDefinitionReg
 
         String beanName = "defaultThriftServiceExporter";
 
-        logger.info("没有设置 ThriftServiceExporter， 注册默认的 ThriftServiceExporter [" + TThreadPoolServerExporter.class.getName() + "]");
+        logger.info("没有设置 ThriftServiceExporter， 注册默认的 ThriftServiceExporter [{}]", TThreadPoolServerExporter.class.getName());
 
         registry.registerBeanDefinition(beanName, beanDefinition);
 

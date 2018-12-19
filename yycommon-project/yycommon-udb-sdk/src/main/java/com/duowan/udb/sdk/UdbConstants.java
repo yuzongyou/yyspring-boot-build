@@ -5,6 +5,10 @@ package com.duowan.udb.sdk;
  */
 public class UdbConstants {
 
+    private UdbConstants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /** UDB Oauth 认证临时Token */
     public static final String COOKIE_UDB_OAUTH_TMP_TOKSN_SEC = "udboauthtmptokensec";
 

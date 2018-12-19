@@ -15,9 +15,8 @@ import com.duowan.thrift.service.HiService;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.concurrent.Executors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Arvin

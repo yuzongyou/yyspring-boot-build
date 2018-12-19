@@ -1,6 +1,7 @@
 package com.duowan.common.thrift.client.loadbalancer;
 
 import com.duowan.common.thrift.client.config.ThriftServerNode;
+import com.duowan.common.thrift.client.exception.ThriftClientException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public abstract class AbstractLoadBalancer implements LoadBalancer {
     private void appendServerNodes(List<ThriftServerNode> serverNodes) {
         List<ThriftServerNode> nodes = new ArrayList<>(serverNodes);
         if (serverNodes == null || serverNodes.isEmpty()) {
-            throw new RuntimeException("None thrift nodes need append!");
+            throw new ThriftClientException("None thrift nodes need append!");
         }
         nodes.addAll(serverNodes);
         this.serverNodes = new CopyOnWriteArrayList<>(serverNodes);

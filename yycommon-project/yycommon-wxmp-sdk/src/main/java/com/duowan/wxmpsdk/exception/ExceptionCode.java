@@ -5,8 +5,14 @@ package com.duowan.wxmpsdk.exception;
  * @version 1.0
  * @since 2018/9/30 8:54
  */
-public interface ExceptionCode {
+public class ExceptionCode {
 
-    /** Code 换取 Session 失败 **/
-    int ERROR_CODE_TO_SESSION = 20001;
+    private ExceptionCode() {
+        throw new IllegalStateException("Constants class");
+    }
+
+    /**
+     * Code 换取 Session 失败
+     **/
+    public static final int ERROR_CODE_TO_SESSION = 20001;
 }

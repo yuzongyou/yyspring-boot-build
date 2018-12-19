@@ -2,14 +2,10 @@ package com.duowan.yyspringboot.autoconfigure.thriftclient;
 
 import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.factory.protocol.TBinaryProtocolFactory;
-import com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProtocolFactory;
-import com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory;
 import com.duowan.common.thrift.client.factory.transport.TSocketTransportFactory;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
 
 /**
  * @author Arvin

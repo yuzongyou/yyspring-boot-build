@@ -14,10 +14,14 @@ import java.util.Set;
  */
 public abstract class ViewUtil {
 
+    private ViewUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * Javascript 变量名称正则表达式
      */
-    private static String JAVASCRIPT_VAR_REGEX = "(?i)^[a-z][a-zA-Z0-9_\\.]*$";
+    private static final String JAVASCRIPT_VAR_REGEX = "(?i)^[a-z][a-zA-Z0-9_\\.]*$";
 
     /**
      * 搜索指定参数名称的值
@@ -52,10 +56,8 @@ public abstract class ViewUtil {
 
         String callback = lookupByVars(request, WebContext.getJsonpCallbackVars());
 
-        if (StringUtils.isNotBlank(callback)) {
-            if (callback.trim().matches(JAVASCRIPT_VAR_REGEX)) {
-                return callback.trim();
-            }
+        if (StringUtils.isNotBlank(callback) && callback.trim().matches(JAVASCRIPT_VAR_REGEX)) {
+            return callback.trim();
         }
 
         return null;
@@ -124,10 +126,8 @@ public abstract class ViewUtil {
     public static String lookupJavascriptVar(HttpServletRequest request) {
         String javascriptVar = lookupByVars(request, WebContext.getJavascriptVars());
 
-        if (StringUtils.isNotBlank(javascriptVar)) {
-            if (javascriptVar.trim().matches(JAVASCRIPT_VAR_REGEX)) {
-                return javascriptVar.trim();
-            }
+        if (StringUtils.isNotBlank(javascriptVar) && javascriptVar.trim().matches(JAVASCRIPT_VAR_REGEX)) {
+            return javascriptVar.trim();
         }
 
         return null;

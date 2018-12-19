@@ -13,14 +13,22 @@ import java.util.Map;
  */
 public class I18nHelper {
 
+    private I18nHelper() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final LangResolver DEFAULT_LANG_RESOLVER = new DefaultLangResolver();
 
     private static LangResolver langResolver;
 
-    /** 语言 --> 消息映射 **/
+    /**
+     * 语言 --> 消息映射
+     **/
     private static Map<String, Map<String, String>> langMessageMap = new HashMap<>();
 
-    /** 默认的消息映射 **/
+    /**
+     * 默认的消息映射
+     **/
     private static Map<String, String> defaultMessageMap = new HashMap<>();
 
     public static LangResolver getLangResolver() {
@@ -56,7 +64,6 @@ public class I18nHelper {
      * @return 返回适配后的信息
      */
     public static String adapter(String lang, String message) {
-        // TODO lang message adapter
         return message;
     }
 

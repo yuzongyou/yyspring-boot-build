@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author xiajiqiu
@@ -18,7 +21,9 @@ import java.util.Map;
  */
 public class InnerIpServiceImpl implements InnerIpService {
 
-    private static final Logger logger = LoggerFactory.getLogger(InnerIpServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InnerIpServiceImpl.class);
+
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * 默认办公网IP获取地址
@@ -84,28 +89,21 @@ public class InnerIpServiceImpl implements InnerIpService {
     /**
      * 初始化
      */
-    public void init() throws Exception {
+    public void init() {
         try {
             initBySync();
-        } catch (Exception e) {
-            throw e;
         } finally {
             // 没有调度执行，调度任务刷新缓存
             if (!hadScheduled) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            try {
-                                Thread.sleep(getRefreshInterval() * 1000);
-
-                                initBySync();
-
-                            } catch (Exception ignored) {
-                            }
+                scheduledExecutorService.scheduleAtFixedRate(() -> {
+                    try {
+                        initBySync();
+                    } catch (Exception e) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug(e.getMessage(), e);
                         }
                     }
-                }).start();
+                }, 0L, getRefreshInterval() * 1000L, TimeUnit.MILLISECONDS);
 
                 hadScheduled = true;
             }
@@ -116,31 +114,30 @@ public class InnerIpServiceImpl implements InnerIpService {
     /**
      * 同步初始化
      *
-     * @throws Exception 任何异常
      */
-    private void initBySync() throws Exception {
+    private void initBySync() {
 
         long begTime = System.currentTimeMillis();
-        logger.info("正在刷新办公网IP");
+        LOGGER.info("正在刷新办公网IP");
 
         String responseText = HttpUtil.doGet(officialUrl);
 
         String[] lines = responseText.split("[\r\n]+");
 
-        Map<String, OfficialIp> officialIpMap = new HashMap<>(lines.length);
+        Map<String, OfficialIp> tempOfficialIpMap = new HashMap<>(lines.length);
 
         OfficialIpParser parser = getOfficialIpParser();
 
         for (String line : lines) {
             OfficialIp officialIp = parser.parse(line);
             if (null != officialIp) {
-                officialIpMap.put(StringUtils.trim(officialIp.getIp()), officialIp);
+                tempOfficialIpMap.put(StringUtils.trim(officialIp.getIp()), officialIp);
             }
         }
 
-        this.officialIpMap = officialIpMap;
+        this.officialIpMap = tempOfficialIpMap;
 
-        logger.info("完成一次办公网IP刷新，耗时 " + (System.currentTimeMillis() - begTime));
+        LOGGER.info("完成一次办公网IP刷新，耗时 {}", (System.currentTimeMillis() - begTime));
 
     }
 

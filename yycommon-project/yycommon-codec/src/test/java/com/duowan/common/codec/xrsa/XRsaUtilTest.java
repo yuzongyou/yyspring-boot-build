@@ -7,8 +7,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Arvin
  * @version 1.0

@@ -7,6 +7,7 @@ import com.duowan.udb.sdk.UdbConstants;
 import com.duowan.udb.security.UdbLoginBox;
 import com.duowan.udb.security.UdbSecurityConstants;
 import com.duowan.udb.security.annotations.IgnoredUdbCheck;
+import com.duowan.udb.security.exception.UdbSecurityException;
 import com.duowan.udb.util.CookieUtils;
 import com.duowan.udb.util.codec.AESHelper;
 import com.duowan.universal.login.BasicCredentials;
@@ -39,7 +40,7 @@ import java.util.Set;
 @IgnoredUdbCheck
 public class UdbSecurityController {
 
-    private static final Logger logger = LoggerFactory.getLogger(UdbSecurityController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UdbSecurityController.class);
 
     private final String udbAppId;
     private final String udbAppKey;
@@ -59,11 +60,6 @@ public class UdbSecurityController {
         String callbackURL = request.getParameter("callbackURL");
         String denyCallbackURL = request.getParameter("denyCallbackURL");
 
-        // TODO XSS Check
-
-//        XssUtil.checkUrl(callbackURL);
-//        XssUtil.checkUrl(denyCallbackURL);
-
         PrintWriter out = response.getWriter();
         String json = null;
 
@@ -75,7 +71,7 @@ public class UdbSecurityController {
             String tmpTokenSecret = duowan.getTokenSecret();
             tmpTokenSecret = AESHelper.encrypt(tmpTokenSecret, udbAppKey);
 
-            logger.info(String.format("entoken:%s,detoken:%s", tmpTokenSecret, AESHelper.decrypt(tmpTokenSecret, udbAppKey)));
+            LOGGER.info("entoken:{},detoken:{}", tmpTokenSecret, duowan.getTokenSecret());
 
             URL redirectURL = duowan.getAuthorizationURL();
             String url = redirectURL.toExternalForm() + "&denyCallbackURL=" + UrlUtil.encodeUrl(denyCallbackURL) + "&UIStyle=qlogin";
@@ -83,12 +79,12 @@ public class UdbSecurityController {
             json = String.format("{\"success\": \"1\",\"url\": \"%s\",\"ttokensec\": \"%s\"}", url, tmpTokenSecret);
 
         } catch (Exception e) {
-            System.err.println("callbackURL:" + callbackURL);
-            System.err.println("denyCallbackURL:" + denyCallbackURL);
-            logger.warn(e.getMessage(), e);
-            throw new RuntimeException(e);
+            LOGGER.info("callbackURL: {}", callbackURL);
+            LOGGER.info("denyCallbackURL: {}", denyCallbackURL);
+            LOGGER.warn(e.getMessage(), e);
+            throw new UdbSecurityException(e);
         } finally {
-            logger.info("json=" + json);
+            LOGGER.info("json={}", json);
             out.append(json);
             out.flush();
             out.close();
@@ -99,8 +95,6 @@ public class UdbSecurityController {
     public void callback(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         String url = request.getParameter("url");
-        // TODO XSS check
-//        XssUtil.checkUrl(url);
 
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
@@ -118,11 +112,11 @@ public class UdbSecurityController {
         } else {
             try {
                 // 验证服务端信息，并且返回流数据
-                String data = this.validate(url, request, response);
+                String data = this.validate(url, request);
                 out.append(data);
             } catch (Exception e) {
-                logger.warn(e.getMessage(), e);
-                throw new RuntimeException(e);
+                LOGGER.warn(e.getMessage(), e);
+                throw new UdbSecurityException(e);
             }
         }
         out.append("</body></html>");
@@ -130,7 +124,7 @@ public class UdbSecurityController {
         out.close();
     }
 
-    protected String validate(String url, HttpServletRequest request, HttpServletResponse response) {
+    protected String validate(String url, HttpServletRequest request) {
 
         // 服务端返回的信息
         String oauthToken = request.getParameter(OAuthHeaderNames.TOKEN_KEY);
@@ -143,8 +137,8 @@ public class UdbSecurityController {
             tokenSecret = AESHelper.decrypt(tokenSecretCookie, udbAppKey);
         }
 
-        logger.info((String.format("[token:%s,tokenSecret:%s,verifierCode:%s,usernmae:%s]",
-                oauthToken, tokenSecret, oauthVerifier, username)));
+        LOGGER.info("[token:{},tokenSecret:{},verifierCode:{},usernmae:{}]",
+                oauthToken, tokenSecret, oauthVerifier, username);
 
         // 校验下
         AssertUtil.assertNotBlank(tokenSecret, "验证出错.tokenSecret为空");
@@ -156,14 +150,14 @@ public class UdbSecurityController {
         Credentials cc = new BasicCredentials(udbAppId, udbAppKey);
         UniversalLoginClient duowan = new UniversalLoginClient(cc);
 
-        logger.info("oauth_token:" + oauthToken + " tokenSecret:" + tokenSecret + " oauth_verifier:" + oauthVerifier);
+        LOGGER.info("oauth_token:{} tokenSecret:{} oauth_verifier:{}", oauthToken, tokenSecret, oauthVerifier);
         String[] accessToken = duowan.getAccessToken(oauthToken, tokenSecret, oauthVerifier);
 
         String yyuid = duowan.getYyuid(accessToken[0]);
-        logger.info(String.format("[token:%s,tokenSecret:%s]", accessToken[0], accessToken[1]));
+        LOGGER.info("[token:{},tokenSecret:{}]", accessToken[0], accessToken[1]);
         // 存储token信息，udb不负责token信息的存储
 
-        List<String> reqDomainList = new LinkedList<String>();
+        List<String> reqDomainList = new LinkedList<>();
         reqDomainList.add(UniversalLoginClient.CookieDomainEnum.DUOWAN_DOMAIN);
         reqDomainList.add(UniversalLoginClient.CookieDomainEnum.YY_DOMAIN);
         reqDomainList.add(UniversalLoginClient.CookieDomainEnum.KUAIKUAI_DOMAIN);
@@ -171,7 +165,7 @@ public class UdbSecurityController {
 
         String writeCookieURL = duowan.getWriteCookieURL(accessToken[0], yyuid, reqDomainList);
 
-        logger.info(String.format("[writeCookieURL:%s]", writeCookieURL));
+        LOGGER.info("[writeCookieURL:{}]", writeCookieURL);
 
         return new StringBuilder().append("<script language=\"JavaScript\" type=\"text/javascript\">function udb_callback(){self.parent.UDB.sdk.PCWeb.writeCrossmainCookieWithCallBack('")
                 .append(writeCookieURL)
@@ -197,7 +191,10 @@ public class UdbSecurityController {
         try {
             HttpSession session = request.getSession();
             session.invalidate();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 
@@ -229,7 +226,10 @@ public class UdbSecurityController {
                     response.addCookie(cookie);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 

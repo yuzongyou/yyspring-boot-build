@@ -1,6 +1,7 @@
 package com.duowan.yyspringboot.autoconfigure.alarm;
 
 import com.duowan.common.alarm.Alarm;
+import com.duowan.common.utils.CommonUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,7 +25,7 @@ public class AlarmAutoConfigurationTest {
     }
 
     @Test
-    public void testAlarm() throws InterruptedException {
+    public void testAlarm() {
 
         Alarm.alarm("test_alarm", "WarnTest");
         Alarm.alarm("WarnTest");
@@ -32,7 +33,7 @@ public class AlarmAutoConfigurationTest {
         Logger logger = LoggerFactory.getLogger("TESTLOG");
         logger.error("ErrorLogTest");
 
-        Thread.sleep(1000);
+        CommonUtil.sleep(1000);
     }
 
 }

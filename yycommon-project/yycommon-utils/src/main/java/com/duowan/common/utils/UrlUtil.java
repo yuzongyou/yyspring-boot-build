@@ -15,6 +15,10 @@ import java.util.*;
  */
 public class UrlUtil {
 
+    private UrlUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
     public static final String PROTOCOL_HTTPS = "https";
     public static final String PROTOCOL_HTTP = "http";
 
@@ -22,9 +26,6 @@ public class UrlUtil {
 
     private static final String QUERY_PARAM_SEPARATOR = "&";
     private static final String QUERY_PARAM_NAME_VALUE_SEPARATOR = "=";
-
-    private UrlUtil() {
-    }
 
     /**
      * 根据参数名获取请求地址中的参数值
@@ -42,13 +43,11 @@ public class UrlUtil {
             String rawQuery = uri.getRawQuery();
             for (String part : rawQuery.split(QUERY_PARAM_SEPARATOR)) {
                 String[] array = part.split(QUERY_PARAM_NAME_VALUE_SEPARATOR);
-                if (array.length >= 1) {
-                    if (paramName.equals(array[0])) {
-                        if (array.length == 1) {
-                            return "";
-                        }
-                        return array[1];
+                if (array.length >= 1 && paramName.equals(array[0])) {
+                    if (array.length == 1) {
+                        return "";
                     }
+                    return array[1];
                 }
             }
 
@@ -107,7 +106,7 @@ public class UrlUtil {
                 return "";
             }
             while (url.matches(HTTP_URL_ENCODE_REGEX)) {
-                url = URLDecoder.decode(url, "UTF-8");
+                url = URLDecoder.decode(url, Encodings.DEFAULT_ENCODING);
             }
             return url;
         } catch (Exception e) {
@@ -127,10 +126,10 @@ public class UrlUtil {
                 return "";
             }
             String curVal = paramValue;
-            String nextVal = URLDecoder.decode(curVal, "UTF-8");
+            String nextVal = URLDecoder.decode(curVal, Encodings.DEFAULT_ENCODING);
             while (!curVal.equals(nextVal) && paramValue.contains("%")) {
                 curVal = nextVal;
-                nextVal = URLDecoder.decode(curVal, "UTF-8");
+                nextVal = URLDecoder.decode(curVal, Encodings.DEFAULT_ENCODING);
             }
             return nextVal;
         } catch (Exception e) {
@@ -160,7 +159,7 @@ public class UrlUtil {
             String value = decodeUrl(url);
             int encodeTimes = 0;
             while (encodeTimes < times) {
-                value = URLEncoder.encode(value, "UTF-8");
+                value = URLEncoder.encode(value, Encodings.DEFAULT_ENCODING);
                 encodeTimes++;
             }
             return value;
@@ -191,7 +190,7 @@ public class UrlUtil {
             String value = decodeParamValue(paramValue);
             int encodeTimes = 0;
             while (encodeTimes < times) {
-                value = URLEncoder.encode(value, "UTF-8");
+                value = URLEncoder.encode(value, Encodings.DEFAULT_ENCODING);
                 encodeTimes++;
             }
             return value;
@@ -208,8 +207,8 @@ public class UrlUtil {
      */
     public static String[] splitByHashData(String url) {
         final String[] array = new String[]{url, ""};
-        int index = url.indexOf("?");
-        int indexHash = url.indexOf("#");
+        int index = url.indexOf('?');
+        int indexHash = url.indexOf('#');
         if (indexHash > index) {
             array[1] = url.substring(indexHash);
             array[0] = url.substring(0, indexHash);
@@ -308,7 +307,7 @@ public class UrlUtil {
         if (params == null || params.isEmpty()) {
             return builder.toString();
         }
-        List<String> keys = new ArrayList<String>(params.keySet());
+        List<String> keys = new ArrayList<>(params.keySet());
 
         if (sortKeys) {
             Collections.sort(keys);

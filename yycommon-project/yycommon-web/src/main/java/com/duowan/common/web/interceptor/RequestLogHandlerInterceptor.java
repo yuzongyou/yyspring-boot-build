@@ -54,7 +54,7 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
                 return true;
             }
         } catch (Exception e) {
-            logger.info("Log request check failed: " + e.getMessage());
+            logger.info("Log request check failed: {}", e.getMessage());
         }
         return true;
     }
@@ -143,16 +143,18 @@ public class RequestLogHandlerInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         try {
             Object obj = request.getAttribute(REQ_INFO_KEY);
             if (obj instanceof ReqInfo) {
                 ReqInfo reqInfo = (ReqInfo) obj;
                 long takeTime = System.currentTimeMillis() - reqInfo.startTime;
-                logger.info("Req: takeTime=" + takeTime + ", info=" + JsonUtil.toJson(reqInfo.reqInfoMap, false) + (ex == null ? "" : ", error=" + ex.getMessage()));
+                String reqInfoString = JsonUtil.toJson(reqInfo.reqInfoMap, false);
+                String errorMessage = ex == null ? "" : ", error=" + ex.getMessage();
+                logger.info("Req: takeTime={}, info={}, {}", takeTime, reqInfoString, errorMessage);
             }
         } catch (Exception e) {
-            logger.warn("Log request info error: " + e.getMessage());
+            logger.warn("Log request info error: {}", e.getMessage());
         }
     }
 }

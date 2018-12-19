@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 处理默认 ResponseBody 和 RestController 标注的异常处理方法
@@ -16,10 +17,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewResolver {
 
-    public ResponseBodyExceptionViewResolver() {
+    public ResponseBodyExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList) {
+        super(errorMessageReaderList);
     }
 
-    public ResponseBodyExceptionViewResolver(boolean logException) {
+    public ResponseBodyExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList, boolean logException) {
+        super(errorMessageReaderList);
         this.setLogException(logException);
     }
 
@@ -33,25 +36,16 @@ public class ResponseBodyExceptionViewResolver extends AbstractExceptionViewReso
 
         RestController restControllerAnn = handlerMethod.getBeanType().getAnnotation(RestController.class);
 
-        if (null != restControllerAnn) {
-            return true;
-        }
+        return null != restControllerAnn;
 
-        return false;
     }
 
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Exception ex) {
         if (ex != null) {
-            int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex);
-            String logInfo = "处理请求异常，默认返回 JsonView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
-            if (logException) {
-                logger.warn(logInfo, ex);
-            } else {
-                logger.warn(logInfo);
-            }
-            return new JsonView(errorCode, errorMessage);
+
+            ErrorMessage errorMessage = getErrorMessage(ex);
+            return new JsonView(errorMessage.getErrorCode(), errorMessage.getMessage());
         }
 
         return null;

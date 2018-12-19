@@ -13,10 +13,12 @@ import java.util.*;
  */
 public class BeanNamesThriftServiceSearcher implements ThriftServiceSearcher {
 
+    private static final Set<String> EMPTY_BEAN_NAMES = new HashSet<>(0);
+
     private final Set<String> beanNames;
 
     public BeanNamesThriftServiceSearcher(Collection<String> beanNames) {
-        this.beanNames = beanNames == null ? new HashSet<String>() : new HashSet<>(beanNames);
+        this.beanNames = beanNames == null ? EMPTY_BEAN_NAMES : new HashSet<>(beanNames);
     }
 
     @Override

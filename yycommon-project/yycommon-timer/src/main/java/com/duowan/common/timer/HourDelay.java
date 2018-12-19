@@ -11,7 +11,7 @@ public class HourDelay implements Delay {
     private final long milliseconds;
 
     public HourDelay(int hour) {
-        this.milliseconds = hour * 60 * 60 * 1000;
+        this.milliseconds = hour * 60 * 60 * 1000L;
     }
 
     @Override

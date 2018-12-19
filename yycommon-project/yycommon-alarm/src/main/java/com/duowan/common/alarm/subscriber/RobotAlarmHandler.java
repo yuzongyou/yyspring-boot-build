@@ -1,9 +1,9 @@
 package com.duowan.common.alarm.subscriber;
 
+import com.duowan.common.alarm.event.RobotAlarmEvent;
 import com.duowan.common.utils.HttpUtil;
 import com.duowan.common.utils.IpAddressUtils;
 import com.duowan.common.utils.RetryUtil;
-import com.duowan.common.alarm.event.RobotAlarmEvent;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

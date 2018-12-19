@@ -99,8 +99,6 @@ public class PerMonthEndPeriod extends AbstractPeriod {
 
         long diff = curMonthExecutePoint - System.currentTimeMillis();
 
-        System.out.println("1   " + diff);
-
         if (diff > 0) {
             // 当月执行时间点还没有到，直接返回要Sleep的时间毫秒数
             return diff;

@@ -5,11 +5,15 @@ package com.duowan.wxmpsdk.client;
  * @version 1.0
  * @since 2018/9/29 17:17
  */
-public interface RetField {
+public class RetField {
 
-    String SESSION_KEY = "session_key";
-    String OPENID = "openid";
-    String UNIONID = "unionid";
-    String ERROR_CODE = "errcode";
-    String ERROR_MSG = "errMsg";
+    private RetField() {
+        throw new IllegalStateException("Constants class");
+    }
+
+    public static final String SESSION_KEY = "session_key";
+    public static final String OPENID = "openid";
+    public static final String UNIONID = "unionid";
+    public static final String ERROR_CODE = "errcode";
+    public static final String ERROR_MSG = "errMsg";
 }

@@ -39,7 +39,7 @@ public class AdmincenterInterceptorService extends HandlerInterceptorAdapter imp
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (!privilegeContext.needCheckPrivilege()) {
             return true;
         }
@@ -49,7 +49,7 @@ public class AdmincenterInterceptorService extends HandlerInterceptorAdapter imp
             throw new NoPrivilegeException();
         }
         if (!hasPrivilege(username, request, response, handler)) {
-            logger.warn("用户[" + username + "] 没有权限操作[" + request.getRequestURI() + "]");
+            logger.warn("用户[{}] 没有权限操作[{}]", username, request.getRequestURI());
             throw new NoPrivilegeException();
         }
         return true;
@@ -131,7 +131,9 @@ public class AdmincenterInterceptorService extends HandlerInterceptorAdapter imp
                 return true;
             }
 
-            if (null != handlerMethod.getMethodAnnotation(NoPrivilege.class)) {
+            NoPrivilege noPrivilege = handlerMethod.getMethodAnnotation(NoPrivilege.class);
+
+            if (null != noPrivilege) {
                 return true;
             }
 

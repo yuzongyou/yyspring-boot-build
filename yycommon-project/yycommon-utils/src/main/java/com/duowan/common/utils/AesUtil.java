@@ -25,6 +25,10 @@ import java.security.Key;
  */
 public class AesUtil {
 
+    private AesUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * use password to encrypt content by AES(128bit).
      *
@@ -58,23 +62,24 @@ public class AesUtil {
         }
     }
 
-    private static final int maxSize = 100;
-    private static final Object elockObj = new Object();
-    private static final Object dlockObj = new Object();
-    private static LRUMap cacheEncryptCipher = new LRUMap(maxSize);
-    private static LRUMap cacheDecryptCipher = new LRUMap(maxSize);
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+    private static final int MAX_SIZE = 100;
+    private static final Object ELOCK_OBJ = new Object();
+    private static final Object DLOCK_OBJ = new Object();
+    private static LRUMap cacheEncryptCipher = new LRUMap(MAX_SIZE);
+    private static LRUMap cacheDecryptCipher = new LRUMap(MAX_SIZE);
 
     private static Cipher getEncryptCipher(String password) {
         try {
             Cipher cp = null;
-            synchronized (elockObj) {
+            synchronized (ELOCK_OBJ) {
                 cp = (Cipher) cacheEncryptCipher.get(password);
             }
             if (cp == null) {
                 Key key = getKey(password);
                 cp = Cipher.getInstance("AES");
                 cp.init(Cipher.ENCRYPT_MODE, key);
-                synchronized (elockObj) {
+                synchronized (ELOCK_OBJ) {
                     cacheEncryptCipher.put(password, cp);
                 }
             }
@@ -87,14 +92,14 @@ public class AesUtil {
     private static Cipher getDecryptCipher(String password) {
         try {
             Cipher cp = null;
-            synchronized (dlockObj) {
+            synchronized (DLOCK_OBJ) {
                 cp = (Cipher) cacheDecryptCipher.get(password);
             }
             if (cp == null) {
                 Key key = getKey(password);
                 cp = Cipher.getInstance("AES");
                 cp.init(Cipher.DECRYPT_MODE, key);
-                synchronized (dlockObj) {
+                synchronized (DLOCK_OBJ) {
                     cacheDecryptCipher.put(password, cp);
                 }
             }
@@ -119,11 +124,11 @@ public class AesUtil {
 
     public static byte[] hex2byte(String strhex) {
         if (strhex == null) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         int l = strhex.length();
         if (l % 2 != 0) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         byte[] b = new byte[l / 2];
         for (int i = 0; i != l / 2; i++) {
@@ -132,7 +137,7 @@ public class AesUtil {
         return b;
     }
 
-    public static String byte2hex(byte b[]) {
+    public static String byte2hex(byte[] b) {
         StringBuilder sb = new StringBuilder();
         for (int n = 0; n < b.length; n++) {
             String stmp = Integer.toHexString(b[n] & 0xff);

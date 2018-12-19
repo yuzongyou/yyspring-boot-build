@@ -37,7 +37,7 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
         if (WebApplicationType.REACTIVE.equals(webApplicationType) || WebApplicationType.SERVLET.equals(webApplicationType)) {
             if (AppContext.isDev()) {
                 WebPrepareUtil.prepareStaticResourceLocations(AppContext.getEnvironment(), AppContext.getModuleDir());
-                WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getEnvironment(), AppContext.getModuleDir());
+                WebPrepareUtil.prepareThymeleafDevConfig(AppContext.getModuleDir());
             }
         } else {
             needAutoConfigurer = false;

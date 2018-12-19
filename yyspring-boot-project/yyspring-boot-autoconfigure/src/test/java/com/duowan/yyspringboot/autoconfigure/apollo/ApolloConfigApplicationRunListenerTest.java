@@ -4,7 +4,6 @@ import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
-import com.duowan.yyspringboot.autoconfigure.virtualdns.VirtualDnsAutoConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,7 +19,11 @@ import java.net.URLConnection;
  */
 public class DownloadUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(DownloadUtil.class);
+    private DownloadUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadUtil.class);
 
     /**
      * 下载文件
@@ -36,16 +40,15 @@ public class DownloadUtil {
         try {
             url = new URL(uri);
         } catch (MalformedURLException e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             return false;
         }
 
         InputStream inStream = null;
-        FileOutputStream fs = null;
-        try {
+        try (FileOutputStream fs = new FileOutputStream(saveFile)) {
             URLConnection conn = url.openConnection();
             inStream = conn.getInputStream();
-            fs = new FileOutputStream(saveFile);
+
 
             byte[] buffer = new byte[1204];
             while ((byteread = inStream.read(buffer)) != -1) {
@@ -54,19 +57,16 @@ public class DownloadUtil {
             }
             return true;
         } catch (IOException e) {
-            logger.warn(e.getMessage());
+            LOGGER.warn(e.getMessage(), e);
             return false;
         } finally {
-            if (null != fs) {
-                try {
-                    fs.close();
-                } catch (IOException ignored) {
-                }
-            }
             if (null != inStream) {
                 try {
                     inStream.close();
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(e.getMessage(), e);
+                    }
                 }
             }
         }

@@ -4,6 +4,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -16,6 +18,8 @@ import java.util.Map;
  * @since 2018/11/21 14:22
  */
 public abstract class AbstractHttpResponse {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractHttpResponse.class);
 
     private HttpResponse httpResponse;
     private Charset charset;
@@ -46,7 +50,10 @@ public abstract class AbstractHttpResponse {
             } else {
                 EntityUtils.consume(resp.getEntity());
             }
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 

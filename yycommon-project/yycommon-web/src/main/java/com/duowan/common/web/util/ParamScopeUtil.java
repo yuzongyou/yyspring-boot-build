@@ -8,7 +8,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -18,7 +18,11 @@ import java.util.Map;
  */
 public class ParamScopeUtil {
 
-    private static Map<ParamLookupScope, ParamScopeResolver> resolverMap = new HashMap<>();
+    private ParamScopeUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static Map<ParamLookupScope, ParamScopeResolver> resolverMap = new EnumMap<>(ParamLookupScope.class);
 
     static {
         resolverMap.put(ParamLookupScope.REQUEST, new RequestScopeResolver());

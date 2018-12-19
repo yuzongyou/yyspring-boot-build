@@ -19,11 +19,18 @@ import java.security.Key;
  *
  * @author zhangfeng@chinaduo.com
  * @version 1.0
- *          <p>
- *          1.1 Implements improvement by apache collections LRUMap.
- * @since  2011-11-16 下午05:16:01
+ * <p>
+ * 1.1 Implements improvement by apache collections LRUMap.
+ * @since 2011-11-16 下午05:16:01
  */
 public class AESHelper {
+
+    private AESHelper() {
+        throw new IllegalStateException("Helper class");
+    }
+
+    private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+
     /**
      * use password to encrypt content by AES(128bit).
      *
@@ -57,23 +64,23 @@ public class AESHelper {
         }
     }
 
-    private static final int maxSize = 100;
-    private static final Object elockObj = new Object();
-    private static final Object dlockObj = new Object();
-    private static LRUMap cacheEncryptCipher = new LRUMap(maxSize);
-    private static LRUMap cacheDecryptCipher = new LRUMap(maxSize);
+    private static final int MAX_SIZE = 100;
+    private static final Object ELOCK_OBJ = new Object();
+    private static final Object DLOCK_OBJ = new Object();
+    private static LRUMap cacheEncryptCipher = new LRUMap(MAX_SIZE);
+    private static LRUMap cacheDecryptCipher = new LRUMap(MAX_SIZE);
 
     private static Cipher getEncryptCipher(String password) {
         try {
             Cipher cp = null;
-            synchronized (elockObj) {
+            synchronized (ELOCK_OBJ) {
                 cp = (Cipher) cacheEncryptCipher.get(password);
             }
             if (cp == null) {
                 Key key = AESHelper.getKey(password);
                 cp = Cipher.getInstance("AES");
                 cp.init(Cipher.ENCRYPT_MODE, key);
-                synchronized (elockObj) {
+                synchronized (ELOCK_OBJ) {
                     cacheEncryptCipher.put(password, cp);
                 }
             }
@@ -86,14 +93,14 @@ public class AESHelper {
     private static Cipher getDecryptCipher(String password) {
         try {
             Cipher cp = null;
-            synchronized (dlockObj) {
+            synchronized (DLOCK_OBJ) {
                 cp = (Cipher) cacheDecryptCipher.get(password);
             }
             if (cp == null) {
                 Key key = AESHelper.getKey(password);
                 cp = Cipher.getInstance("AES");
                 cp.init(Cipher.DECRYPT_MODE, key);
-                synchronized (dlockObj) {
+                synchronized (DLOCK_OBJ) {
                     cacheDecryptCipher.put(password, cp);
                 }
             }
@@ -118,11 +125,11 @@ public class AESHelper {
 
     public static byte[] hex2byte(String strhex) {
         if (strhex == null) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         int l = strhex.length();
         if (l % 2 != 0) {
-            return null;
+            return EMPTY_BYTE_ARRAY;
         }
         byte[] b = new byte[l / 2];
         for (int i = 0; i != l / 2; i++) {
@@ -131,7 +138,7 @@ public class AESHelper {
         return b;
     }
 
-    public static String byte2hex(byte b[]) {
+    public static String byte2hex(byte[] b) {
         StringBuilder sb = new StringBuilder();
         for (int n = 0; n < b.length; n++) {
             String stmp = Integer.toHexString(b[n] & 0xff);
@@ -143,33 +150,4 @@ public class AESHelper {
         return sb.toString().toUpperCase();
     }
 
-    public static void main(String[] args) {
-
-        String key = "2d9472f8-18bb-4291-8d0b-7851e8088f3b";
-        String content = "B2A9EEC49B2C841B1D722046378F11DB";
-        String encode = AESHelper.decrypt(content, key);
-        System.out.println("解码:" + encode);
-        String decode = AESHelper.encrypt("", key);
-        System.out.println("编码" + decode);
-
-
-        //logger.info(content+"\n"+encode+"\n"+base64+"\n"+decode);
-
-		/*
-		MapIterator itr = cacheEncryptCipher.mapIterator();
-		while(itr.hasNext()) {
-			logger.info(itr.next().getClass().getName());
-		}
-		
-		String key2="zhangfeng";
-		String encode2 = AESHelper.encrypt(content, key2);
-		String decode2 = AESHelper.decrypt(encode2, key2);
-		logger.info(content+"\n"+encode2+"\n"+decode2);
-		
-		itr = cacheEncryptCipher.mapIterator();
-		while(itr.hasNext()) {
-			logger.info(itr.next().getClass().getName());
-		}
-		*/
-    }
 }

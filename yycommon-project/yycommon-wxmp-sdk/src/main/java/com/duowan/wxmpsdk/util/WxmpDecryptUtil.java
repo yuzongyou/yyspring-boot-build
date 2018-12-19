@@ -21,6 +21,10 @@ import java.security.Security;
  */
 public class WxmpDecryptUtil {
 
+    private WxmpDecryptUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -34,7 +38,7 @@ public class WxmpDecryptUtil {
      * @return 返回解密后的文本信息
      * @throws WxmpException 发生任何错误将包装成本异常抛出
      */
-    public static String decrypt(String encryptText, String ivText, String sessionKeyText) throws WxmpException {
+    public static String decrypt(String encryptText, String ivText, String sessionKeyText) {
 
         try {
             byte[] encryptData = Base64.decode(encryptText);
@@ -53,9 +57,13 @@ public class WxmpDecryptUtil {
         }
     }
 
-    private static AlgorithmParameters generateIV(byte[] iv) throws Exception {
-        AlgorithmParameters params = AlgorithmParameters.getInstance("AES");
-        params.init(new IvParameterSpec(iv));
-        return params;
+    private static AlgorithmParameters generateIV(byte[] iv) {
+        try {
+            AlgorithmParameters params = AlgorithmParameters.getInstance("AES");
+            params.init(new IvParameterSpec(iv));
+            return params;
+        } catch (Exception e) {
+            throw new WxmpException(e);
+        }
     }
 }

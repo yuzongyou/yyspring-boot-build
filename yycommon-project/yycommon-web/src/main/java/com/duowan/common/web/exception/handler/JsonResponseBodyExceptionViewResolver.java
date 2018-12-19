@@ -7,6 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 处理默认 JsonResponse
@@ -15,10 +16,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class JsonResponseBodyExceptionViewResolver extends AbstractExceptionViewResolver {
 
-    public JsonResponseBodyExceptionViewResolver() {
+    public JsonResponseBodyExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList) {
+        super(errorMessageReaderList);
     }
 
-    public JsonResponseBodyExceptionViewResolver(boolean logException) {
+    public JsonResponseBodyExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList, boolean logException) {
+        super(errorMessageReaderList);
         this.setLogException(logException);
     }
 
@@ -31,15 +34,8 @@ public class JsonResponseBodyExceptionViewResolver extends AbstractExceptionView
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Exception ex) {
         if (ex != null) {
-            int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex);
-            String logInfo = "处理请求异常，默认返回 JsonResponse: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
-            if (logException) {
-                logger.warn(logInfo, ex);
-            } else {
-                logger.warn(logInfo);
-            }
-            return new StatusJsonView(errorCode, errorMessage);
+            ErrorMessage errorMessage = getErrorMessage(ex);
+            return new StatusJsonView(errorMessage.getErrorCode(), errorMessage.getMessage());
         }
 
         return null;

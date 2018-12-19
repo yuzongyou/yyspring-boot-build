@@ -11,7 +11,7 @@ public class DayDelay implements Delay {
     private final long milliseconds;
 
     public DayDelay(int days) {
-        this.milliseconds = days * 24 * 60 * 60 * 1000;
+        this.milliseconds = days * 24 * 60 * 60 * 1000L;
     }
 
     @Override

@@ -70,7 +70,7 @@ public class AdmincenterDaoHttpImpl implements AdmincenterDao {
 
         if (!success) {
             String message = ConvertUtil.toString(respMap.get("message"), "请查看是否在管理中心给此用户分配了对应产品的角色");
-            logger.warn("无法获取用户权限： " + message);
+            logger.warn("无法获取用户权限： {}", message);
             return new HashSet<>(0);
         }
         String message = ConvertUtil.toString(respMap.get("message"), "");
@@ -78,7 +78,7 @@ public class AdmincenterDaoHttpImpl implements AdmincenterDao {
             return new HashSet<>(0);
         }
         String[] functionPoints = message.split(",");
-        Set<String> set = new HashSet<String>(functionPoints.length);
+        Set<String> set = new HashSet<>(functionPoints.length);
         set.addAll(Arrays.asList(functionPoints));
         return set;
     }

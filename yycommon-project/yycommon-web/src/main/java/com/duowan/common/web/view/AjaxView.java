@@ -152,6 +152,5 @@ public class AjaxView<T> extends AbstractTextView {
     }
 
     private void checkDataXssAndFilter() {
-        // TODO 检查 XSS
     }
 }

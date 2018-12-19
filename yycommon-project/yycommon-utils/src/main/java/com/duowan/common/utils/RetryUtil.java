@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,10 @@ import org.slf4j.LoggerFactory;
  * @author Arvin
  */
 public class RetryUtil {
+
+    private RetryUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 执行器
@@ -50,7 +55,7 @@ public class RetryUtil {
                 if (tryTimes >= totalTryTimes) {
                     // 重试结束
                     if (throwException) {
-                        throw new RuntimeException(e);
+                        throw new UtilsException(e);
                     }
                     return null;
                 }
@@ -59,7 +64,7 @@ public class RetryUtil {
                     CommonUtil.sleep(intervalMillis);
                 }
                 if (tryTimes > 1) {
-                    logger.warn("准备第[{}]次重试执行，interval=[{}],totalTryTimes=[{}],error=[{}]", (tryTimes - 1), intervalMillis, e.getMessage());
+                    logger.warn("准备第[{}]次重试执行，interval=[{}],totalTryTimes=[{}],error=[{}]", (tryTimes - 1), intervalMillis, tryTimes, e.getMessage());
                 }
             }
         }

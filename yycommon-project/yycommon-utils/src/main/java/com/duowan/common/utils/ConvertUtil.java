@@ -1,6 +1,8 @@
 package com.duowan.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +14,12 @@ import java.util.Date;
  * @author Arvin
  */
 public abstract class ConvertUtil {
+
+    private ConvertUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConvertUtil.class);
 
     /**
      * 转换成字符串
@@ -232,7 +240,10 @@ public abstract class ConvertUtil {
             for (String acceptedDateFormat : acceptedDateFormats) {
                 try {
                     return new SimpleDateFormat(acceptedDateFormat).parse(timeString);
-                } catch (ParseException ignored) {
+                } catch (ParseException e) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(e.getMessage(), e);
+                    }
                 }
             }
         }

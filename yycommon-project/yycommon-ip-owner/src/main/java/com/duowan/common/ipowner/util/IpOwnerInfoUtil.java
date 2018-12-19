@@ -12,6 +12,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class IpOwnerInfoUtil {
 
+    private IpOwnerInfoUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * <pre>
      * 根据 省市的 查询结果填充
@@ -31,30 +35,30 @@ public class IpOwnerInfoUtil {
      * // array[11]:   国际代码
      * </pre>
      *
-     * @param IpOwnerInfo iP信息
+     * @param ipOwnerInfo iP信息
      * @param array       查询结果值
      * @return 返回 IpOwnerInfo
      */
-    public static IpOwnerInfo fillByProvinceAndCityResult(IpOwnerInfo IpOwnerInfo, String[] array) {
+    public static IpOwnerInfo fillByProvinceAndCityResult(IpOwnerInfo ipOwnerInfo, String[] array) {
 
-        if (IpOwnerInfo == null) {
-            IpOwnerInfo = new IpOwnerInfo();
+        if (ipOwnerInfo == null) {
+            ipOwnerInfo = new IpOwnerInfo();
         }
 
-        IpOwnerInfo.setCountry(array[0]);
-        IpOwnerInfo.setProvince(array[1]);
-        IpOwnerInfo.setCity(array[2]);
-        IpOwnerInfo.setDistrict(array[3]);
-        IpOwnerInfo.setProvider(array[4]);
-        IpOwnerInfo.setLongitude(array[5]);
-        IpOwnerInfo.setLatitude(array[6]);
-        IpOwnerInfo.setLocation(array[7]);
-        IpOwnerInfo.setTimeZone(array[8]);
-        IpOwnerInfo.setCode(array[9]);
-        IpOwnerInfo.setCountryCode(array[10]);
-        IpOwnerInfo.setInternationalCode(array[11]);
+        ipOwnerInfo.setCountry(array[0]);
+        ipOwnerInfo.setProvince(array[1]);
+        ipOwnerInfo.setCity(array[2]);
+        ipOwnerInfo.setDistrict(array[3]);
+        ipOwnerInfo.setProvider(array[4]);
+        ipOwnerInfo.setLongitude(array[5]);
+        ipOwnerInfo.setLatitude(array[6]);
+        ipOwnerInfo.setLocation(array[7]);
+        ipOwnerInfo.setTimeZone(array[8]);
+        ipOwnerInfo.setCode(array[9]);
+        ipOwnerInfo.setCountryCode(array[10]);
+        ipOwnerInfo.setInternationalCode(array[11]);
 
-        return IpOwnerInfo;
+        return ipOwnerInfo;
     }
 
     /**
@@ -72,35 +76,35 @@ public class IpOwnerInfoUtil {
      * // array[6]:    区县中心点纬度
      * </pre>
      *
-     * @param IpOwnerInfo iP信息
+     * @param ipOwnerInfo iP信息
      * @param array       查询结果值
      * @return 返回 IpOwnerInfo
      */
-    public static IpOwnerInfo fillByDistrictResult(IpOwnerInfo IpOwnerInfo, String[] array) {
+    public static IpOwnerInfo fillByDistrictResult(IpOwnerInfo ipOwnerInfo, String[] array) {
 
-        if (IpOwnerInfo == null) {
-            IpOwnerInfo = new IpOwnerInfo();
-        }
-
-        if (StringUtils.isBlank(IpOwnerInfo.getCountry())) {
-            IpOwnerInfo.setCountry(array[0]);
-        }
-        if (StringUtils.isBlank(IpOwnerInfo.getProvince())) {
-            IpOwnerInfo.setProvince(array[1]);
-        }
-        if (StringUtils.isBlank(IpOwnerInfo.getCity())) {
-            IpOwnerInfo.setCity(array[2]);
-        }
-        if (StringUtils.isBlank(IpOwnerInfo.getDistrict())) {
-            IpOwnerInfo.setDistrict(array[3]);
+        if (ipOwnerInfo == null) {
+            ipOwnerInfo = new IpOwnerInfo();
         }
 
-        IpOwnerInfo.setDistrictCode(array[4]);
-        IpOwnerInfo.setDistrictRadius(array[5]);
-        IpOwnerInfo.setDistrictLongitude(array[6]);
-        IpOwnerInfo.setDistrictLatitude(array[7]);
+        if (StringUtils.isBlank(ipOwnerInfo.getCountry())) {
+            ipOwnerInfo.setCountry(array[0]);
+        }
+        if (StringUtils.isBlank(ipOwnerInfo.getProvince())) {
+            ipOwnerInfo.setProvince(array[1]);
+        }
+        if (StringUtils.isBlank(ipOwnerInfo.getCity())) {
+            ipOwnerInfo.setCity(array[2]);
+        }
+        if (StringUtils.isBlank(ipOwnerInfo.getDistrict())) {
+            ipOwnerInfo.setDistrict(array[3]);
+        }
 
-        return IpOwnerInfo;
+        ipOwnerInfo.setDistrictCode(array[4]);
+        ipOwnerInfo.setDistrictRadius(array[5]);
+        ipOwnerInfo.setDistrictLongitude(array[6]);
+        ipOwnerInfo.setDistrictLatitude(array[7]);
+
+        return ipOwnerInfo;
     }
 
 }

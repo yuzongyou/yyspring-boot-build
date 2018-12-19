@@ -21,7 +21,7 @@ public class DnsCacheUtil {
 
     private static ScheduledExecutorService dnsRefreshExecutor;
 
-    private static final Set<String> hadScheduleHosts = new HashSet<String>();
+    private static final Set<String> HAD_SCHEDULE_HOSTS = new HashSet<>();
 
     /**
      * DNS 解析拦截器
@@ -31,7 +31,7 @@ public class DnsCacheUtil {
     /**
      * 调度结果 list
      */
-    private static final List<ScheduledFuture<?>> scheduleFutureList = new ArrayList<ScheduledFuture<?>>();
+    private static final List<ScheduledFuture<?>> SCHEDULE_FUTURE_LIST = new ArrayList<>();
 
     static {
         ThreadFactory factory = Executors.defaultThreadFactory();
@@ -43,9 +43,8 @@ public class DnsCacheUtil {
      * 刷新DNS
      *
      * @param host 主机地址
-     * @throws Exception 任何异常
      */
-    static void refreshDns(final String host) throws Exception {
+    static void refreshDns(final String host) {
         if (null != host && !"".equals(host.trim())) {
             if (null != dnsInterceptor) {
                 try {
@@ -78,51 +77,44 @@ public class DnsCacheUtil {
      *
      * @param host               主机地址
      * @param runOnceImmediately 立即调用一次
-     * @throws Exception 任何异常
      */
-    static void scheduleDnsAutoRefreshCache(final String host, final boolean runOnceImmediately) throws Exception {
+    static void scheduleDnsAutoRefreshCache(final String host, final boolean runOnceImmediately) {
 
         if (runOnceImmediately) {
             refreshDns(host);
         }
 
-        if (hadScheduleHosts.contains(host)) {
+        if (HAD_SCHEDULE_HOSTS.contains(host)) {
             return;
         }
 
-        synchronized (hadScheduleHosts) {
-            if (!hadScheduleHosts.contains(host)) {
-                hadScheduleHosts.add(host);
+        synchronized (HAD_SCHEDULE_HOSTS) {
+            if (!HAD_SCHEDULE_HOSTS.contains(host)) {
+                HAD_SCHEDULE_HOSTS.add(host);
 
                 int policy = InetAddressCachePolicy.get();
                 boolean isNever = InetAddressCachePolicy.NEVER == policy;
                 boolean isForever = InetAddressCachePolicy.FOREVER == policy;
                 if (isForever || isNever) {
                     // 虽然是永久，但是不排除中途变了，加个调度
-                    dnsRefreshExecutor.schedule(new Runnable() {
-                        @Override
-                        public void run() {
-                            synchronized (hadScheduleHosts) {
-                                hadScheduleHosts.remove(host);
-                            }
+                    dnsRefreshExecutor.schedule(() -> {
+                        synchronized (HAD_SCHEDULE_HOSTS) {
+                            HAD_SCHEDULE_HOSTS.remove(host);
                         }
                     }, 20000, TimeUnit.MILLISECONDS);
                     return;
                 }
 
 
-                long expireMillis = policy * 1000;
+                long expireMillis = policy * 1000L;
                 long scheduleExpireMillis = expireMillis - getMaxDnsMillis();
                 scheduleExpireMillis = scheduleExpireMillis < 1000 ? 1000 : scheduleExpireMillis;
 
-                scheduleFutureList.add(dnsRefreshExecutor.scheduleAtFixedRate(new Runnable() {
-                    @Override
-                    public void run() {
+                SCHEDULE_FUTURE_LIST.add(dnsRefreshExecutor.scheduleAtFixedRate(() -> {
 
-                        try {
-                            refreshDns(host);
-                        } catch (Exception ignored) {
-                        }
+                    try {
+                        refreshDns(host);
+                    } catch (Exception ignored) {
                     }
                 }, scheduleExpireMillis, scheduleExpireMillis, TimeUnit.MILLISECONDS));
             }
@@ -138,14 +130,11 @@ public class DnsCacheUtil {
             @Override
             public void beforePut(final String host, final Object object) {
                 try {
-                    executor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                DNS_START_TIME_MAP.put(host, System.currentTimeMillis());
-                                scheduleDnsAutoRefreshCache(host, false);
-                            } catch (Exception ignored) {
-                            }
+                    executor.execute(() -> {
+                        try {
+                            dnsStartTimeMap.put(host, System.currentTimeMillis());
+                            scheduleDnsAutoRefreshCache(host, false);
+                        } catch (Exception ignored) {
                         }
                     });
                 } catch (Exception ignored) {
@@ -162,12 +151,12 @@ public class DnsCacheUtil {
     /**
      * DNS 解析最大时间
      */
-    private static volatile int MAX_DNS_MILLIS = 15000;
+    private static volatile int maxDnsMillis = 15000;
 
     /**
      * JVM 历史解析过的 DNS域名列表
      */
-    private static Map<String, Long> DNS_START_TIME_MAP = new HashMap<String, Long>();
+    private static Map<String, Long> dnsStartTimeMap = new HashMap<>();
 
     /**
      * 默认DNS缓存时间
@@ -191,7 +180,7 @@ public class DnsCacheUtil {
     /**
      * 启用自动重新缓存
      */
-    public static void enabledAutoReCache() throws Exception {
+    public static void enabledAutoReCache() {
         autoReCache = true;
 
         reScheduleAllRefreshTask();
@@ -199,13 +188,13 @@ public class DnsCacheUtil {
         wrapDnsCache();
     }
 
-    static void reScheduleAllRefreshTask() throws Exception {
+    static void reScheduleAllRefreshTask() {
 
-        hadScheduleHosts.clear();
+        HAD_SCHEDULE_HOSTS.clear();
 
         // 重新调度host 进行 dns解析
-        if (DNS_START_TIME_MAP != null && !DNS_START_TIME_MAP.isEmpty()) {
-            Set<String> hostSet = DNS_START_TIME_MAP.keySet();
+        if (dnsStartTimeMap != null && !dnsStartTimeMap.isEmpty()) {
+            Set<String> hostSet = dnsStartTimeMap.keySet();
             for (String host : hostSet) {
                 scheduleDnsAutoRefreshCache(host, true);
             }
@@ -234,27 +223,26 @@ public class DnsCacheUtil {
 
     static void terminateAllScheduleTask() {
         // 终止所有调度任务
-        synchronized (scheduleFutureList) {
-            for (ScheduledFuture future : scheduleFutureList) {
+        synchronized (SCHEDULE_FUTURE_LIST) {
+            for (ScheduledFuture future : SCHEDULE_FUTURE_LIST) {
                 future.cancel(false);
             }
 
-            scheduleFutureList.clear();
+            SCHEDULE_FUTURE_LIST.clear();
         }
     }
 
     public static int getMaxDnsMillis() {
-        return MAX_DNS_MILLIS;
+        return maxDnsMillis;
     }
 
     /**
      * 设置 DNS 解析最大时间，预估值，传递一个最大的DNS解析时间
      *
      * @param maxDnsMillis DNS 最大解析时间，只是一个预估
-     * @throws Exception 任何异常
      */
-    public static void setMaxDnsMillis(int maxDnsMillis) throws Exception {
-        MAX_DNS_MILLIS = maxDnsMillis < 1000 ? 15000 : maxDnsMillis;
+    public static void setMaxDnsMillis(int maxDnsMillis) {
+        DnsCacheUtil.maxDnsMillis = maxDnsMillis < 1000 ? 15000 : maxDnsMillis;
 
         if (isAutoReCache()) {
             terminateAllScheduleTask();
@@ -284,9 +272,8 @@ public class DnsCacheUtil {
      * 设置 DNS 缓存时间
      *
      * @param seconds 缓存时间，单位是秒, 0 表示不缓存，-1表示永久缓存， 正数表示缓存的秒数
-     * @throws Exception 任何异常
      */
-    public static void setDnsCacheTime(int seconds) throws Exception {
+    public static void setDnsCacheTime(int seconds) {
         int expire = seconds;
         if (seconds < 0) {
             expire = InetAddressCachePolicy.FOREVER;

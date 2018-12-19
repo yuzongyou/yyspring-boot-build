@@ -65,6 +65,6 @@ public class TextView extends AbstractTextView {
     }
 
     private void checkXssAndFilter() {
-        // TODO 检查 XSS
+        // Do nothing
     }
 }

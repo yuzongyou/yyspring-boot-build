@@ -1,7 +1,10 @@
 package com.duowan.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -11,6 +14,13 @@ import java.util.*;
  * @author Arvin
  */
 public abstract class CommonUtil {
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtil.class);
+
+    private CommonUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * List 进行反转
@@ -201,7 +211,7 @@ public abstract class CommonUtil {
             }
         } else {
             if (obj instanceof Collection) {
-                Collection collection = (Collection)obj;
+                Collection collection = (Collection) obj;
                 for (Object subObj : collection) {
                     concatObject(builder, nullToIgnore, separator, subObj);
                 }
@@ -243,7 +253,11 @@ public abstract class CommonUtil {
         if (millis > 0) {
             try {
                 Thread.sleep(millis);
-            } catch (InterruptedException ignored) {
+            } catch (InterruptedException e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -333,7 +347,7 @@ public abstract class CommonUtil {
             return instanceList;
         }
 
-        List<T> resultList = new ArrayList<T>();
+        List<T> resultList = new ArrayList<>();
 
         for (T instance : instanceList) {
             if (!existsLogicEqualInstance(resultList, instance)) {
@@ -597,6 +611,11 @@ public abstract class CommonUtil {
         String regex = "^" + wildcardPattern.replaceAll("\\*", "[^\\*]*") + "$";
 
         return string.matches(regex);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public static <T> T[] createArray(Class<T> elementType, int size) {
+        return (T[]) Array.newInstance(elementType, size > 0 ? size : 0);
     }
 
 }

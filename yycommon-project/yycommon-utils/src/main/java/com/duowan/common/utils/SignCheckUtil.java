@@ -1,15 +1,15 @@
 package com.duowan.common.utils;
 
 import com.duowan.common.utils.exception.SignFailException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Arvin
  */
 public class SignCheckUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(SignCheckUtil.class);
+    private SignCheckUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 不区分大小写检查 MD5 加密字符串是否一致， 检查 actual == MD5(rawString)

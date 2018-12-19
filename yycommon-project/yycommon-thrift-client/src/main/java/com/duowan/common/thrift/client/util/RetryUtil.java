@@ -1,5 +1,6 @@
 package com.duowan.common.thrift.client.util;
 
+import com.duowan.common.thrift.client.exception.ThriftClientException;
 import com.duowan.common.utils.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,8 @@ public class RetryUtil {
          *
          * @param tryTime 当前尝试调用次数
          * @return 返回执行结果
-         * @throws Exception 业务的任何异常
          */
-        T execute(int tryTime) throws Exception;
+        T execute(int tryTime);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(RetryUtil.class);
@@ -52,7 +52,7 @@ public class RetryUtil {
                 if (tryTimes >= totalTryTimes) {
                     // 重试结束
                     if (throwException) {
-                        throw new RuntimeException(e);
+                        throw new ThriftClientException(e);
                     }
                     return null;
                 }
@@ -61,7 +61,7 @@ public class RetryUtil {
                     CommonUtil.sleep(intervalMillis);
                 }
                 if (tryTimes > 1) {
-                    logger.warn("准备第[{}]次重试执行，interval=[{}],totalTryTimes=[{}],error=[{}]", (tryTimes - 1), intervalMillis, e.getMessage());
+                    logger.warn("准备第[{}]次重试执行，interval=[{}],totalTryTimes=[{}],error=[{}]", (tryTimes - 1), intervalMillis, tryTimes, e.getMessage());
                 }
             }
         }

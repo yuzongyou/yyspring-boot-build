@@ -4,6 +4,7 @@ import com.duowan.common.thrift.client.ClientType;
 import com.duowan.common.thrift.client.config.TClientConfig;
 import com.duowan.common.thrift.client.config.ThriftServerNode;
 import com.duowan.common.thrift.client.exception.TProtocolFacotryNotFoundException;
+import com.duowan.common.thrift.client.exception.ThriftClientException;
 import com.duowan.common.thrift.client.exception.ThriftInvalidClientTypeException;
 import com.duowan.common.thrift.client.exception.ThriftInvokeException;
 import com.duowan.common.thrift.client.interceptor.ThriftInterceptor;
@@ -18,13 +19,9 @@ import com.duowan.common.thrift.client.util.ThriftUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,7 +33,7 @@ import java.util.List;
  * @version 1.0
  * @since 2018/9/18 15:39
  */
-public class ThriftClientFactoryBean implements FactoryBean, InitializingBean {
+public class ThriftClientFactoryBean implements FactoryBean {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -104,110 +101,98 @@ public class ThriftClientFactoryBean implements FactoryBean, InitializingBean {
         }
         List<ThriftInterceptor> interceptorList = new ArrayList<>(interceptors.size() + 1);
         interceptorList.add(new ThriftLoggingInterceptor());
-        for (ThriftInterceptor interceptor : interceptors) {
-            if (!ThriftLoggingInterceptor.class.equals(interceptor.getClass())) {
-                interceptorList.add(interceptor);
+        for (ThriftInterceptor thriftInterceptor : interceptors) {
+            if (!ThriftLoggingInterceptor.class.equals(thriftInterceptor.getClass())) {
+                interceptorList.add(thriftInterceptor);
             }
         }
         return interceptorList;
     }
 
     @Override
-    public Object getObject() throws Exception {
+    public Object getObject() {
         return createJdkProxyObject();
     }
 
     private Object createJdkProxyObject() {
 
-        return Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{getObjectType()}, new InvocationHandler() {
+        return Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{getObjectType()}, (proxy, method, args) -> {
 
-            @Override
-            public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
+            int tryTimes = clientConfig.getDefaultRetryTimes();
+            if (tryTimes < 0) {
+                tryTimes = 0;
+            }
 
-                int tryTimes = clientConfig.getDefaultRetryTimes();
-                if (tryTimes < 0) {
-                    tryTimes = 0;
-                }
+            return RetryUtil.execute(tryTimes, 0, true, tryTime -> {
 
-                return RetryUtil.execute(tryTimes, 0, true, new RetryUtil.Executor<Object>() {
-                    @Override
-                    public Object execute(int tryTime) throws Exception {
+                PooledTransport pooledTransport = null;
+                ThriftServerNode serverNode = null;
 
-                        PooledTransport pooledTransport = null;
-                        ThriftServerNode serverNode = null;
+                Exception exception = null;
+                Object returnValue = null;
+                ThriftInvokeContext context = null;
+                String tryLabel = tryTime == 1 ? "首次执行 " : "第[" + tryTime + "]次尝试执行 ";
 
-                        Exception exception = null;
-                        Object returnValue = null;
-                        ThriftInvokeContext context = null;
-                        String tryLabel = tryTime == 1 ? "首次执行 " : "第[" + tryTime + "]次尝试执行 ";
+                try {
+                    // 选择一个Key
+                    serverNode = lb.chooseServerNode(null);
+                    if (serverNode == null) {
+                        throw new ThriftInvokeException(tryLabel + "无法获取Thrift服务[" + serviceClass.getName() + "]节点！");
+                    }
 
-                        try {
-                            // 选择一个Key
-                            serverNode = lb.chooseServerNode(null);
-                            if (serverNode == null) {
-                                throw new ThriftInvokeException(tryLabel + "无法获取Thrift服务[" + serviceClass.getName() + "]节点！");
-                            }
+                    // 从连接池中获取client
+                    pooledTransport = pool.borrowObject(serverNode);
+                    // 设置最后一次访问时间
+                    pooledTransport.setLastAccessTime(System.currentTimeMillis());
 
-                            // 从连接池中获取client
-                            pooledTransport = pool.borrowObject(serverNode);
-                            // 设置最后一次访问时间
-                            pooledTransport.setLastAccessTime(System.currentTimeMillis());
+                    Object client = pooledTransport.getClient(protocolFactory.router(), clientType);
 
-                            Object client = pooledTransport.getClient(protocolFactory.router(), clientType);
-
-                            if (interceptor != null) {
-                                context = new ThriftInvokeContext(method, args, clientConfig, serverNode, pooledTransport, protocolFactory, client);
-                                returnValue = interceptor.before(context);
-                                if (null != returnValue) {
-                                    return returnValue;
-                                }
-                            }
-
-                            // 执行方法
-                            returnValue = method.invoke(client, args);
+                    if (interceptor != null) {
+                        context = new ThriftInvokeContext(method, args, clientConfig, serverNode, pooledTransport, protocolFactory, client);
+                        returnValue = interceptor.before(context);
+                        if (null != returnValue) {
                             return returnValue;
-                        } catch (Exception e) {
-                            // 调用出错的话，直接将该连接丢弃
-                            if (null != pooledTransport) {
-                                pooledTransport.discard(); // 遗弃
-                                String remark = tryLabel + "Thrift 调用异常: method=" + method.getName() + ", args=" + ThriftUtil.argsToString(args);
-                                pooledTransport.setRemark(remark);
-                                logger.warn(remark + ", client =[" + pooledTransport + "], error = " + e.getMessage(), e);
-                            }
-
-                            exception = e;
-                            if (interceptor != null && context != null) {
-                                interceptor.afterThrowing(exception, context);
-                            }
-
-                            throw e;
-                        } finally {
-
-                            if (exception == null && interceptor != null && context != null) {
-                                if (interceptor != null) {
-                                    interceptor.afterReturning(returnValue, context);
-                                }
-                            }
-
-                            // 释放到连接池中
-                            if (null != pooledTransport && serverNode != null) {
-                                pool.returnObject(serverNode, pooledTransport);
-                            }
                         }
                     }
-                });
 
-            }
+                    // 执行方法
+                    returnValue = method.invoke(client, args);
+                    return returnValue;
+                } catch (Exception e) {
+                    // 调用出错的话，直接将该连接丢弃
+                    if (null != pooledTransport) {
+                        pooledTransport.discard(); // 遗弃
+                        String remark = tryLabel + "Thrift 调用异常: method=" + method.getName() + ", args=" + ThriftUtil.argsToString(args);
+                        pooledTransport.setRemark(remark);
+                        logger.warn(remark + ", client =[" + pooledTransport + "], error = " + e.getMessage(), e);
+                    }
+
+                    exception = e;
+                    if (interceptor != null && context != null) {
+                        interceptor.afterThrowing(exception, context);
+                    }
+
+                    throw new ThriftClientException(e);
+                } finally {
+
+                    if (exception == null && interceptor != null && context != null) {
+                        if (interceptor != null) {
+                            interceptor.afterReturning(returnValue, context);
+                        }
+                    }
+
+                    // 释放到连接池中
+                    if (null != pooledTransport && serverNode != null) {
+                        pool.returnObject(serverNode, pooledTransport);
+                    }
+                }
+            });
+
         });
     }
 
     @Override
     public Class<?> getObjectType() {
         return objectType;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
     }
 }

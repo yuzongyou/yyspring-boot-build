@@ -6,7 +6,6 @@ import com.duowan.common.thrift.client.config.ThriftServerNode;
 import com.duowan.common.thrift.client.factory.protocol.AbstractTProtocolFactory;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
-import com.duowan.service.TestService;
 import com.duowan.thrift.service.HiService;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;

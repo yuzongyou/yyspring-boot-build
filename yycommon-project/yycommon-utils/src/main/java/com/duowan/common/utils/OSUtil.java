@@ -20,22 +20,28 @@ import java.util.Set;
  */
 public class OSUtil {
 
+    private OSUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
+    private static final String OS_NAME_WINDOWS = "windows";
+
     /**
      * IP的最后一个数字
      */
-    private static String LAST_IP_NUM = null;
+    private static String lastIpNum = null;
 
     /**
      * 本进程ID
      */
-    private static String PROCESS_PID = null;
+    private static String processPid = null;
 
     /**
      * 本地IP
      */
-    private static String LOCAL_IP = null;
+    private static String localIp = null;
 
-    private static Logger logger = LoggerFactory.getLogger(OSUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OSUtil.class);
 
     /**
      * 判断是否为windows
@@ -45,7 +51,7 @@ public class OSUtil {
     public static boolean isWindowsOS() {
         boolean isWindowsOS = false;
         String osName = System.getProperty("os.name");
-        if (osName.toLowerCase().indexOf("windows") > -1) {
+        if (osName.toLowerCase().contains(OS_NAME_WINDOWS)) {
             isWindowsOS = true;
         }
         return isWindowsOS;
@@ -57,10 +63,10 @@ public class OSUtil {
      * @return 是否
      */
     public static String getLocalIp() {
-        if (LOCAL_IP == null) {
-            LOCAL_IP = doGetLocalIp();
+        if (localIp == null) {
+            localIp = doGetLocalIp();
         }
-        return LOCAL_IP;
+        return localIp;
     }
 
     /**
@@ -99,21 +105,21 @@ public class OSUtil {
                         if (!ip.isSiteLocalAddress()
                                 && !ip.isLoopbackAddress()
                                 && !subInterfaceIps.contains(ipAddr) // 不是子接口的IP
-                                && ipAddr.indexOf(":") == -1) {
+                                && ipAddr.indexOf(':') == -1) {
                             // 外网IP
                             netIp = ipAddr;
                             found = true;
                             break;
                         } else if (ip.isSiteLocalAddress()
                                 && !ip.isLoopbackAddress()
-                                && ipAddr.indexOf(":") == -1) {
+                                && ipAddr.indexOf(':') == -1) {
                             // 内网IP
                             localIp = ipAddr;
                         }
                     }
                 }
 
-                logger.info("netIp: " + netIp + ", localIp: " + localIp);
+                LOGGER.info("netIp: {}, localIp: {}", netIp, localIp);
                 if (netIp != null && !"".equals(netIp)) {
                     return netIp;
                 } else {
@@ -134,7 +140,7 @@ public class OSUtil {
     private static Set<String> getSubInterfaceAddresses() throws SocketException {
         //所有网络接口
         Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        Set<String> subInterfaceAddresses = new HashSet<String>();
+        Set<String> subInterfaceAddresses = new HashSet<>();
 
         while (networkInterfaces.hasMoreElements()) {
             NetworkInterface networkInterface = networkInterfaces.nextElement();
@@ -161,10 +167,10 @@ public class OSUtil {
      * @return 返回IP最后一个数字
      */
     public static String getIpLastNumber() {
-        if (LAST_IP_NUM == null) {
+        if (lastIpNum == null) {
             return doGetIpLastNumber();
         }
-        return LAST_IP_NUM;
+        return lastIpNum;
     }
 
     private static String doGetIpLastNumber() {
@@ -172,20 +178,21 @@ public class OSUtil {
         if (ip == null) {
             ip = "127.0.0.1";
         }
-        int pos = ip.lastIndexOf(".");
-        String num = "1";
+        int pos = ip.lastIndexOf('.');
+        String num;
         if (pos >= 0) {
             num = ip.substring(pos + 1);
         } else {
             // maybe ipv6
-            num = String.valueOf(Math.abs((long) ip.hashCode()) % 1000);
+            int positiveHashCode = ip.hashCode() < 0 ? ip.hashCode() + -1 : ip.hashCode();
+            num = String.valueOf(positiveHashCode % 1000L);
         }
         if (num.length() == 1) {
             num = "00" + num;
         } else if (num.length() == 2) {
             num = "0" + num;
         }
-        LAST_IP_NUM = num;
+        lastIpNum = num;
         return num;
     }
 
@@ -194,8 +201,8 @@ public class OSUtil {
      *
      * @return java进程id
      */
-    public static final String getPid() {
-        if (PROCESS_PID == null) {
+    public static String getPid() {
+        if (processPid == null) {
             RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
             String processName = runtimeMXBean.getName();
             String pid = null;
@@ -204,16 +211,16 @@ public class OSUtil {
             }
 
             if (pid == null) {
-                logger.warn("Cannot get pid, random one ...");
+                LOGGER.warn("Cannot get pid, random one ...");
                 Random rand = new Random();
                 pid = rand.nextInt(65536) + "";
             }
             if (pid.length() > 5) {
                 pid = pid.substring(0, 5);
             }
-            PROCESS_PID = pid;
-            logger.info("pid = " + PROCESS_PID);
+            processPid = pid;
+            LOGGER.info("pid = {}", processPid);
         }
-        return PROCESS_PID;
+        return processPid;
     }
 }

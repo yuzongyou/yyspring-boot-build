@@ -25,10 +25,7 @@ public class MysqlDialect extends AbstractDialect {
 
     static {
         ClassPathResource resource = new ClassPathResource("/META-INF/mysql-keyword.txt");
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
-
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (!"".equals(line.trim())) {
@@ -38,14 +35,6 @@ public class MysqlDialect extends AbstractDialect {
             }
         } catch (IOException e) {
             throw new JdbcException("解析Mysql关键字异常！");
-        } finally {
-            if (null != reader) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new JdbcException("解析Mysql关键字关闭异常！");
-                }
-            }
         }
     }
 

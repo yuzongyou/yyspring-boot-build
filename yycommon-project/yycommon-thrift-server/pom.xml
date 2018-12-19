@@ -22,6 +22,11 @@
 
         <dependency>
             <groupId>com.duowan</groupId>
+            <artifactId>yycommon-exception</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.duowan</groupId>
             <artifactId>yycommon-thrift-client</artifactId>
             <scope>test</scope>
         </dependency>

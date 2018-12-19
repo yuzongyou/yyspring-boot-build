@@ -3,6 +3,7 @@ package com.duowan.yyspringboot.autoconfigure.web;
 import com.duowan.common.web.error.YyBasicErrorController;
 import com.duowan.common.web.exception.ExtendErrorAttributes;
 import com.duowan.common.web.exception.handler.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -60,32 +61,44 @@ public class YyErrorMvcAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public CodeExceptionErrorMessageReader codeExceptionErrorMessageReader() {
+        return new CodeExceptionErrorMessageReader();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ValidationExceptionErrorMessageReader validationExceptionErrorMessageReader() {
+        return new ValidationExceptionErrorMessageReader();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(AjaxViewExceptionViewResolver.class)
-    public AjaxViewExceptionViewResolver ajaxViewExceptionViewResolver() {
-        return new AjaxViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
+    public AjaxViewExceptionViewResolver ajaxViewExceptionViewResolver(@Autowired(required = false) List<ErrorMessageReader> errorMessageReaderList) {
+        return new AjaxViewExceptionViewResolver(errorMessageReaderList, webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(JsonViewExceptionViewResolver.class)
-    public JsonViewExceptionViewResolver jsonViewExceptionViewResolver() {
-        return new JsonViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
+    public JsonViewExceptionViewResolver jsonViewExceptionViewResolver(@Autowired(required = false) List<ErrorMessageReader> errorMessageReaderList) {
+        return new JsonViewExceptionViewResolver(errorMessageReaderList, webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(ResponseBodyExceptionViewResolver.class)
-    public ResponseBodyExceptionViewResolver responseBodyExceptionViewResolver() {
-        return new ResponseBodyExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
+    public ResponseBodyExceptionViewResolver responseBodyExceptionViewResolver(@Autowired(required = false) List<ErrorMessageReader> errorMessageReaderList) {
+        return new ResponseBodyExceptionViewResolver(errorMessageReaderList, webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(JsonResponseBodyExceptionViewResolver.class)
-    public JsonResponseBodyExceptionViewResolver jsonResponseBodyExceptionViewResolver() {
-        return new JsonResponseBodyExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
+    public JsonResponseBodyExceptionViewResolver jsonResponseBodyExceptionViewResolver(@Autowired(required = false) List<ErrorMessageReader> errorMessageReaderList) {
+        return new JsonResponseBodyExceptionViewResolver(errorMessageReaderList, webMvcProperties.isExceptionResolverLogException());
     }
 
     @Bean
     @ConditionalOnMissingBean(TextViewExceptionViewResolver.class)
-    public TextViewExceptionViewResolver textViewExceptionViewResolver() {
-        return new TextViewExceptionViewResolver(webMvcProperties.isExceptionResolverLogException());
+    public TextViewExceptionViewResolver textViewExceptionViewResolver(@Autowired(required = false) List<ErrorMessageReader> errorMessageReaderList) {
+        return new TextViewExceptionViewResolver(errorMessageReaderList, webMvcProperties.isExceptionResolverLogException());
     }
 }

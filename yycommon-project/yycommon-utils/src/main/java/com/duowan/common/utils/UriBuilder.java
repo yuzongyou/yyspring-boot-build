@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
  */
 public class UriBuilder {
 
+    private static final int DEFAULT_HTTP_PORT = 80;
+
     private static final String HTTP_PATTERN = "(?i)(http|https):";
 
     private static final String USERINFO_PATTERN = "([^@\\[/?#]*)";
@@ -218,22 +220,29 @@ public class UriBuilder {
     public String build() {
         StringBuilder builder = new StringBuilder();
 
-        if (StringUtils.isBlank(this.schema)) {
-            builder.append("//");
-        } else {
-            builder.append(this.schema).append("://");
-        }
-        if (StringUtils.isNotBlank(this.userinfo)) {
-            builder.append(this.userinfo).append("@");
-        }
+        appendSchema(builder);
+        appendUserinfo(builder);
+
         builder.append(this.host);
 
-        if (port != 80 && port != -1) {
-            builder.append(":").append(port);
+        appendPort(builder);
+
+        appendPath(builder);
+
+        appendParams(builder);
+
+        appendFragment(builder);
+
+        return builder.toString();
+    }
+
+    private void appendFragment(StringBuilder builder) {
+        if (null != fragment && !"".equals(fragment)) {
+            builder.append("#").append(fragment);
         }
-        if (null != path && !"".equals(path.trim())) {
-            builder.append(path);
-        }
+    }
+
+    private void appendParams(StringBuilder builder) {
         boolean hadParams = this.paramsMap != null && !this.paramsMap.isEmpty();
 
         if (hadParams) {
@@ -251,12 +260,32 @@ public class UriBuilder {
             }
             builder.setLength(builder.length() - 1);
         }
+    }
 
-        if (null != fragment && !"".equals(fragment)) {
-            builder.append("#").append(fragment);
+    private void appendPath(StringBuilder builder) {
+        if (null != path && !"".equals(path.trim())) {
+            builder.append(path);
         }
+    }
 
-        return builder.toString();
+    private void appendPort(StringBuilder builder) {
+        if (port != DEFAULT_HTTP_PORT && port != -1) {
+            builder.append(":").append(port);
+        }
+    }
+
+    private void appendUserinfo(StringBuilder builder) {
+        if (StringUtils.isNotBlank(this.userinfo)) {
+            builder.append(this.userinfo).append("@");
+        }
+    }
+
+    private void appendSchema(StringBuilder builder) {
+        if (StringUtils.isBlank(this.schema)) {
+            builder.append("//");
+        } else {
+            builder.append(this.schema).append("://");
+        }
     }
 
     public String getSchema() {

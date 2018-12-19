@@ -10,7 +10,7 @@ import com.duowan.common.thrift.client.factory.protocol.TMultiplexedCompactProto
 import com.duowan.common.thrift.client.factory.transport.TFastFramedTransportFactory;
 import com.duowan.common.thrift.client.servernode.FixedServerNodeDiscovery;
 import com.duowan.common.thrift.client.servernode.ServerNodeDiscovery;
-import com.duowan.common.thrift.server.exporter.TSimpleServerExporter;
+import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.thrift.service.HelloService;
 import com.duowan.thrift.service.HiService;
@@ -235,10 +235,10 @@ public class TSimpleServerExporterTest {
         TSimpleServerExporter exporter = new TSimpleServerExporter(port, false);
         exporter.export(Arrays.asList(
                 new ThriftServiceWrapper(new HelloServiceImpl()),
-                        new ThriftServiceWrapper(new HiServiceImpl())
+                new ThriftServiceWrapper(new HiServiceImpl())
         ), null, null);
 
-        Thread.sleep(1000);
+        CommonUtil.sleep(1000);
 
         testHiServiceClient(port, "HiService");
         testHelloServiceClient(port, "HelloService");

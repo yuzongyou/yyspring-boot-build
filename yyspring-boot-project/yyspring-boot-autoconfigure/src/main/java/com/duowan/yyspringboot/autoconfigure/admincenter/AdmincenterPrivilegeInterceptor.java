@@ -42,7 +42,8 @@ public class AdmincenterPrivilegeInterceptor implements PrivilegeInterceptor {
         if (!ajaxView) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
 
-            ajaxView = null != handlerMethod.getMethodAnnotation(ResponseBody.class);
+            ResponseBody responseBody = handlerMethod.getMethodAnnotation(ResponseBody.class);
+            ajaxView = null != responseBody;
 
             if (!ajaxView) {
                 ajaxView = AbstractTextView.class.isAssignableFrom(handlerMethod.getMethod().getReturnType());

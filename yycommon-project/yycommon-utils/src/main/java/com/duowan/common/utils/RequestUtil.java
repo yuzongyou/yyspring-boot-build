@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class RequestUtil {
 
+    private RequestUtil() {
+    }
+
     /**
      * 搜索用户IP请求头Header名称列表
      **/
@@ -58,8 +61,13 @@ public abstract class RequestUtil {
         return realClientIp;
     }
 
+    /**
+     * 检查 "X-Forwarded-For" 需要在Nginx中配置，proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+     *
+     * @param request 当前请求
+     * @return 返回客户端IP
+     */
     private static String lookupClientIpByXForwardFor(HttpServletRequest request) {
-        // 检查 "X-Forwarded-For" 需要在Nginx中配置，proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
         String xforward = request.getHeader("X-Forwarded-For");
 
         if (StringUtils.isNotBlank(xforward)) {

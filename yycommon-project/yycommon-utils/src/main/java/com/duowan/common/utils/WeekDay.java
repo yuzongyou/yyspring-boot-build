@@ -152,7 +152,7 @@ public enum WeekDay {
         }
     };
 
-    private static Map<Integer, WeekDay> MAP = new HashMap<>();
+    private static final Map<Integer, WeekDay> MAP = new HashMap<>();
 
     static {
         WeekDay[] weekDays = WeekDay.values();

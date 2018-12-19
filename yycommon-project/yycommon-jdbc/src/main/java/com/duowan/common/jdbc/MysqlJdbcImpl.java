@@ -1,8 +1,8 @@
 package com.duowan.common.jdbc;
 
-import  com.duowan.common.jdbc.dialect.Dialect;
-import  com.duowan.common.jdbc.dialect.MysqlDialect;
-import  com.duowan.common.jdbc.sqlbuilder.*;
+import com.duowan.common.jdbc.dialect.Dialect;
+import com.duowan.common.jdbc.dialect.MysqlDialect;
+import com.duowan.common.jdbc.sqlbuilder.*;
 import org.apache.commons.lang3.StringUtils;
 
 /**

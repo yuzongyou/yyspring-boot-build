@@ -42,7 +42,7 @@ public enum CenterInfoType {
     private int id;
     private String name;
 
-    private static Map<Integer, CenterInfoType> TYPE_MAP = new HashMap<Integer, CenterInfoType>();
+    private static final Map<Integer, CenterInfoType> TYPE_MAP = new HashMap<>();
 
     static {
         for (CenterInfoType type : values()) {

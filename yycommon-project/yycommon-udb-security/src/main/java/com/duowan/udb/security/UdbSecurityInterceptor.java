@@ -82,7 +82,11 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         this.interceptorPatterns = fixPatterns(interceptorPatterns);
         this.excludePatterns = fixPatterns(excludePatterns);
 
-        logger.info("初始化 UdbSecurityInterceptor 拦截器, 跳过静态资源: " + staticSkip + ", 默认拦截模式： " + defaultCheckMode + ", 排除的包名和类： " + JsonUtil.toJson(excludePackagesOrClassNames));
+        String excludePackageOrClassNameString = JsonUtil.toJson(excludePackagesOrClassNames);
+        logger.info("初始化 UdbSecurityInterceptor 拦截器, 跳过静态资源: {}, 默认拦截模式： {}, 排除的包名和类： {}",
+                staticSkip,
+                defaultCheckMode,
+                excludePackageOrClassNameString);
     }
 
     private Set<String> fixExcludePackagesOrClassNames(Set<String> excludePackagesOrClassNames) {
@@ -123,12 +127,12 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        boolean isStatic = isStaticRequest(request, response, handler);
+        boolean isStatic = isStaticRequest(handler);
 
         if (isStatic && this.staticSkip) {
             return true;
         }
-        CheckMode checkMode = detectUdbCheckMode(request, response, handler, isStatic);
+        CheckMode checkMode = detectUdbCheckMode(request, handler, isStatic);
 
         if (null == checkMode || CheckMode.NONE.equals(checkMode)) {
             // 不需要做登录控制
@@ -151,9 +155,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         if (null != udbOauth && udbOauth.isLogin()) {
             // 检查权限
             if (privilegeInterceptor != null) {
-                if (!privilegeInterceptor.checkPrivilege(username, request, response, handler)) {
-                    return false;
-                }
+                return privilegeInterceptor.checkPrivilege(username, request, response, handler);
             }
             return true;
         } else {
@@ -162,7 +164,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         }
     }
 
-    private CheckMode detectUdbCheckMode(HttpServletRequest request, HttpServletResponse response, Object handler, boolean isStatic) {
+    private CheckMode detectUdbCheckMode(HttpServletRequest request, Object handler, boolean isStatic) {
 
         String requestUri = request.getRequestURI();
         boolean isMatchExcludePattern = isMatchExcludePattern(requestUri);
@@ -176,12 +178,12 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Class<?> beanType = handlerMethod.getBeanType();
 
-            if (!isRequestNeedUdbCheck(request, beanType, handlerMethod)) {
+            if (!isRequestNeedUdbCheck(beanType)) {
                 return null;
             }
 
             // 获取注解拦截要求
-            CheckMode checkMode = detectAnnotatedUdbCheckMode(request, beanType, handlerMethod);
+            CheckMode checkMode = detectAnnotatedUdbCheckMode(beanType, handlerMethod);
             if (checkMode == null) {
                 // 注解为空，表示根据当前请求地址是否需要拦截来计算
                 if (isMatchExcludePattern) {
@@ -207,9 +209,9 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         return null;
     }
 
-    private CheckMode detectAnnotatedUdbCheckMode(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
+    private CheckMode detectAnnotatedUdbCheckMode(Class<?> beanType, HandlerMethod handlerMethod) {
 
-        CheckMode methodCheckMode = detectMethodAnnotatedUdbCheckMode(request, beanType, handlerMethod);
+        CheckMode methodCheckMode = detectMethodAnnotatedUdbCheckMode(handlerMethod);
         if (null != methodCheckMode) {
             return methodCheckMode;
         }
@@ -225,7 +227,7 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
         return null;
     }
 
-    private CheckMode detectMethodAnnotatedUdbCheckMode(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
+    private CheckMode detectMethodAnnotatedUdbCheckMode(HandlerMethod handlerMethod) {
 
         if (null != handlerMethod.getMethodAnnotation(IgnoredUdbCheck.class)) {
             return CheckMode.NONE;
@@ -262,12 +264,12 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
     /**
      * 是否是静态资源请求
      */
-    private boolean isStaticRequest(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    private boolean isStaticRequest(Object handler) {
 
-        return handler == null || !(handler instanceof HandlerMethod);
+        return !(handler instanceof HandlerMethod);
     }
 
-    private boolean isRequestNeedUdbCheck(HttpServletRequest request, Class<?> beanType, HandlerMethod handlerMethod) {
+    private boolean isRequestNeedUdbCheck(Class<?> beanType) {
 
         // spring 开头的不拦截
         if (null != this.excludePackagesOrClassNames) {
@@ -291,14 +293,14 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
      */
     private void toUdbUnloginView(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        if (!needForwardToUdbLoginUI(request, response, handler)) {
+        if (!needForwardToUdbLoginUI(handler)) {
             throw new UdbUnLoginException();
         }
 
         forwardToUdbLoginUI(request, response);
     }
 
-    private boolean needForwardToUdbLoginUI(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    private boolean needForwardToUdbLoginUI(Object handler) {
 
         if (handler instanceof HandlerMethod) {
 
@@ -365,8 +367,8 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
     /**
      * 获取域名.
      *
-     * @param request
-     * @return
+     * @param request 当前请求
+     * @return 域名
      */
     public static String getDomain(HttpServletRequest request) {
         String serverName = getServerName(request);
@@ -386,10 +388,11 @@ public class UdbSecurityInterceptor implements HandlerInterceptor {
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-
+        // DO nothing
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        // DO nothing
     }
 }

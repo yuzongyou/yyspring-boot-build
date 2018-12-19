@@ -3,6 +3,7 @@ package com.duowan.yyspringboot.autoconfigure.admincenter;
 import com.duowan.common.admincenter.context.PrivilegeContext;
 import com.duowan.common.admincenter.dao.AdmincenterDao;
 import com.duowan.common.admincenter.dao.http.AdmincenterDaoHttpImpl;
+import com.duowan.common.admincenter.exception.PrivilegeParseException;
 import com.duowan.common.admincenter.model.Privilege;
 import com.duowan.common.admincenter.service.AdmincenterService;
 import com.duowan.common.admincenter.service.impl.AdmincenterInterceptorService;
@@ -50,15 +51,19 @@ public class AdmincenterAutoConfiguration {
     }
 
     @Bean
-    public PrivilegeContext privilegeContext(AdmincenterProperties admincenterProperties) throws Exception {
-        String privilegeXmlText = PrivilegeXmlLoader.loadPrivilegeXml(admincenterProperties.getPrivilegeXmlPath());
+    public PrivilegeContext privilegeContext(AdmincenterProperties admincenterProperties) {
+        try {
+            String privilegeXmlText = PrivilegeXmlLoader.loadPrivilegeXml(admincenterProperties.getPrivilegeXmlPath());
 
-        Boolean needCheckPrivilege = admincenterProperties.getNeedCheckPrivilege();
-        if (null == needCheckPrivilege) {
-            needCheckPrivilege = !AppContext.isDev();
+            Boolean needCheckPrivilege = admincenterProperties.getNeedCheckPrivilege();
+            if (null == needCheckPrivilege) {
+                needCheckPrivilege = !AppContext.isDev();
+            }
+
+            return new PrivilegeContext(privilegeXmlText, needCheckPrivilege);
+        } catch (Exception e) {
+            throw new PrivilegeParseException(e);
         }
-
-        return new PrivilegeContext(privilegeXmlText, needCheckPrivilege);
     }
 
     @Bean

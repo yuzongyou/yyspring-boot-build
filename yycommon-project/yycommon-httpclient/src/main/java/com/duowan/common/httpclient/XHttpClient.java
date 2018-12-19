@@ -1,7 +1,6 @@
 package com.duowan.common.httpclient;
 
 import com.duowan.common.XApi;
-import com.duowan.common.exception.HttpInvokeException;
 import com.duowan.common.util.Util;
 
 import java.util.Map;
@@ -19,16 +18,16 @@ public class XHttpClient {
     /**
      * 请求前的拦截器
      **/
-    private PreRequestInterceptor<AbstractHcRequestContext> preRequestInterceptor;
+    private PreRequestInterceptor<AbstractHcRequestContext> globalPreRequestInterceptor;
+    private PreRequestInterceptor<HcPostContext> globalPostPreInterceptor;
+    private PreRequestInterceptor<HcGetContext> globalGetPreInterceptor;
+    private PreRequestInterceptor<HcDeleteContext> globalDeletePreInterceptor;
+    private PreRequestInterceptor<HcPutContext> globalPutPreInterceptor;
+
     private PreRequestInterceptor<HcPostContext> postPreInterceptor;
     private PreRequestInterceptor<HcGetContext> getPreInterceptor;
     private PreRequestInterceptor<HcDeleteContext> deletePreInterceptor;
     private PreRequestInterceptor<HcPutContext> putPreInterceptor;
-
-    private PreRequestInterceptor<HcPostContext> customPostPreInterceptor;
-    private PreRequestInterceptor<HcGetContext> customGetPreInterceptor;
-    private PreRequestInterceptor<HcDeleteContext> customDeletePreInterceptor;
-    private PreRequestInterceptor<HcPutContext> customPutPreInterceptor;
 
     public XHttpClient() {
         this(null, null);
@@ -44,17 +43,17 @@ public class XHttpClient {
     }
 
     public PreRequestInterceptor<AbstractHcRequestContext> getPreRequestInterceptor() {
-        return preRequestInterceptor;
+        return globalPreRequestInterceptor;
     }
 
     public void setPreRequestInterceptor(final PreRequestInterceptor<AbstractHcRequestContext> preRequestInterceptor) {
-        this.preRequestInterceptor = preRequestInterceptor;
+        this.globalPreRequestInterceptor = preRequestInterceptor;
 
-        if (null != this.preRequestInterceptor) {
-            this.postPreInterceptor = preRequestInterceptor::preHandle;
-            this.getPreInterceptor = preRequestInterceptor::preHandle;
-            this.deletePreInterceptor = preRequestInterceptor::preHandle;
-            this.putPreInterceptor = preRequestInterceptor::preHandle;
+        if (null != this.globalPreRequestInterceptor) {
+            this.globalPostPreInterceptor = preRequestInterceptor::preHandle;
+            this.globalGetPreInterceptor = preRequestInterceptor::preHandle;
+            this.globalDeletePreInterceptor = preRequestInterceptor::preHandle;
+            this.globalPutPreInterceptor = preRequestInterceptor::preHandle;
         }
     }
 
@@ -71,66 +70,66 @@ public class XHttpClient {
     }
 
     public PreRequestInterceptor<HcPostContext> getPostPreInterceptor() {
-        return customPostPreInterceptor == null ? postPreInterceptor : customPostPreInterceptor;
+        return postPreInterceptor == null ? globalPostPreInterceptor : postPreInterceptor;
     }
 
     public void setPostPreInterceptor(PreRequestInterceptor<HcPostContext> postPreInterceptor) {
-        this.customPostPreInterceptor = postPreInterceptor;
+        this.postPreInterceptor = postPreInterceptor;
     }
 
     public PreRequestInterceptor<HcGetContext> getGetPreInterceptor() {
-        return customGetPreInterceptor == null ? getPreInterceptor : customGetPreInterceptor;
+        return getPreInterceptor == null ? globalGetPreInterceptor : getPreInterceptor;
     }
 
     public void setGetPreInterceptor(PreRequestInterceptor<HcGetContext> getPreInterceptor) {
-        this.customGetPreInterceptor = getPreInterceptor;
+        this.getPreInterceptor = getPreInterceptor;
     }
 
     public PreRequestInterceptor<HcDeleteContext> getDeletePreInterceptor() {
-        return customDeletePreInterceptor == null ? deletePreInterceptor : customDeletePreInterceptor;
+        return deletePreInterceptor == null ? globalDeletePreInterceptor : deletePreInterceptor;
     }
 
     public void setDeletePreInterceptor(PreRequestInterceptor<HcDeleteContext> deletePreInterceptor) {
-        this.customDeletePreInterceptor = deletePreInterceptor;
+        this.deletePreInterceptor = deletePreInterceptor;
     }
 
     public PreRequestInterceptor<HcPutContext> getPutPreInterceptor() {
-        return customPutPreInterceptor == null ? putPreInterceptor : customPutPreInterceptor;
+        return putPreInterceptor == null ? globalPutPreInterceptor : putPreInterceptor;
     }
 
     public void setPutPreInterceptor(PreRequestInterceptor<HcPutContext> putPreInterceptor) {
-        this.customPutPreInterceptor = putPreInterceptor;
+        this.putPreInterceptor = putPreInterceptor;
     }
 
-    public HcGetContext get(String url) throws HttpInvokeException {
+    public HcGetContext get(String url) {
         return get(logEnabled, url);
     }
 
-    public HcPostContext post(String url) throws HttpInvokeException {
+    public HcPostContext post(String url) {
         return post(logEnabled, url);
     }
 
-    public HcDeleteContext delete(String url) throws HttpInvokeException {
+    public HcDeleteContext delete(String url) {
         return delete(logEnabled, url);
     }
 
-    public HcPutContext put(String url) throws HttpInvokeException {
+    public HcPutContext put(String url) {
         return put(logEnabled, url);
     }
 
-    public HcGetContext get(boolean logEnabled, String url) throws HttpInvokeException {
+    public HcGetContext get(boolean logEnabled, String url) {
         return HttpClientUtils.get(logEnabled, getApiUrl(url)).addPreInterceptor(getGetPreInterceptor());
     }
 
-    public HcPostContext post(boolean logEnabled, String url) throws HttpInvokeException {
+    public HcPostContext post(boolean logEnabled, String url) {
         return HttpClientUtils.post(logEnabled, getApiUrl(url)).addPreInterceptor(getPostPreInterceptor());
     }
 
-    public HcDeleteContext delete(boolean logEnabled, String url) throws HttpInvokeException {
+    public HcDeleteContext delete(boolean logEnabled, String url) {
         return HttpClientUtils.delete(logEnabled, getApiUrl(url)).addPreInterceptor(getDeletePreInterceptor());
     }
 
-    public HcPutContext put(boolean logEnabled, String url) throws HttpInvokeException {
+    public HcPutContext put(boolean logEnabled, String url) {
         return HttpClientUtils.put(logEnabled, getApiUrl(url)).addPreInterceptor(getPutPreInterceptor());
     }
 

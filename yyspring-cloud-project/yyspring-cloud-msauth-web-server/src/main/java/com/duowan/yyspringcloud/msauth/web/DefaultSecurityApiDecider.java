@@ -1,9 +1,9 @@
 package com.duowan.yyspringcloud.msauth.web;
 
+import com.duowan.yyspringcloud.msauth.web.annotations.SecurityApi;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.method.HandlerMethod;
-import com.duowan.yyspringcloud.msauth.web.annotations.SecurityApi;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

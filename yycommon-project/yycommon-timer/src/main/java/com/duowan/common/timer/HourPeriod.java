@@ -10,7 +10,7 @@ public class HourPeriod extends AbstractPeriod {
     private final long milliSeconds;
 
     public HourPeriod(int hour) {
-        this.milliSeconds = hour * 60 * 60 * 1000;
+        this.milliSeconds = hour * 60 * 60 * 1000L;
     }
 
     @Override

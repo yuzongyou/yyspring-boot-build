@@ -1,7 +1,10 @@
 package com.duowan.common.ipowner.seeker;
 
+import com.duowan.common.ipowner.exception.IpownerException;
 import com.duowan.common.ipowner.util.Constants;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +18,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Arvin
  */
 public class IpProvinceAndCitySeeker implements IpSeeker {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IpProvinceAndCitySeeker.class);
 
     /**
      * ip文件路径
@@ -40,17 +45,12 @@ public class IpProvinceAndCitySeeker implements IpSeeker {
     private File ipFile;
     private ReentrantLock lock = new ReentrantLock();
 
-    private void load(String filename) {
-        ipFile = new File(filename);
-        load();
-    }
-
     private void load(String filename, boolean strict) {
         ipFile = new File(filename);
         if (strict) {
-            int contentLength = Long.valueOf(ipFile.length()).intValue();
+            int contentLength = (int) ipFile.length();
             if (contentLength < 512 * 1024) {
-                throw new RuntimeException("ip data file error.");
+                throw new IpownerException("ip data file error.");
             }
         }
         load();
@@ -59,19 +59,19 @@ public class IpProvinceAndCitySeeker implements IpSeeker {
     @Override
     public String[] find(String ip) {
         String[] ips = ip.split("\\.");
-        int prefix_value = (Integer.valueOf(ips[0]) * 256 + Integer.valueOf(ips[1]));
-        long ip2long_value = ip2long(ip);
-        int start = index[prefix_value];
-        int max_comp_len = offset - 262144 - 4;
+        int prefixValue = (Integer.valueOf(ips[0]) * 256 + Integer.valueOf(ips[1]));
+        long ip2longValue = ip2long(ip);
+        int start = index[prefixValue];
+        int maxCompLen = offset - 262144 - 4;
         long tmpInt;
-        long index_offset = -1;
-        int index_length = -1;
+        long indexOffset = -1;
+        int indexLength = -1;
         byte b = 0;
-        for (start = start * 9 + 262144; start < max_comp_len; start += 9) {
+        for (start = start * 9 + 262144; start < maxCompLen; start += 9) {
             tmpInt = int2long(indexBuffer.getInt(start));
-            if (tmpInt >= ip2long_value) {
-                index_offset = bytesToLong(b, indexBuffer.get(start + 6), indexBuffer.get(start + 5), indexBuffer.get(start + 4));
-                index_length = (0xFF & indexBuffer.get(start + 7) << 8) + (0xFF & indexBuffer.get(start + 8));
+            if (tmpInt >= ip2longValue) {
+                indexOffset = bytesToLong(b, indexBuffer.get(start + 6), indexBuffer.get(start + 5), indexBuffer.get(start + 4));
+                indexLength = (0xFF & indexBuffer.get(start + 7) << 8) + (0xFF & indexBuffer.get(start + 8));
                 break;
             }
         }
@@ -80,9 +80,9 @@ public class IpProvinceAndCitySeeker implements IpSeeker {
 
         lock.lock();
         try {
-            dataBuffer.position(offset + (int) index_offset - 262144);
-            areaBytes = new byte[index_length];
-            dataBuffer.get(areaBytes, 0, index_length);
+            dataBuffer.position(offset + (int) indexOffset - 262144);
+            areaBytes = new byte[indexLength];
+            dataBuffer.get(areaBytes, 0, indexLength);
         } finally {
             lock.unlock();
         }
@@ -113,25 +113,17 @@ public class IpProvinceAndCitySeeker implements IpSeeker {
     }
 
     private byte[] getBytesByFile(File file) {
-        FileInputStream fin = null;
-        byte[] bs = new byte[new Long(file.length()).intValue()];
-        try {
-            fin = new FileInputStream(file);
+        byte[] bs = new byte[(int) file.length()];
+        try (FileInputStream fin = new FileInputStream(file)) {
             int readBytesLength = 0;
             int i;
             while ((i = fin.available()) > 0) {
                 fin.read(bs, readBytesLength, i);
                 readBytesLength += i;
             }
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } finally {
-            try {
-                if (fin != null) {
-                    fin.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        } catch (IOException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
             }
         }
 
@@ -144,11 +136,10 @@ public class IpProvinceAndCitySeeker implements IpSeeker {
 
     private int str2Ip(String ip) {
         String[] ss = ip.split("\\.");
-        int a, b, c, d;
-        a = Integer.parseInt(ss[0]);
-        b = Integer.parseInt(ss[1]);
-        c = Integer.parseInt(ss[2]);
-        d = Integer.parseInt(ss[3]);
+        int a = Integer.parseInt(ss[0]);
+        int b = Integer.parseInt(ss[1]);
+        int c = Integer.parseInt(ss[2]);
+        int d = Integer.parseInt(ss[3]);
         return (a << 24) | (b << 16) | (c << 8) | d;
     }
 

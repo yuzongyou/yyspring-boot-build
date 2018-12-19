@@ -9,14 +9,18 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class UdbContext {
 
+    private UdbContext() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 获取Udb认证
      *
      * @param attrLookupScopes 认证属性搜索作用域
-     * @param udbAppId             udbAppId
-     * @param udbAppKey            UdbAppKey
-     * @param request              当前请求对象
-     * @param authLevel            认证级别
+     * @param udbAppId         udbAppId
+     * @param udbAppKey        UdbAppKey
+     * @param request          当前请求对象
+     * @param authLevel        认证级别
      * @return 返回认证对象
      */
     public static UdbOauth getUdbOauth(AttrLookupScope[] attrLookupScopes, String udbAppId, String udbAppKey, HttpServletRequest request, UdbAuthLevel authLevel) {
@@ -30,10 +34,8 @@ public class UdbContext {
 
         Object obj = request.getAttribute(key);
 
-        if (null != obj) {
-            if (obj instanceof UdbOauth) {
-                return (UdbOauth) obj;
-            }
+        if (obj instanceof UdbOauth) {
+            return (UdbOauth) obj;
         }
 
         UdbOauth oauth = new UdbOauth(attrLookupScopes, udbAppId, udbAppKey, request, authLevel);

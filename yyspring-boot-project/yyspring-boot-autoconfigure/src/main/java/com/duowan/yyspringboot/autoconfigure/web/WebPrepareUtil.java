@@ -22,10 +22,15 @@ import java.util.Set;
  */
 public class WebPrepareUtil {
 
+    private WebPrepareUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
     private static List<String> initInfo = new ArrayList<>();
 
     private static final String FILE_URL_PREFIX = "file:///";
     private static final String FILE_URL_PREFIX_REGEX = "(?i)^file:///.*";
+    private static final String LOG_STATIC_RES_PREFIX = "开发环境，设置静态资源路径： ";
 
     public static String appendSystemUrlFilePrefix(String path) {
         if (path.matches(FILE_URL_PREFIX_REGEX)) {
@@ -72,7 +77,7 @@ public class WebPrepareUtil {
                 String newValue = resetLocationForDevEnv(resourceLocationPrefix, locationKeyPrefix, locationKey, value);
                 // 重置值
                 System.setProperty(locationKey, newValue);
-                initInfo.add("开发环境，设置静态资源路径： " + locationKey + "=" + newValue + ", 原始配置： " + value);
+                initInfo.add(LOG_STATIC_RES_PREFIX + locationKey + "=" + newValue + ", 原始配置： " + value);
             }
         }
     }
@@ -125,11 +130,11 @@ public class WebPrepareUtil {
     }
 
     private static void resetStaticResourceLocationsAsDefault(String locationPrefix, String locationKeyPrefix) {
-        initInfo.add("开发环境，设置静态资源路径： " + locationKeyPrefix + "[0] = /");
-        initInfo.add("开发环境，设置静态资源路径： " + locationKeyPrefix + "[1] = " + locationPrefix + "META-INF/resources/");
-        initInfo.add("开发环境，设置静态资源路径： " + locationKeyPrefix + "[2] = " + locationPrefix + "resources/");
-        initInfo.add("开发环境，设置静态资源路径： " + locationKeyPrefix + "[3] = " + locationPrefix + "static/");
-        initInfo.add("开发环境，设置静态资源路径： " + locationKeyPrefix + "[4] = " + locationPrefix + "public/");
+        initInfo.add(LOG_STATIC_RES_PREFIX + locationKeyPrefix + "[0] = /");
+        initInfo.add(LOG_STATIC_RES_PREFIX + locationKeyPrefix + "[1] = " + locationPrefix + "META-INF/resources/");
+        initInfo.add(LOG_STATIC_RES_PREFIX + locationKeyPrefix + "[2] = " + locationPrefix + "resources/");
+        initInfo.add(LOG_STATIC_RES_PREFIX + locationKeyPrefix + "[3] = " + locationPrefix + "static/");
+        initInfo.add(LOG_STATIC_RES_PREFIX + locationKeyPrefix + "[4] = " + locationPrefix + "public/");
 
         System.setProperty(locationKeyPrefix + "[0]", "/");
         System.setProperty(locationKeyPrefix + "[1]", locationPrefix + "META-INF/resources/");
@@ -138,17 +143,17 @@ public class WebPrepareUtil {
         System.setProperty(locationKeyPrefix + "[4]", locationPrefix + "public/");
     }
 
-    public static void prepareThymeleafDevConfig(StandardEnvironment appEnvironment, String moduleDir) {
+    public static void prepareThymeleafDevConfig(String moduleDir) {
         if (isThymeleafImported()) {
 
             // 如果是开发环境的话，重置 thymeleaf 路径
-            resetThymeleafTemplatePrefix(appEnvironment, moduleDir);
+            resetThymeleafTemplatePrefix(moduleDir);
 
             // Thymeleaf 缓存， 开发环境如果没有设置怎么默认就是 false
-            resetThymeleafCache(appEnvironment);
+            resetThymeleafCache();
 
             // Thymeleaf 模版模式， 3.0 默认设置为 HTML
-            resetThymeleafMode(appEnvironment);
+            resetThymeleafMode();
         }
     }
 
@@ -156,7 +161,7 @@ public class WebPrepareUtil {
      * Thymeleaf 模版处理的文件内容格式，HTML， XML， TEXT， JAVASCRIPT， CSS， RAW，thymeleaf3.0 版本使用HTML即可
      * 使用本模版，默认 HTML5 是过时的， 更改为默认的 HTML
      */
-    private static void resetThymeleafMode(StandardEnvironment appEnvironment) {
+    private static void resetThymeleafMode() {
         String thymeleafModeKey = "spring.thymeleaf.mode";
         String deprecatedModeValue = "HTML5";
 
@@ -172,7 +177,7 @@ public class WebPrepareUtil {
     /**
      * Thymeleaf 缓存， 开发环境如果没有设置怎么默认就是 false
      */
-    private static void resetThymeleafCache(StandardEnvironment appEnvironment) {
+    private static void resetThymeleafCache() {
         String thymeleafCacheKey = "spring.thymeleaf.cache";
 
         String thymeleafCacheValue = AppContext.getAppProperty(thymeleafCacheKey, null);
@@ -195,10 +200,8 @@ public class WebPrepareUtil {
 
     /**
      * 如果是开发环境的话，重置 thymeleaf 路径
-     *
-     * @param appEnvironment
      */
-    private static void resetThymeleafTemplatePrefix(StandardEnvironment appEnvironment, String moduleDir) {
+    private static void resetThymeleafTemplatePrefix(String moduleDir) {
         try {
 
             String resourceDir = PathUtil.normalizePath(moduleDir + "/src/main/resources/");
@@ -221,7 +224,8 @@ public class WebPrepareUtil {
 
                 initInfo.add("开发环境，设置Thymeleaf模版路径： " + thymeleafPrefixKey + "=" + thymeleafTemplatePathPrefix + ", 原始配置： " + thymeleafTemplatePrefix);
             }
-        } catch (MalformedURLException ignored) {
+        } catch (MalformedURLException e) {
+            initInfo.add("resetThymeleafTemplatePrefix error: " + e.getMessage());
         }
     }
 

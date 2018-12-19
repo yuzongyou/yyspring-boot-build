@@ -20,17 +20,21 @@ import java.util.Map;
  */
 public class IDCardUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(IDCardUtil.class);
+    private IDCardUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IDCardUtil.class);
 
     /**
      * 旧版身份证号码长度
      **/
-    private static int OLD_IDCARD_LENGTH = 15;
+    private static final int OLD_IDCARD_LENGTH = 15;
 
     /**
      * 新版身份证号码长度
      **/
-    private static int NEW_IDCARD_LENGTH = 18;
+    private static final int NEW_IDCARD_LENGTH = 18;
 
 
     /**
@@ -38,17 +42,17 @@ public class IDCardUtil {
      */
     private static final Map<Integer, String> AREA_MAP;
 
-    private static int[] WI = new int[]{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
+    private static final int[] WI = new int[]{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
 
     /**
      * 最后一位字符
      */
-    private static String[] LAST_STR = new String[]{"1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"};
+    private static final String[] LAST_STR = new String[]{"1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"};
 
-    private static String IDCARD_REGEX = "^\\d+[\\dX]$";
+    private static final String IDCARD_REGEX = "^\\d+[\\dX]$";
 
     static {
-        Map<Integer, String> areaMap = new HashMap<Integer, String>();
+        Map<Integer, String> areaMap = new HashMap<>();
         areaMap.put(11, "北京");
         areaMap.put(12, "天津");
         areaMap.put(13, "河北");
@@ -106,7 +110,7 @@ public class IDCardUtil {
      * @return 返回身份证号码年龄
      * @throws RuntimeException 如果不是合法的身份证将会抛出异常
      */
-    public static int getAge(String idCard) throws RuntimeException {
+    public static int getAge(String idCard) {
         AssertUtil.assertTrue(isValidBirthday(idCard), "身份证格式不合法");
         idCard = convertToNewFormatIdCard(idCard);
         Date birthday = getNewIdCardBirthday(idCard);
@@ -119,15 +123,14 @@ public class IDCardUtil {
 
             int age = calendar2.get(Calendar.YEAR) - calendar1.get(Calendar.YEAR);
             // 还没过生日，周岁减一
-            if (calendar2.get(Calendar.MONTH) <= calendar1.get(Calendar.MONTH)) {
-                // 还没过生日，周岁减一
-                if (calendar2.get(Calendar.DAY_OF_MONTH) < calendar1.get(Calendar.DAY_OF_MONTH)) {
-                    age -= 1;
-                }
+            // 还没过生日，周岁减一
+            if (calendar2.get(Calendar.MONTH) <= calendar1.get(Calendar.MONTH)
+                    && calendar2.get(Calendar.DAY_OF_MONTH) < calendar1.get(Calendar.DAY_OF_MONTH)) {
+                age -= 1;
             }
             return age < 1 ? 0 : age;
         } catch (Exception e) {
-            logger.warn("解析身份证年龄出错， idCard=" + idCard, e);
+            LOGGER.warn("解析身份证年龄出错， idCard=" + idCard, e);
             return 0;
         }
     }
@@ -186,10 +189,7 @@ public class IDCardUtil {
         if (null == birthday) {
             return false;
         }
-        if (birthday.after(new Date())) {
-            return false;
-        }
-        return true;
+        return !birthday.after(new Date());
     }
 
     private static Date getNewIdCardBirthday(String idCard) {

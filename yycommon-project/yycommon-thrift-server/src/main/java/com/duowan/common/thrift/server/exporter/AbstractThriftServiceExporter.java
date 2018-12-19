@@ -1,6 +1,7 @@
 package com.duowan.common.thrift.server.exporter;
 
 import com.duowan.common.thrift.server.exception.CanNotDeduceTServerException;
+import com.duowan.common.thrift.server.exception.ThriftServerException;
 import com.duowan.common.thrift.server.exception.ThriftServiceExportException;
 import com.duowan.common.thrift.server.util.ThriftUtil;
 import org.apache.thrift.TMultiplexedProcessor;
@@ -66,16 +67,19 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
 
     private TServer thriftServer;
 
-    private final Map<Class<?>, Class<? extends TServer>> argsClassToServerClassMap = Collections.unmodifiableMap(new HashMap<Class<?>, Class<? extends TServer>>() {
-        {
-            put(TServer.Args.class, TSimpleServer.class);
-            put(TSimpleServer.Args.class, TSimpleServer.class);
-            put(TThreadPoolServer.Args.class, TThreadPoolServer.class);
-            put(TNonblockingServer.Args.class, TNonblockingServer.class);
-            put(THsHaServer.Args.class, THsHaServer.class);
-            put(TThreadedSelectorServer.Args.class, TThreadedSelectorServer.class);
-        }
-    });
+    private static final Map<Class<?>, Class<? extends TServer>> ARGS_CLASS_TO_SERVER_CLASS_MAP = loadArgsClassToServerClassMap();
+
+
+    private static Map<Class<?>, Class<? extends TServer>> loadArgsClassToServerClassMap() {
+        Map<Class<?>, Class<? extends TServer>> map = new HashMap<>(7);
+        map.put(TServer.Args.class, TSimpleServer.class);
+        map.put(TSimpleServer.Args.class, TSimpleServer.class);
+        map.put(TThreadPoolServer.Args.class, TThreadPoolServer.class);
+        map.put(TNonblockingServer.Args.class, TNonblockingServer.class);
+        map.put(THsHaServer.Args.class, THsHaServer.class);
+        map.put(TThreadedSelectorServer.Args.class, TThreadedSelectorServer.class);
+        return Collections.unmodifiableMap(map);
+    }
 
     public AbstractThriftServiceExporter() {
         this(DEFAULT_THRIFT_SERVER_PORT, DEFAULT_JOIN_TO_PARENT_THREAD);
@@ -119,7 +123,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
                 return TThreadedSelectorServer.class.getConstructor(TThreadedSelectorServer.Args.class);
             }
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new ThriftServerException(e);
         }
         throw new CanNotDeduceTServerException("不合法的Thrift Server class : " + serverClass.getName());
     }
@@ -142,7 +146,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
                 return TThreadedSelectorServer.Args.class.getConstructor(TNonblockingServerTransport.class);
             }
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw new ThriftServerException(e);
         }
         throw new CanNotDeduceTServerException("不合法的Thrift Server class : " + serverClass.getName());
     }
@@ -183,7 +187,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
      * @return 返回TServer类
      */
     protected Class<? extends TServer> deduceServerClass(Class<T> argsClass) {
-        Class<? extends TServer> clazz = argsClassToServerClassMap.get(argsClass);
+        Class<? extends TServer> clazz = ARGS_CLASS_TO_SERVER_CLASS_MAP.get(argsClass);
         if (null == clazz) {
             throw new CanNotDeduceTServerException("无法推断参数类[" + this.argsClass.getName() + "]对应的 TServer 类！");
         }
@@ -215,7 +219,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
     }
 
     public Map<Class<?>, Class<? extends TServer>> getArgsClassToServerClassMap() {
-        return argsClassToServerClassMap;
+        return ARGS_CLASS_TO_SERVER_CLASS_MAP;
     }
 
     public int getPort() {
@@ -247,7 +251,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
     }
 
     @Override
-    public synchronized void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException {
+    public synchronized void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment) {
 
         String mode = joinToParentThread ? "JOIN_TO_PARENT_THREAD" : "NEW_THREAD";
 
@@ -258,10 +262,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
         }
 
         if (exported) {
-            logger.info("已经发布过Thrift服务, mode: " + mode +
-                    ", port:" + getPort() +
-                    ", exporter:" + this +
-                    ", services:" + getThriftServiceInfo());
+            logger.info("已经发布过Thrift服务, mode: {}, port={}, exporter={}, services={}", mode, getPort(), this, getThriftServiceInfo());
             return;
         }
 
@@ -286,10 +287,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
 
             thriftServer = (TServer) serverConstructor.newInstance(args);
 
-            logger.info("成功发布Thrift服务, mode: " + mode +
-                    ", port:" + getPort() +
-                    ", exporter:" + this +
-                    ", services:" + getThriftServiceInfo());
+            logger.info("成功发布Thrift服务, mode: {}, port={}, exporter={}, services={}", mode, getPort(), this, getThriftServiceInfo());
 
             if (joinToParentThread) {
                 thriftServer.serve();
@@ -323,7 +321,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
     }
 
     @Override
-    public void stop() throws ThriftServiceExportException {
+    public void stop() {
         String mode = joinToParentThread ? "JOIN_TO_PARENT_THREAD" : "NEW_THREAD";
         if (exported) {
             if (joinToParentThread && thriftServer != null) {
@@ -332,15 +330,9 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
                 listenThread.shutdownNow();
             }
 
-            logger.info("成功停止了Thrift服务, mode: " + mode +
-                    ", port:" + getPort() +
-                    ", exporter:" + this +
-                    ", services:" + getThriftServiceInfo());
+            logger.info("成功停止了Thrift服务, mode: {}, port={}, exporter={}, services={}", mode, getPort(), this, getThriftServiceInfo());
         } else {
-            logger.info("Thrift服务尚未启动，不需要停止, mode: " + mode +
-                    ", port:" + getPort() +
-                    ", exporter:" + this +
-                    ", services:" + getThriftServiceInfo());
+            logger.info("Thrift服务尚未启动，不需要停止, mode: {}, port={}, exporter={}, services={}", mode, getPort(), this, getThriftServiceInfo());
         }
     }
 
@@ -358,20 +350,14 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
 
     private boolean isReactiveWebApplication(Environment environment) {
         Class<?> reactiveWebEnvClass = lookupClass("org.springframework.boot.web.reactive.context.ConfigurableReactiveWebEnvironment");
-        if (null != reactiveWebEnvClass && reactiveWebEnvClass.isAssignableFrom(environment.getClass())) {
-            // Servlet
-            return true;
-        }
-        return false;
+        // Servlet
+        return null != reactiveWebEnvClass && reactiveWebEnvClass.isAssignableFrom(environment.getClass());
     }
 
     private boolean isServletWebApplication(Environment environment) {
         Class<?> webEnvClass = lookupClass("org.springframework.web.context.ConfigurableWebEnvironment");
-        if (null != webEnvClass && webEnvClass.isAssignableFrom(environment.getClass())) {
-            // Servlet
-            return true;
-        }
-        return false;
+        // Servlet
+        return null != webEnvClass && webEnvClass.isAssignableFrom(environment.getClass());
     }
 
     private Class<?> lookupClass(String className) {
@@ -405,7 +391,8 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
             Class<?> thriftServiceClass = wrapper.getThriftServiceClass();
             TProcessor processor = ThriftUtil.createThriftServiceProcessor(thriftServiceClass, wrapper.getIfaceClass(), service);
             multiplexedProcessor.registerProcessor(wrapper.getRouter(), processor);
-            logger.info("注册Thrift服务到 [LOCALHOST:" + getPort() + "/" + wrapper.getRouter() + "] by service [" + service + "] for thrift class [" + thriftServiceClass.getName() + "]");
+            logger.info("注册Thrift服务到 [LOCALHOST:{}/{}] by service [{}] for thrift class [{}]",
+                    getPort(), wrapper.getRouter(), service, thriftServiceClass.getName());
         }
 
         // 同时发布多个
@@ -425,7 +412,7 @@ public abstract class AbstractThriftServiceExporter<T extends TServer.AbstractSe
         try {
             return (T) argsConstructor.newInstance(serverTransport);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ThriftServerException(e);
         }
 
     }

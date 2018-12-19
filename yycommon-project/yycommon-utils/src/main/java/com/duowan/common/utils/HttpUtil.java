@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,11 @@ import java.util.Map;
  */
 public class HttpUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
+
+    private HttpUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 默认超时时间
@@ -96,7 +101,7 @@ public class HttpUtil {
     }
 
     public static String doGet(String url, Map<String, String> paramsMap, Map<String, String> cookieMap, int connectionTimeout, int readTimeout) {
-        return doGet(url, paramsMap, cookieMap, connectionTimeout, readTimeout, "UTF-8");
+        return doGet(url, paramsMap, cookieMap, connectionTimeout, readTimeout, Encodings.DEFAULT_ENCODING);
     }
 
     /**
@@ -130,15 +135,15 @@ public class HttpUtil {
 
             addCookieForHttpUrlConnection(conn, cookieMap);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("HttpGet: url=" + finalUrl);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("HttpGet: url={}", finalUrl);
             }
 
             is = getInputStream(conn);
 
-            return readInputStreamAsString(is, StringUtils.isBlank(encoding) ? "UTF-8" : encoding);
+            return readInputStreamAsString(is, StringUtils.isBlank(encoding) ? Encodings.DEFAULT_ENCODING : encoding);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new UtilsException(e.getMessage(), e);
         } finally {
             closeInputStream(is);
             closeConnection(conn);
@@ -151,7 +156,7 @@ public class HttpUtil {
             return;
         }
 
-        List<String> keys = new ArrayList<String>(cookieMap.keySet());
+        List<String> keys = new ArrayList<>(cookieMap.keySet());
         for (int i = 0; i < keys.size(); i++) {
             String key = keys.get(i);
             String value = cookieMap.get(key);
@@ -184,7 +189,10 @@ public class HttpUtil {
         if (is != null) {
             try {
                 is.close();
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
             }
         }
     }
@@ -202,11 +210,11 @@ public class HttpUtil {
     /**
      * Post 请求
      *
-     * @param url 请求地址
+     * @param url       请求地址
      * @param paramsMap 请求参数
      * @return 返回请求结果
      */
-    public static String doPost(String url, Map<String,String> paramsMap) {
+    public static String doPost(String url, Map<String, String> paramsMap) {
         return doPost(url, paramsMap, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_READ_TIMEOUT);
     }
 
@@ -224,7 +232,7 @@ public class HttpUtil {
     }
 
     public static String doPost(String url, Map<String, String> paramMap, Map<String, String> cookieMap, int connectionTimeout, int readTimeout) {
-        return doPost(url, paramMap, cookieMap, connectionTimeout, readTimeout, "UTF-8");
+        return doPost(url, paramMap, cookieMap, connectionTimeout, readTimeout, Encodings.DEFAULT_ENCODING);
     }
 
     /**
@@ -271,8 +279,8 @@ public class HttpUtil {
                 out.close();
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("HttpPost: url=" + url + ", postData=" + postData);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("HttpPost: url={}, postData={}", url, postData);
             }
 
             addCookieForHttpUrlConnection(conn, cookieMap);
@@ -281,7 +289,7 @@ public class HttpUtil {
 
             return readInputStreamAsString(is, encoding);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new UtilsException(e.getMessage(), e);
         } finally {
             closeInputStream(is);
             closeConnection(conn);
@@ -293,7 +301,7 @@ public class HttpUtil {
             return null;
         }
         if (null == encoding || "".equals(encoding.trim())) {
-            encoding = "UTF-8";
+            encoding = Encodings.DEFAULT_ENCODING;
         }
         StringBuilder builder = new StringBuilder();
         byte[] b = new byte[4096];

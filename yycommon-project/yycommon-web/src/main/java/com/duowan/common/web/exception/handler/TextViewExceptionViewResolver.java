@@ -6,16 +6,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Arvin
  */
 public class TextViewExceptionViewResolver extends AbstractExceptionViewResolver {
 
-    public TextViewExceptionViewResolver() {
+    public TextViewExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList) {
+        super(errorMessageReaderList);
     }
 
-    public TextViewExceptionViewResolver(boolean logException) {
+    public TextViewExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList, boolean logException) {
+        super(errorMessageReaderList);
         this.setLogException(logException);
     }
 
@@ -29,15 +32,9 @@ public class TextViewExceptionViewResolver extends AbstractExceptionViewResolver
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler, Exception ex) {
 
         if (ex != null) {
-            int errorCode = getErrorCode(ex);
-            String errorMessage = getErrorMessage(ex);
-            String logInfo = "处理请求异常，返回 TextView: status=[" + errorCode + "], errorMessage=[" + errorMessage + "]";
-            if (logException) {
-                logger.warn(logInfo, ex);
-            } else {
-                logger.warn(logInfo);
-            }
-            return new TextView(errorCode + ":" + errorMessage);
+
+            ErrorMessage errorMessage = getErrorMessage(ex);
+            return new TextView(errorMessage.getErrorCode() + ":" + errorMessage.getMessage());
         }
 
         return null;

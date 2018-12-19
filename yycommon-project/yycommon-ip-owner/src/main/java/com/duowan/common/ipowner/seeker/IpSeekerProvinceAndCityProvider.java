@@ -1,9 +1,9 @@
 package com.duowan.common.ipowner.seeker;
 
+import com.duowan.common.ipowner.util.Constants;
 import com.duowan.common.timer.PerDayPeriod;
 import com.duowan.common.timer.Period;
 import com.duowan.common.utils.ConvertUtil;
-import com.duowan.common.ipowner.util.Constants;
 import org.apache.commons.lang3.StringUtils;
 
 /**

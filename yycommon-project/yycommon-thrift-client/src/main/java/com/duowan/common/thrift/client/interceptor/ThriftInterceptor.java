@@ -14,25 +14,22 @@ public interface ThriftInterceptor extends Ordered {
      *
      * @param invokeContext 执行上下文
      * @return 结果对象，如果不为null则直接返回结果
-     * @throws Exception 任何异常
      */
-    Object before(ThriftInvokeContext invokeContext) throws Exception;
+    Object before(ThriftInvokeContext invokeContext);
 
     /**
      * 在执行 Thrift 方法之后进行拦截， 注意是没有任何异常的情况下才会被调用
      *
      * @param returnValue   返回值
      * @param invokeContext 执行上下文
-     * @throws Exception 任何异常
      */
-    void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception;
+    void afterReturning(Object returnValue, ThriftInvokeContext invokeContext);
 
     /**
      * 在执行 Thrift 方法之后进行拦截， 注意是没有任何异常的情况下才会被调用
      *
      * @param exception     运行异常
      * @param invokeContext 执行上下文
-     * @throws Exception 任何异常
      */
-    void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) throws Exception;
+    void afterThrowing(Exception exception, ThriftInvokeContext invokeContext);
 }

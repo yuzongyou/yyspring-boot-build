@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class DefaultLoadBalancer extends AbstractLoadBalancer {
 
-    private final static Logger logger = LoggerFactory.getLogger(DefaultLoadBalancer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLoadBalancer.class);
 
     private Rule rule;
 
@@ -49,7 +49,7 @@ public class DefaultLoadBalancer extends AbstractLoadBalancer {
             try {
                 return serverNodeDiscovery.getServerNodes();
             } catch (Exception e) {
-                logger.warn("从ServerNodeDiscovery获取Thrift服务节点失败: " + e.getMessage(), e);
+                LOGGER.warn("从ServerNodeDiscovery获取Thrift服务节点失败: " + e.getMessage(), e);
             }
         }
         return nodeList;

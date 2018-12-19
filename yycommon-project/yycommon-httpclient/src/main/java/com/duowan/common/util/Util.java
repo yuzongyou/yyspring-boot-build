@@ -7,6 +7,10 @@ package com.duowan.common.util;
  */
 public class Util {
 
+    private Util() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean isBlank(String value) {
         return null == value || "".equals(value.trim());
     }

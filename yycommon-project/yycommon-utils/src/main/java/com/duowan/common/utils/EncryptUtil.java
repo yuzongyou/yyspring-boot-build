@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,10 @@ import java.security.MessageDigest;
 public class EncryptUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(EncryptUtil.class);
+
+    private EncryptUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * MD5 加密，加密后的密文是大写
@@ -90,7 +95,7 @@ public class EncryptUtil {
 
             return byte2hex(localMac.doFinal());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UtilsException(e);
         }
     }
 }

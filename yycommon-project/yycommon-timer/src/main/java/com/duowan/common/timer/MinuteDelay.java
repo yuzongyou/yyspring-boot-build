@@ -11,7 +11,7 @@ public class MinuteDelay implements Delay {
     private final long milliseconds;
 
     public MinuteDelay(int minute) {
-        this.milliseconds = minute * 60 * 1000;
+        this.milliseconds = minute * 60 * 1000L;
     }
 
     @Override

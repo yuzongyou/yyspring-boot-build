@@ -18,15 +18,12 @@ public class LogReqMetadata {
 
     private static Map<String, LogReqMetadata> metadataMap = new HashMap<>();
 
-    private static LogReqMetadata EMPTY_LOG_REQ_METADATA = new LogReqMetadata(null, null);
+    private static final LogReqMetadata EMPTY_LOG_REQ_METADATA = new LogReqMetadata(null, null);
 
     private static final String PATTERN_ALL = "*";
     private static final String PATTERN_SPLIT = ",";
     private static final Set<String> EMPTY_SET = new HashSet<>(0);
 
-    private String requestMethod;
-    private String requestUri;
-    private LogRequestInfo logRequestInfo;
     private boolean includeParamAll;
     private boolean excludeParamAll;
     private boolean includeCookieAll;
@@ -50,9 +47,6 @@ public class LogReqMetadata {
                 return;
             }
             Environment environment = context.getEnvironment();
-            this.requestMethod = request.getMethod();
-            this.requestUri = request.getRequestURI();
-            this.logRequestInfo = logRequestInfo;
 
             initParamMetadata(environment, logRequestInfo);
             initCookieMetadata(environment, logRequestInfo);
@@ -68,17 +62,17 @@ public class LogReqMetadata {
     }
 
     private void initHeaderMetadata(Environment environment, LogRequestInfo logRequestInfo) {
-        String excludeParams = resolveProperty(environment, logRequestInfo.excludeHeaders());
-        if (PATTERN_ALL.equals(excludeParams)) {
+        String tempExcludeParams = resolveProperty(environment, logRequestInfo.excludeHeaders());
+        if (PATTERN_ALL.equals(tempExcludeParams)) {
             this.excludeHeaderAll = true;
             return;
         }
-        String includeParams = resolveProperty(environment, logRequestInfo.includeHeaders());
-        this.includeHeaderAll = PATTERN_ALL.equals(includeParams);
+        String tempIncludeParams = resolveProperty(environment, logRequestInfo.includeHeaders());
+        this.includeHeaderAll = PATTERN_ALL.equals(tempIncludeParams);
 
-        this.excludeHeaders = toParamNameSet(excludeParams);
+        this.excludeHeaders = toParamNameSet(tempExcludeParams);
         if (!this.includeHeaderAll) {
-            this.includeHeaders = toParamNameSet(includeParams);
+            this.includeHeaders = toParamNameSet(tempIncludeParams);
         }
         boolean hadIncludeHeader = this.includeHeaders != null && !this.includeHeaders.isEmpty();
         if (!this.includeHeaderAll && !hadIncludeHeader) {
@@ -87,17 +81,17 @@ public class LogReqMetadata {
     }
 
     private void initCookieMetadata(Environment environment, LogRequestInfo logRequestInfo) {
-        String excludeParams = resolveProperty(environment, logRequestInfo.excludeCookies());
-        if (PATTERN_ALL.equals(excludeParams)) {
+        String tempExcludeParams = resolveProperty(environment, logRequestInfo.excludeCookies());
+        if (PATTERN_ALL.equals(tempExcludeParams)) {
             this.excludeCookieAll = true;
             return;
         }
-        String includeParams = resolveProperty(environment, logRequestInfo.includeCookies());
-        this.includeCookieAll = PATTERN_ALL.equals(includeParams);
+        String tempIncludeParams = resolveProperty(environment, logRequestInfo.includeCookies());
+        this.includeCookieAll = PATTERN_ALL.equals(tempIncludeParams);
 
-        this.excludeCookies = toParamNameSet(excludeParams);
+        this.excludeCookies = toParamNameSet(tempExcludeParams);
         if (!this.includeCookieAll) {
-            this.includeCookies = toParamNameSet(includeParams);
+            this.includeCookies = toParamNameSet(tempIncludeParams);
         }
 
         boolean hadInclude = this.includeCookies != null && !this.includeCookies.isEmpty();
@@ -107,17 +101,17 @@ public class LogReqMetadata {
     }
 
     private void initParamMetadata(Environment environment, LogRequestInfo logRequestInfo) {
-        String excludeParams = resolveProperty(environment, logRequestInfo.excludeParams());
-        if (PATTERN_ALL.equals(excludeParams)) {
+        String tempExcludeParams = resolveProperty(environment, logRequestInfo.excludeParams());
+        if (PATTERN_ALL.equals(tempExcludeParams)) {
             this.excludeParamAll = true;
             return;
         }
-        String includeParams = resolveProperty(environment, logRequestInfo.includeParams());
-        this.includeParamAll = PATTERN_ALL.equals(includeParams);
+        String tempIncludeParams = resolveProperty(environment, logRequestInfo.includeParams());
+        this.includeParamAll = PATTERN_ALL.equals(tempIncludeParams);
 
-        this.excludeParams = toParamNameSet(excludeParams);
+        this.excludeParams = toParamNameSet(tempExcludeParams);
         if (!this.includeParamAll) {
-            this.includeParams = toParamNameSet(includeParams);
+            this.includeParams = toParamNameSet(tempIncludeParams);
         }
 
         boolean hadInclude = this.includeParams != null && !this.includeParams.isEmpty();
@@ -147,14 +141,7 @@ public class LogReqMetadata {
         String requestMethod = request.getMethod();
         String requestUri = request.getRequestURI();
 
-        String key = requestMethod + " " + requestUri;
-        LogReqMetadata metadata = metadataMap.get(key);
-        if (null == metadata) {
-            metadata = new LogReqMetadata(request, logRequestInfo);
-            metadataMap.put(key, metadata);
-        }
-
-        return metadata;
+        return metadataMap.computeIfAbsent(requestMethod + " " + requestUri, key -> new LogReqMetadata(request, logRequestInfo));
     }
 
     public boolean isIncludeParamAll() {
@@ -188,10 +175,7 @@ public class LogReqMetadata {
         if (null != excludeParams && excludeParams.contains(name)) {
             return false;
         }
-        if (null != includeParams && includeParams.contains(name)) {
-            return true;
-        }
-        return false;
+        return null != includeParams && includeParams.contains(name);
     }
 
     public boolean includeCookie(String name) {
@@ -201,10 +185,7 @@ public class LogReqMetadata {
         if (null != excludeCookies && excludeCookies.contains(name)) {
             return false;
         }
-        if (null != includeCookies && includeCookies.contains(name)) {
-            return true;
-        }
-        return false;
+        return null != includeCookies && includeCookies.contains(name);
     }
 
     public boolean includeHeader(String name) {
@@ -214,9 +195,6 @@ public class LogReqMetadata {
         if (null != excludeHeaders && excludeHeaders.contains(name)) {
             return false;
         }
-        if (null != includeHeaders && includeHeaders.contains(name)) {
-            return true;
-        }
-        return false;
+        return null != includeHeaders && includeHeaders.contains(name);
     }
 }

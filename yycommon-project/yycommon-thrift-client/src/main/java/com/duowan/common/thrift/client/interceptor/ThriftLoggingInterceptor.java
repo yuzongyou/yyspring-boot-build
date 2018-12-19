@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ThriftLoggingInterceptor implements ThriftInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ThriftLoggingInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftLoggingInterceptor.class);
 
     @Override
     public int getOrder() {
@@ -19,32 +19,30 @@ public class ThriftLoggingInterceptor implements ThriftInterceptor {
     }
 
     @Override
-    public Object before(ThriftInvokeContext invokeContext) throws Exception {
-        logger.info(invokeContext.getTraceId() +
-                " method=" + invokeContext.getMethod().getName() +
-                ", args=" + ThriftUtil.argsToString(invokeContext.getArgs()) +
-                ", Transport=" + invokeContext.getPooledTransport() +
-                ", client=" + invokeContext.getClient());
+    public Object before(ThriftInvokeContext invokeContext) {
+        String argString = ThriftUtil.argsToString(invokeContext.getArgs());
+        LOGGER.info("{} method={}, args={}, Transport={}, client={}",
+                invokeContext.getTraceId(), invokeContext.getMethod().getName(), argString, invokeContext.getPooledTransport(), invokeContext.getClient());
         return null;
     }
 
     @Override
-    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception {
-        logger.info(invokeContext.getTraceId() +
-                " method=" + invokeContext.getMethod().getName() +
-                ", args=" + ThriftUtil.argsToString(invokeContext.getArgs()) +
-                ", Transport=" + invokeContext.getPooledTransport() +
-                ", client=" + invokeContext.getClient() +
-                ", return=" + returnValue);
+    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) {
+
+        String argString = ThriftUtil.argsToString(invokeContext.getArgs());
+
+        LOGGER.info("{} method={}, args={}, Transport={}, client={}, return={}",
+                invokeContext.getTraceId(), invokeContext.getMethod().getName(), argString, invokeContext.getPooledTransport(), invokeContext.getClient(), returnValue);
     }
 
     @Override
-    public void afterThrowing(Exception e, ThriftInvokeContext invokeContext) throws Exception {
+    public void afterThrowing(Exception e, ThriftInvokeContext invokeContext) {
         String remark = null;
         if (null != invokeContext.getPooledTransport()) {
             remark = invokeContext.getPooledTransport().getRemark();
         }
-        logger.warn(invokeContext.getTraceId() + " remark=[" + remark + "], node =[" + invokeContext.getServerNode() + "], error = " + e.getMessage(), e);
+        String logInfo = invokeContext.getTraceId() + " remark=[" + remark + "], node =[" + invokeContext.getServerNode() + "], error = " + e.getMessage();
+        LOGGER.warn(logInfo, e);
     }
 
 }

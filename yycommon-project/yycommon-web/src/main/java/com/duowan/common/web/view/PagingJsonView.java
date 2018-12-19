@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @author Arvin
  */
-public class PagingJsonView<T> extends JsonView<Map<String, Object> > {
+public class PagingJsonView<T> extends JsonView<Map<String, Object>> {
 
     /**
      * 创建一个分页视图 数据Map
@@ -26,7 +26,7 @@ public class PagingJsonView<T> extends JsonView<Map<String, Object> > {
      */
     public static <T> Map<String, Object> createPagingDataMap(List<T> dataList, int total, int pageNo, int pageSize) {
         Map<String, Object> dataMap = new HashMap<>(4);
-        dataList = null == dataList ? new ArrayList<T>() : dataList;
+        dataList = null == dataList ? new ArrayList<>() : dataList;
 
         if (pageNo < 1 || pageSize < 1) {
             throw new InvalidPagingParamException("分页参数不正确，要求 pageNo > 0 并且 pageSize > 0");

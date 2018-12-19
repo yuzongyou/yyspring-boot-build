@@ -9,15 +9,18 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class BooleanArrayConverter extends AbstractArrayConverter {
 
+    private static final Boolean[] EMPTY_ARRAY = new Boolean[0];
+
     public BooleanArrayConverter() {
         super(Boolean.class);
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     protected <T> T[] getArrayObject(JSONObject jsonObject, String dataKey) {
         String content = jsonObject.getString(dataKey);
         if (null == content) {
-            return null;
+            return (T[]) EMPTY_ARRAY;
         }
         String[] strArr = content.split(",");
         Boolean[] arr = new Boolean[strArr.length];

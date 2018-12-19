@@ -1,8 +1,8 @@
 package com.duowan.common.jdbc;
 
+import com.duowan.common.jdbc.definition.QueryCondDef;
 import com.duowan.common.jdbc.exception.JdbcException;
 import com.duowan.common.jdbc.exception.ModelDefNotFoundException;
-import com.duowan.common.jdbc.definition.QueryCondDef;
 import com.duowan.common.utils.AssertUtil;
 
 import java.util.HashMap;

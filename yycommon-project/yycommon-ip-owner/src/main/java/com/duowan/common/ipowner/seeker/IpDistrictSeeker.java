@@ -2,6 +2,8 @@ package com.duowan.common.ipowner.seeker;
 
 import com.duowan.common.ipowner.util.Constants;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +17,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Arvin
  */
 public class IpDistrictSeeker implements IpSeeker {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(IpDistrictSeeker.class);
 
     /**
      * ip文件路径
@@ -47,11 +51,9 @@ public class IpDistrictSeeker implements IpSeeker {
     }
 
     private void load() {
-        FileInputStream fin = null;
         lock.lock();
-        try {
-            dataBuffer = ByteBuffer.allocate(Long.valueOf(ipFile.length()).intValue());
-            fin = new FileInputStream(ipFile);
+        try (FileInputStream fin = new FileInputStream(ipFile)) {
+            dataBuffer = ByteBuffer.allocate((int) ipFile.length());
             int readBytesLength;
             byte[] chunk = new byte[4096];
             while (fin.available() > 0) {
@@ -72,16 +74,11 @@ public class IpDistrictSeeker implements IpSeeker {
                 }
             }
             indexBuffer.order(ByteOrder.BIG_ENDIAN);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-        } finally {
-            try {
-                if (fin != null) {
-                    fin.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        } catch (IOException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
             }
+        } finally {
             lock.unlock();
         }
     }
@@ -89,34 +86,38 @@ public class IpDistrictSeeker implements IpSeeker {
     @Override
     public String[] find(String ip) {
         String[] ips = ip.split("\\.");
-        int prefix_value = (Integer.valueOf(ips[0]) * 256 + Integer.valueOf(ips[1]));
-        long ip2long_value = ip2long(ip);
-        int start = index[prefix_value];
-        int max_comp_len = offset - 262148;
-        long index_offset = -1;
-        int index_length = -1;
-        for (start = start * 13 + 262144; start < max_comp_len; start += 13) {
-            if (int2long(indexBuffer.getInt(start)) <= ip2long_value) {
-                if (int2long(indexBuffer.getInt(start + 4)) >= ip2long_value) {
-                    index_offset = bytesToLong(indexBuffer.get(start + 11), indexBuffer.get(start + 10), indexBuffer.get(start + 9), indexBuffer.get(start + 8));
-                    index_length = 0xFF & indexBuffer.get(start + 12);
-                    break;
+        int prefixValue = (Integer.valueOf(ips[0]) * 256 + Integer.valueOf(ips[1]));
+        long ip2LongValue = ip2long(ip);
+        int start = index[prefixValue];
+        int maxCompLen = offset - 262148;
+        long indexOffset = -1;
+        int indexLength = -1;
+        for (start = start * 13 + 262144; start < maxCompLen; start += 13) {
+            boolean needBreak = false;
+            if (int2long(indexBuffer.getInt(start)) <= ip2LongValue) {
+                if (int2long(indexBuffer.getInt(start + 4)) >= ip2LongValue) {
+                    indexOffset = bytesToLong(indexBuffer.get(start + 11), indexBuffer.get(start + 10), indexBuffer.get(start + 9), indexBuffer.get(start + 8));
+                    indexLength = 0xFF & indexBuffer.get(start + 12);
+                    needBreak = true;
                 }
             } else {
+                needBreak = true;
+            }
+            if (needBreak) {
                 break;
             }
         }
 
-        if (index_offset == -1 && index_length == -1) {
-            return null;
+        if (indexOffset == -1 && indexLength == -1) {
+            return new String[0];
         }
 
         byte[] areaBytes;
         lock.lock();
         try {
-            dataBuffer.position(offset + (int) index_offset - 262144);
-            areaBytes = new byte[index_length];
-            dataBuffer.get(areaBytes, 0, index_length);
+            dataBuffer.position(offset + (int) indexOffset - 262144);
+            areaBytes = new byte[indexLength];
+            dataBuffer.get(areaBytes, 0, indexLength);
         } finally {
             lock.unlock();
         }
@@ -130,11 +131,10 @@ public class IpDistrictSeeker implements IpSeeker {
 
     private int str2Ip(String ip) {
         String[] ss = ip.split("\\.");
-        int a, b, c, d;
-        a = Integer.parseInt(ss[0]);
-        b = Integer.parseInt(ss[1]);
-        c = Integer.parseInt(ss[2]);
-        d = Integer.parseInt(ss[3]);
+        int a = Integer.parseInt(ss[0]);
+        int b = Integer.parseInt(ss[1]);
+        int c = Integer.parseInt(ss[2]);
+        int d = Integer.parseInt(ss[3]);
         return (a << 24) | (b << 16) | (c << 8) | d;
     }
 

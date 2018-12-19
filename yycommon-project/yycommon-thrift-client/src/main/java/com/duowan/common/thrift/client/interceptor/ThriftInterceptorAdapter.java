@@ -8,17 +8,17 @@ package com.duowan.common.thrift.client.interceptor;
 public abstract class ThriftInterceptorAdapter implements ThriftInterceptor {
 
     @Override
-    public Object before(ThriftInvokeContext invokeContext) throws Exception {
+    public Object before(ThriftInvokeContext invokeContext) {
         return null;
     }
 
     @Override
-    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception {
+    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) {
 
     }
 
     @Override
-    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) throws Exception {
+    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) {
 
     }
 

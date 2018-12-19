@@ -1,17 +1,20 @@
 package com.duowan.common.dns.util;
 
+import com.duowan.common.dns.exception.DnsException;
+
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 /**
  * @author Arvin
  */
 public class DnsCacheWrapper extends LinkedHashMap<String, Object> {
 
-    private final DnsCacheInterceptor interceptor;
+    private final transient DnsCacheInterceptor interceptor;
 
     public DnsCacheWrapper(DnsCacheInterceptor interceptor) {
         if (null == interceptor) {
-            throw new RuntimeException(DnsCacheInterceptor.class.getSimpleName() + " 不能为空！");
+            throw new DnsException(DnsCacheInterceptor.class.getSimpleName() + " 不能为空！");
         }
         this.interceptor = interceptor;
     }
@@ -31,5 +34,21 @@ public class DnsCacheWrapper extends LinkedHashMap<String, Object> {
         Object ret = super.get(key);
         this.interceptor.afterGet(stringKey, ret);
         return ret;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), interceptor);
     }
 }

@@ -53,6 +53,6 @@ public class ThriftClientAutoConfiguration extends AbstractAutoConfiguration {
         }
 
         // 注册Bean
-        ThriftClientRegister.registerThriftClientBeanDefinitions(clientConfigList, registry, environment);
+        ThriftClientRegister.registerThriftClientBeanDefinitions(clientConfigList, registry);
     }
 }

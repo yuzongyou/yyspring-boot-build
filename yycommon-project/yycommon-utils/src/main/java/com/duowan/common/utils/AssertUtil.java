@@ -11,6 +11,10 @@ import java.util.Collection;
  */
 public abstract class AssertUtil {
 
+    private AssertUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 默认的异常代码
      */

@@ -1,7 +1,6 @@
 package com.duowan.common.utils;
 
 import com.duowan.common.utils.exception.JsonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -23,6 +21,10 @@ import java.util.*;
  * @author Arvin
  */
 public abstract class JsonUtil {
+
+    private JsonUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
 
@@ -250,7 +252,7 @@ public abstract class JsonUtil {
         } catch (Exception e) {
             handleException(e, throwException);
         }
-        return null;
+        return new ArrayList<>(0);
     }
 
     /**
@@ -292,7 +294,7 @@ public abstract class JsonUtil {
         } catch (Exception e) {
             handleException(e, throwException);
         }
-        return null;
+        return new HashSet<>(0);
     }
 
     /**
@@ -739,7 +741,7 @@ public abstract class JsonUtil {
      */
     public static <T> List<T> toObjectList(String json, String expression, Class<T> valueType) {
         if (StringUtils.isBlank(json)) {
-            return null;
+            return new ArrayList<>(0);
         }
 
         JsonNode jsonNode = toJsonNode(json);

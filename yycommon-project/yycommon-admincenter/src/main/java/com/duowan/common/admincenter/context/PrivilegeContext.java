@@ -46,7 +46,7 @@ public class PrivilegeContext {
      **/
     private Set<String> noPrivilegeUrls = new HashSet<>();
 
-    public PrivilegeContext(String privilegeXml, boolean needCheckPrivilege) throws Exception {
+    public PrivilegeContext(String privilegeXml, boolean needCheckPrivilege) {
         if (StringUtils.isBlank(privilegeXml)) {
             throw new CodeException(500, "权限文件内容不能为空！");
         }
@@ -98,12 +98,11 @@ public class PrivilegeContext {
 
     public List<Privilege> getPrivilegesByIds(Set<String> privilegeIds) {
         List<Privilege> privileges = new ArrayList<>();
-        for (String privilegeId : privilegeIds) {
-            Privilege privilege = getPrivilegeById(privilegeId);
-            if (null != privilege) {
+
+        for (Privilege privilege : allPrivileges) {
+            if (privilegeIds.contains(privilege.getPrivilegeId())) {
                 privileges.add(privilege);
             }
-
         }
 
         return privileges;

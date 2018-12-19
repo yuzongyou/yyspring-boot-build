@@ -9,6 +9,10 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 public class TraceUtil {
 
+    private TraceUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String generateTraceId() {
         return RandomStringUtils.random(10, true, true);
     }

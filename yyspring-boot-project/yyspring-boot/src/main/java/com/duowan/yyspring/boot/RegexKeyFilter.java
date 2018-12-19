@@ -7,17 +7,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class RegexKeyFilter implements KeyFilter {
 
-    private final String REGEX;
+    private final String regex;
 
     public RegexKeyFilter(String regex) {
-        REGEX = regex;
+        this.regex = regex;
     }
 
     @Override
     public boolean filter(String key) {
-        if (StringUtils.isBlank(REGEX)) {
+        if (StringUtils.isBlank(regex)) {
             return true;
         }
-        return !StringUtils.isBlank(key) && key.matches(REGEX);
+        return !StringUtils.isBlank(key) && key.matches(regex);
     }
 }

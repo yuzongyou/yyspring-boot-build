@@ -1,7 +1,11 @@
 package com.duowan.common.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 /**
  * @author Arvin
@@ -9,6 +13,12 @@ import javax.servlet.http.HttpSession;
  * @since 2018/8/28 14:31
  */
 public class SessionUtil {
+
+    private SessionUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SessionUtil.class);
 
     public static <T> T get(HttpServletRequest request, String key, Class<T> requireType) {
         try {
@@ -27,12 +37,15 @@ public class SessionUtil {
         }
     }
 
-    public static void set(HttpServletRequest request, String key, Object value) {
+    public static void set(HttpServletRequest request, String key, Serializable value) {
         try {
             HttpSession session = request.getSession();
 
             session.setAttribute(key, value);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
     }
 }

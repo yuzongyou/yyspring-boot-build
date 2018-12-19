@@ -11,7 +11,7 @@ public class SecondDelay implements Delay {
     private final long milliseconds;
 
     public SecondDelay(int seconds) {
-        this.milliseconds = seconds * 1000;
+        this.milliseconds = seconds * 1000L;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,9 @@ import java.util.jar.JarFile;
  */
 public abstract class ClassUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClassUtil.class);
+    private ClassUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public interface ClassAccept {
 
@@ -34,6 +37,10 @@ public abstract class ClassUtil {
          */
         boolean accept(Class<?> clazz);
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassUtil.class);
+
+    private static final String PATH_DELIMITER = "/";
 
     /**
      * 是否包含给定注解中的任意一个
@@ -82,7 +89,7 @@ public abstract class ClassUtil {
      */
     public static Set<Class<?>> scan(String basePackages, Class<? extends Annotation>... annotations) {
         Set<String> packages = extractPackages(basePackages);
-        if (packages == null || packages.isEmpty()) {
+        if (packages.isEmpty()) {
             return new HashSet<>();
         }
         String[] packageNames = packages.toArray(new String[packages.size()]);
@@ -99,12 +106,7 @@ public abstract class ClassUtil {
     public static Set<Class<?>> scan(String[] basePackages, final Class<? extends Annotation>... annotations) {
         ClassAccept accepter = null;
         if (CommonUtil.isAnyNotNull(annotations)) {
-            accepter = new ClassAccept() {
-                @Override
-                public boolean accept(Class<?> clazz) {
-                    return null != clazz && containsAnyAnnotations(clazz, annotations);
-                }
-            };
+            accepter = clazz -> containsAnyAnnotations(clazz, annotations);
         }
 
         return scan(true, basePackages, accepter);
@@ -136,12 +138,7 @@ public abstract class ClassUtil {
         ClassAccept accepter = null;
 
         if (null != superClass) {
-            accepter = new ClassAccept() {
-                @Override
-                public boolean accept(Class<?> clazz) {
-                    return null != clazz && superClass.isAssignableFrom(clazz);
-                }
-            };
+            accepter = clazz -> null != clazz && superClass.isAssignableFrom(clazz);
         }
 
         return scan(scanSubPackage, basePackages, accepter);
@@ -159,7 +156,7 @@ public abstract class ClassUtil {
         // 提取包列表
         Set<String> allPackages = extractPackages(basePackages);
 
-        if (allPackages == null || allPackages.isEmpty()) {
+        if (allPackages.isEmpty()) {
             return new HashSet<>();
         }
         Set<Class<?>> classSet = new HashSet<>();
@@ -187,7 +184,7 @@ public abstract class ClassUtil {
 
         for (String basePackage : basePackages) {
             Set<String> subPackages = extractPackages(basePackage);
-            if (null != subPackages && !subPackages.isEmpty()) {
+            if (!subPackages.isEmpty()) {
                 packageSet.addAll(subPackages);
             }
         }
@@ -284,7 +281,7 @@ public abstract class ClassUtil {
 
                 String protocol = url.getProtocol();
 
-                if (protocol.equalsIgnoreCase("file")) {
+                if ("file".equalsIgnoreCase(protocol)) {
 
                     Set<Class<?>> subClassSet = scanFromUrlPath(classLoader, url.getPath(), packageName, accepter, scanSubPackage);
                     if (null != subClassSet && !subClassSet.isEmpty()) {
@@ -293,7 +290,7 @@ public abstract class ClassUtil {
                     continue;
                 }
 
-                if (protocol.equalsIgnoreCase("jar")) {
+                if ("jar".equalsIgnoreCase(protocol)) {
                     Set<Class<?>> subClassSet = scanFromJarPath(classLoader, url, packageName, accepter, scanSubPackage);
                     if (null != subClassSet && !subClassSet.isEmpty()) {
                         classSet.addAll(subClassSet);
@@ -303,7 +300,7 @@ public abstract class ClassUtil {
 
 
         } catch (Exception e) {
-            throw new RuntimeException("解析[" + packageName + "]下的类错误！", e);
+            throw new UtilsException("解析[" + packageName + "]下的类错误！", e);
         }
         return classSet;
     }
@@ -347,22 +344,29 @@ public abstract class ClassUtil {
                 boolean isSubPackage = !packageName.equals(basePackage);
 
                 if (scanSubPackage || !isSubPackage) {
-                    try {
-                        classPath = classPath.replaceFirst("(?i)\\.class$", "");
-                        Class<?> clazz = classLoader.loadClass(classPath);
-                        boolean isAccept = null == accepter || accepter.accept(clazz);
-                        if (isAccept) {
-                            classSet.add(clazz);
-                        }
-                    } catch (ClassNotFoundException ignored) {
-                    }
+                    collectIfClassPathIsClass(classLoader, accepter, classSet, classPath);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("解析[" + url + "]下的类错误！", e);
+            throw new UtilsException("解析[" + url + "]下的类错误！", e);
         }
 
         return classSet;
+    }
+
+    private static void collectIfClassPathIsClass(ClassLoader classLoader, ClassAccept accepter, Set<Class<?>> classSet, String classPath) {
+        try {
+            classPath = classPath.replaceFirst("(?i)\\.class$", "");
+            Class<?> clazz = classLoader.loadClass(classPath);
+            boolean isAccept = null == accepter || accepter.accept(clazz);
+            if (isAccept) {
+                classSet.add(clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage());
+            }
+        }
     }
 
     private static JarFile getJarFileFromUrl(URL url) {
@@ -376,7 +380,7 @@ public abstract class ClassUtil {
                 JarURLConnection connection = (JarURLConnection) url.openConnection();
                 return connection.getJarFile();
             } catch (Exception e1) {
-                throw new RuntimeException("无法将url转换成JarFile: " + e1.getMessage());
+                throw new UtilsException("无法将url转换成JarFile: " + e1.getMessage());
             }
         }
     }
@@ -396,8 +400,8 @@ public abstract class ClassUtil {
         path = path.replaceFirst("(?i)jar:[/\\\\]*", "");
         path = path.replaceFirst("(?i)![^\\\\!]+$", "");
 
-        if (!path.contains(":") && !path.startsWith("/")) {
-            path = "/" + path;
+        if (!path.contains(":") && !path.startsWith(PATH_DELIMITER)) {
+            path = PATH_DELIMITER + path;
         }
 
         return path;
@@ -488,7 +492,7 @@ public abstract class ClassUtil {
         String filePath = file.getPath();
 
         filePath = PathUtil.normalizePath(filePath);
-        String basePackagePath = StringUtils.isBlank(basePackage) ? "" : basePackage.replace('.', '/') + "/";
+        String basePackagePath = StringUtils.isBlank(basePackage) ? "" : basePackage.replace('.', '/') + PATH_DELIMITER;
 
         int index = filePath.lastIndexOf("/classes/" + basePackagePath);
         if (index < 1) {

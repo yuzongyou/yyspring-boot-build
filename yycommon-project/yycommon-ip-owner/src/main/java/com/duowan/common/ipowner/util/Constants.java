@@ -7,6 +7,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Constants {
 
+    private Constants() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * 获取存储基路径
      */
@@ -32,7 +36,7 @@ public class Constants {
     /**
      * Cache-Control 请求头, 30min
      */
-    public final static String DEFAULT_CACHE_CONTROL_MAX_AGE = "max-age=" + 60 * 30;
+    public static final String DEFAULT_CACHE_CONTROL_MAX_AGE = "max-age=" + 60 * 30;
 
     /**
      * 未知的省份

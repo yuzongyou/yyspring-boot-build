@@ -5,6 +5,10 @@ package com.duowan.udb.security;
  */
 public class UdbSecurityConstants {
 
+    private UdbSecurityConstants() {
+        throw new IllegalStateException("Constants class");
+    }
+
     /**
      * UDB Oauth 认证临时Token
      */

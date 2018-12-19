@@ -13,7 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ import java.util.List;
  */
 public class ExtendErrorAttributes extends DefaultErrorAttributes implements ErrorAttributes, HandlerExceptionResolver, Ordered {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExtendErrorAttributes.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendErrorAttributes.class);
 
     private List<ExceptionViewResolver> exceptionViewResolverList;
 
@@ -29,7 +28,7 @@ public class ExtendErrorAttributes extends DefaultErrorAttributes implements Err
         // 排序
         this.exceptionViewResolverList = sortExceptionViewResolverList(exceptionViewResolverList);
 
-        logger.info("创建异常Attribute: " + this.getClass().getName());
+        LOGGER.info("创建异常Attribute: {}", this.getClass().getName());
     }
 
     /**
@@ -39,12 +38,9 @@ public class ExtendErrorAttributes extends DefaultErrorAttributes implements Err
      */
     private List<ExceptionViewResolver> sortExceptionViewResolverList(List<ExceptionViewResolver> exceptionViewResolverList) {
 
-        Collections.sort(exceptionViewResolverList, new Comparator<ExceptionViewResolver>() {
-            @Override
-            public int compare(ExceptionViewResolver o1, ExceptionViewResolver o2) {
-                int ret = o1.getOrder() - o2.getOrder();
-                return ret == 0 ? 0 : ret > 0 ? 1 : -1;
-            }
+        Collections.sort(exceptionViewResolverList, (o1, o2) -> {
+            int ret = o1.getOrder() - o2.getOrder();
+            return Integer.compare(ret, 0);
         });
 
         return exceptionViewResolverList;

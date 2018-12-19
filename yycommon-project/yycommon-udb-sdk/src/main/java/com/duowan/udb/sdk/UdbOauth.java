@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 
 import static com.duowan.common.utils.CommonUtil.isAllBlank;
 
@@ -17,14 +18,14 @@ import static com.duowan.common.utils.CommonUtil.isAllBlank;
  *
  * @author Arvin
  */
-public class UdbOauth {
+public class UdbOauth implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(UdbOauth.class);
 
     /**
      * 验证
      */
-    private UserinfoForOauth oauth;
+    private transient UserinfoForOauth oauth;
 
     /**
      * 本地验证登录
@@ -72,17 +73,17 @@ public class UdbOauth {
 
         String oauthCookie = lookupCookieValueExt(request, "oauthCookie");
         String udbOar = lookupCookieValueExt(request, "udb_oar");
-        String username = lookupCookieValueExt(request, "username");
-        String yyuid = lookupCookieValueExt(request, "yyuid");
+        String tempUsername = lookupCookieValueExt(request, "username");
+        String tempYyuid = lookupCookieValueExt(request, "yyuid");
 
-        if (isAllBlank(oauthCookie, udbOar, username, yyuid)) {
+        if (isAllBlank(oauthCookie, udbOar, tempUsername, tempYyuid)) {
             init(udbAppId, udbAppKey, new UserinfoForOauth(request, null, udbAppId, udbAppKey), authLevel);
         } else {
             UserinfoForOauth userinfoForOauth = null;
-            if (StringUtils.isNotBlank(username)) {
-                userinfoForOauth = new UserinfoForOauth(username, -1, oauthCookie, udbOar, udbAppId, udbAppKey);
-            } else if (StringUtils.isNotBlank(yyuid)) {
-                userinfoForOauth = new UserinfoForOauth(null, Long.parseLong(yyuid), oauthCookie, udbOar, udbAppId, udbAppKey);
+            if (StringUtils.isNotBlank(tempUsername)) {
+                userinfoForOauth = new UserinfoForOauth(tempUsername, -1, oauthCookie, udbOar, udbAppId, udbAppKey);
+            } else if (StringUtils.isNotBlank(tempYyuid)) {
+                userinfoForOauth = new UserinfoForOauth(null, Long.parseLong(tempYyuid), oauthCookie, udbOar, udbAppId, udbAppKey);
             } else {
                 userinfoForOauth = new UserinfoForOauth(request, null, udbAppId, udbAppKey);
             }

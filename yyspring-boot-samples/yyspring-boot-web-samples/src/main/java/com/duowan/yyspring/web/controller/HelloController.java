@@ -3,18 +3,15 @@ package com.duowan.yyspring.web.controller;
 //import com.duowan.common.ipowner.IpOwnerService;
 //import com.duowan.common.jdbc.Jdbc;
 
-import com.duowan.common.web.annotations.LogRequestInfo;
 import com.duowan.common.web.response.JsonResponse;
 import com.duowan.common.web.view.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +52,6 @@ public class HelloController extends BaseController {
     }
 
     @RequestMapping("hello2.do")
-    @LogRequestInfo(header = true, cookie = true, param = true)
     public JsonView hello2(String name, String requestUri) {
         logger.info(requestUri + ": " + name);
         logger.error(requestUri + ": " + name);

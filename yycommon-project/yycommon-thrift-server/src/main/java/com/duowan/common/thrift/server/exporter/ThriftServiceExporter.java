@@ -1,6 +1,5 @@
 package com.duowan.common.thrift.server.exporter;
 
-import com.duowan.common.thrift.server.exception.ThriftServiceExportException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
@@ -19,16 +18,13 @@ public interface ThriftServiceExporter {
      * @param thriftServiceWrappers 实例列表
      * @param applicationContext    Spring 上下文
      * @param environment           环境变量
-     * @throws ThriftServiceExportException 服务导出错误
      */
-    void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment) throws ThriftServiceExportException;
+    void export(List<ThriftServiceWrapper> thriftServiceWrappers, ApplicationContext applicationContext, Environment environment);
 
 
     /**
      * 终止任务
-     *
-     * @throws ThriftServiceExportException 终止异常
      */
-    void stop() throws ThriftServiceExportException;
+    void stop();
 
 }

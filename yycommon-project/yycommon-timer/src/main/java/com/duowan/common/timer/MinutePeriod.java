@@ -10,7 +10,7 @@ public class MinutePeriod extends AbstractPeriod {
     private final long milliSeconds;
 
     public MinutePeriod(int minute) {
-        this.milliSeconds = minute * 60 * 1000;
+        this.milliSeconds = minute * 60 * 1000L;
     }
 
     @Override

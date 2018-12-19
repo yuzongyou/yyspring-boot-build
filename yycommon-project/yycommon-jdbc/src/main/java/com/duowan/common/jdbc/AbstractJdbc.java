@@ -19,9 +19,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +79,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public <T> T queryModel(String sql, Class<T> requireType, Object... params) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
             }
             return getJdbcTemplate().queryForObject(sql, new BeanPropertyRowMapper<>(requireType), params);
         } catch (EmptyResultDataAccessException e) {
@@ -95,7 +92,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
         try {
             BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(requireType);
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
             }
             if (isEmptyParams(paramList)) {
                 return getJdbcTemplate().queryForObject(sql, rowMapper);
@@ -110,7 +107,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public <T> T queryModel(String sql, RowMapper<T> rowMapper, Class<T> requireType, Object... params) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
             }
             return getJdbcTemplate().queryForObject(sql, rowMapper, params);
         } catch (EmptyResultDataAccessException e) {
@@ -122,7 +119,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public <T> T queryModel(String sql, List<Object> paramList, Class<T> requireType, RowMapper<T> rowMapper) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
             }
             if (isEmptyParams(paramList)) {
                 return getJdbcTemplate().queryForObject(sql, rowMapper);
@@ -137,7 +134,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public Map<String, Object> queryMap(String sql, Object... params) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
             }
             return getJdbcTemplate().queryForMap(sql, params);
         } catch (EmptyResultDataAccessException e) {
@@ -149,7 +146,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public Map<String, Object> queryMap(List<Object> paramList, String sql) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
             }
             if (isEmptyParams(paramList)) {
                 return getJdbcTemplate().queryForMap(sql);
@@ -163,7 +160,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public <T> List<T> queryModelList(String sql, Class<T> requireType, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().query(sql, new BeanPropertyRowMapper<>(requireType), params);
     }
@@ -180,7 +177,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public <T> List<T> queryModelList(String sql, List<Object> paramList, Class<T> requireType) {
         BeanPropertyRowMapper<T> rowMapper = new BeanPropertyRowMapper<>(requireType);
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().query(sql, rowMapper);
@@ -191,7 +188,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public <T> List<T> queryModelList(String sql, RowMapper<T> rowMapper, Class<T> requireType, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().query(sql, rowMapper, params);
     }
@@ -199,7 +196,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public <T> List<T> queryModelList(String sql, List<Object> paramList, Class<T> requireType, RowMapper<T> rowMapper) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().query(sql, rowMapper);
@@ -210,7 +207,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public List<Map<String, Object>> queryMapList(String sql, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().queryForList(sql, params);
     }
@@ -218,7 +215,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public List<Map<String, Object>> queryMapList(List<Object> paramList, String sql) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().queryForList(sql);
@@ -245,7 +242,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     public <T> T querySingleColumn(String sql, T defaultValue, Class<T> requireType, Object... params) {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
             }
             T ret = getJdbcTemplate().queryForObject(sql, new SingleColumnRowMapper<>(requireType), params);
             return null == ret ? defaultValue : ret;
@@ -260,7 +257,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
         T ret;
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+                logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
             }
             if (isEmptyParams(paramList)) {
                 ret = getJdbcTemplate().queryForObject(sql, new SingleColumnRowMapper<>(requireType));
@@ -276,7 +273,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public <T> List<T> querySingleColumnList(String sql, Class<T> requireType, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().query(sql, new SingleColumnRowMapper<>(requireType), params);
     }
@@ -289,7 +286,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public <T> List<T> querySingleColumnList(List<Object> paramList, Class<T> requireType, String sql) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().query(sql, new SingleColumnRowMapper<>(requireType));
@@ -429,7 +426,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int insert(String sql, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().update(sql, params);
     }
@@ -437,7 +434,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int insert(List<Object> params, String sql) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         if (isEmptyParams(params)) {
             return getJdbcTemplate().update(sql);
@@ -448,7 +445,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int insert(String sql, GenerateKeyCallback keyCallback, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         PreparedStatementSetter preparedStatementSetter = null;
         if (params != null && params.length > 0) {
@@ -508,7 +505,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
 
         AssertUtil.assertNotEmpty(paramsList, "参数列表不能为空！");
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramsList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramsList));
         }
         return intArrayToSum(getJdbcTemplate().batchUpdate(sql, paramsList));
     }
@@ -533,15 +530,10 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
         BatchInsertStatementCallback bsc = new BatchInsertStatementCallback(pss, keyCallback);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramsList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramsList));
         }
 
-        return getJdbcTemplate().execute(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                return con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            }
-        }, bsc);
+        return getJdbcTemplate().execute(con -> con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS), bsc);
     }
 
     @Override
@@ -573,17 +565,14 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
             FieldDef autoIncrementFieldDef = MDContext.getMD(model.getClass()).getAutoIncrementFieldDef();
             if (autoIncrementFieldDef != null) {
                 // 设置自增主键
-                GenerateKeyCallback callback = new GenerateKeyCallback() {
-                    @Override
-                    public void call(int rowIndex, Object primaryKey) {
-                        try {
-                            FieldDef autoIncrementFieldDef = MDContext.getMD(model.getClass()).getAutoIncrementFieldDef();
-                            ReflectUtil.setFieldValue(model, autoIncrementFieldDef.getField(), primaryKey);
-                        } catch (Exception e) {
-                            String message = "自增主键设置失败： " + e.getMessage();
-                            logger.warn(message, e);
-                            throw new JdbcException(message, e);
-                        }
+                GenerateKeyCallback callback = (rowIndex, primaryKey) -> {
+                    try {
+                        FieldDef autoIncrementFieldDef1 = MDContext.getMD(model.getClass()).getAutoIncrementFieldDef();
+                        ReflectUtil.setFieldValue(model, autoIncrementFieldDef1.getField(), primaryKey);
+                    } catch (Exception e) {
+                        String message = "自增主键设置失败： " + e.getMessage();
+                        logger.warn(message, e);
+                        throw new JdbcException(message, e);
                     }
                 };
                 return insert(sql, callback, params);
@@ -629,7 +618,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int update(String sql, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().update(sql, params);
     }
@@ -637,7 +626,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int update(List<Object> paramList, String sql) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().update(sql);
@@ -658,7 +647,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int updateLimit(String sql, int limit, Object... params) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(params));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(params));
         }
         return getJdbcTemplate().update(buildUpdateLimitSql(sql, 1, limit), params);
     }
@@ -666,7 +655,7 @@ public abstract class AbstractJdbc extends JdbcDaoSupport implements Jdbc {
     @Override
     public int updateLimit(List<Object> paramList, String sql, int limit) {
         if (logger.isDebugEnabled()) {
-            logger.debug(sql + ", params=" + JsonUtil.toJson(paramList));
+            logger.debug("{}, params={}", sql, JsonUtil.toJson(paramList));
         }
         if (isEmptyParams(paramList)) {
             return getJdbcTemplate().update(buildUpdateLimitSql(sql, 1, limit));

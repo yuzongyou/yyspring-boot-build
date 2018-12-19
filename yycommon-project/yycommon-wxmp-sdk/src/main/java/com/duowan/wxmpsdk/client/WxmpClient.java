@@ -19,9 +19,13 @@ import org.slf4j.LoggerFactory;
  */
 public class WxmpClient {
 
+    private WxmpClient() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String CODE_TO_SESSION_URL = " https://api.weixin.qq.com/sns/jscode2session";
 
-    private static final Logger logger = LoggerFactory.getLogger(WxmpClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WxmpClient.class);
 
     /**
      * 使用一次性微信小程序 code 换取会话信息
@@ -32,17 +36,17 @@ public class WxmpClient {
      * @return 返回
      * @throws WxmpException 发生任何错误将包装成本异常抛出
      */
-    public static Code2Session code2Session(String appid, String secret, String code) throws WxmpException {
+    public static Code2Session code2Session(String appid, String secret, String code) {
 
         String reqUrl = CODE_TO_SESSION_URL + "?appid=" + appid + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code";
 
-        logger.info("code2Session: reqUrl=" + reqUrl);
+        LOGGER.info("code2Session: reqUrl={}", reqUrl);
 
         String responseText = null;
         try {
             responseText = HttpUtil.doGet(reqUrl);
 
-            logger.info("code2Session Resp: " + responseText);
+            LOGGER.info("code2Session Resp: {}", responseText);
             JSONObject jsonObject = JSON.parseObject(responseText);
 
             if (jsonObject.containsKey(RetField.SESSION_KEY)) {
@@ -54,11 +58,11 @@ public class WxmpClient {
                 if (StringUtils.isBlank(errorMsg)) {
                     errorMsg = "小程序code无法获取session";
                 }
-                throw new Exception(errorMsg);
+                throw new WxmpException(errorMsg);
             }
 
         } catch (Exception e) {
-            logger.warn("code2Session 失败: response: " + responseText + ", error=" + e.getMessage());
+            LOGGER.warn("code2Session 失败: response: {}, error={}", responseText, e.getMessage());
             throw new WxmpException(ExceptionCode.ERROR_CODE_TO_SESSION, e);
         }
     }
@@ -72,7 +76,7 @@ public class WxmpClient {
      * @return 返回解密后的文本信息
      * @throws WxmpException 发生任何错误将包装成本异常抛出
      */
-    public static String decryptData(String encryptText, String ivText, String sessionKeyText) throws WxmpException {
+    public static String decryptData(String encryptText, String ivText, String sessionKeyText) {
         AssertUtil.assertNotBlank(encryptText, "要解密的数据为空！");
         AssertUtil.assertNotBlank(ivText, "要解密的初始向量为空！");
         AssertUtil.assertNotBlank(sessionKeyText, "要解密的会话key为空！");

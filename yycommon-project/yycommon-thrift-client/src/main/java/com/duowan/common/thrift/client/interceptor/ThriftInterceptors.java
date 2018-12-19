@@ -1,7 +1,6 @@
 package com.duowan.common.thrift.client.interceptor;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -22,18 +21,15 @@ public class ThriftInterceptors implements ThriftInterceptor {
             this.needInterceptor = false;
         }
 
-        Collections.sort(interceptors, new Comparator<ThriftInterceptor>() {
-            @Override
-            public int compare(ThriftInterceptor o1, ThriftInterceptor o2) {
-                int ret = o1.getOrder() - o2.getOrder();
-                return ret > 0 ? 1 : ret == 0 ? 0 : -1;
-            }
+        Collections.sort(interceptors, (o1, o2) -> {
+            int ret = o1.getOrder() - o2.getOrder();
+            return Integer.compare(ret, 0);
         });
         this.interceptors = new CopyOnWriteArrayList<>(interceptors);
     }
 
     @Override
-    public Object before(ThriftInvokeContext invokeContext) throws Exception {
+    public Object before(ThriftInvokeContext invokeContext) {
         if (!needInterceptor) {
             return null;
         }
@@ -47,7 +43,7 @@ public class ThriftInterceptors implements ThriftInterceptor {
     }
 
     @Override
-    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) throws Exception {
+    public void afterReturning(Object returnValue, ThriftInvokeContext invokeContext) {
         if (!needInterceptor) {
             return;
         }
@@ -57,7 +53,7 @@ public class ThriftInterceptors implements ThriftInterceptor {
     }
 
     @Override
-    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) throws Exception {
+    public void afterThrowing(Exception exception, ThriftInvokeContext invokeContext) {
         if (!needInterceptor) {
             return;
         }

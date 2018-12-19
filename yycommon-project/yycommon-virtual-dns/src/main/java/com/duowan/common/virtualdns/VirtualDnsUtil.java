@@ -1,32 +1,46 @@
 package com.duowan.common.virtualdns;
 
+import com.duowan.common.dns.exception.DnsException;
 import com.duowan.common.dns.util.InetAddressUtil;
 import com.duowan.common.dns.util.OsUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.net.spi.nameservice.NameService;
 import sun.net.util.IPAddressUtil;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Arvin
  */
 public class VirtualDnsUtil {
 
+    private VirtualDnsUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(VirtualDnsUtil.class);
+
     /**
      * 默认是没有启用自定义的DNS解析
      */
     private static volatile boolean enabled = false;
 
+    private static final ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
+
     /**
      * 域名 to InetAddress 数组 MAP
      */
-    private static Map<String, InetAddress[]> domainIpsMap = new HashMap<String, InetAddress[]>();
+    private static Map<String, InetAddress[]> domainIpsMap = new HashMap<>();
 
     /**
      * 自定义的 NameService， 实现自己的 DNS 解析
@@ -147,11 +161,11 @@ public class VirtualDnsUtil {
      */
     public static void add(String domain, Collection<String> ips) {
         if (isBlank(domain)) {
-            throw new RuntimeException("域名不能为空！");
+            throw new DnsException("域名不能为空！");
         }
 
-        Map<String, List<String>> domainIpMap = new HashMap<String, List<String>>(1);
-        List<String> ipList = new ArrayList<String>();
+        Map<String, List<String>> domainIpMap = new HashMap<>(1);
+        List<String> ipList = new ArrayList<>();
 
         for (String ip : ips) {
             if (!isBlank(ip) || isValidIp(ip)) {
@@ -160,7 +174,7 @@ public class VirtualDnsUtil {
         }
 
         if (ipList.isEmpty()) {
-            throw new RuntimeException("没有指定[" + domain + "] 对应的解析IP");
+            throw new DnsException("没有指定[" + domain + "] 对应的解析IP");
         }
 
         domainIpMap.put(domain, ipList);
@@ -195,7 +209,7 @@ public class VirtualDnsUtil {
      * 清空所有的自定义 DNS
      */
     public static void clear() {
-        domainIpsMap = new HashMap<String, InetAddress[]>();
+        domainIpsMap = new HashMap<>();
     }
 
     /**
@@ -221,7 +235,7 @@ public class VirtualDnsUtil {
     /**
      * 本地hosts的域名映射MAP， 域名 to IP 列表
      */
-    private static Map<String, List<String>> LOCAL_HOSTS_MAP = reloadLocalHosts();
+    private static Map<String, List<String>> localHostsMap = reloadLocalHosts();
 
     /**
      * 每隔 10 秒重新刷新本地 host
@@ -251,29 +265,18 @@ public class VirtualDnsUtil {
     /**
      * 调度执行本地hosts刷新
      */
-    private static Thread scheduleReloadLocalHost() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        if (!isEnabled()) {
-                            break;
-                        }
-                        Thread.sleep(getLocalHostReloadInterval() * 1000);
-                        if (isEnabled()) {
-                            reloadLocalHosts();
-                        } else {
-                            break;
-                        }
-                    } catch (Exception ignored) {
-                    }
+    private static void scheduleReloadLocalHost() {
+        EXECUTOR_SERVICE.scheduleAtFixedRate(() -> {
+            try {
+                if (isEnabled()) {
+                    reloadLocalHosts();
+                }
+            } catch (Exception e) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
                 }
             }
-        });
-
-        thread.start();
-        return thread;
+        }, 0L, getLocalHostReloadInterval() * 1000L, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -284,10 +287,10 @@ public class VirtualDnsUtil {
      */
     public static boolean isLocalHosts(String host) {
 
-        if (null == LOCAL_HOSTS_MAP) {
+        if (null == localHostsMap) {
             return false;
         }
-        return LOCAL_HOSTS_MAP.containsKey(host);
+        return localHostsMap.containsKey(host);
     }
 
     /**
@@ -296,8 +299,11 @@ public class VirtualDnsUtil {
      * @return 返回域名 to IP 列表映射
      */
     public static Map<String, List<String>> getLocalHostsMap() {
-        return Collections.unmodifiableMap(LOCAL_HOSTS_MAP);
+        return Collections.unmodifiableMap(localHostsMap);
     }
+
+    private static final String WINDOWS_HOST_FILE_PATH = String.format("C:%swindows%sSystem32%sdrivers%setc%shosts", File.separator, File.separator, File.separator, File.separator, File.separator);
+    private static final String LINUX_HOST_FILE_PATH = File.pathSeparator + "etc " + File.pathSeparator + "hosts";
 
     /**
      * 重新加载本地hosts
@@ -312,10 +318,10 @@ public class VirtualDnsUtil {
 
         if (OsUtil.isWindows()) {
             // Windows 操作系统，加载路径： C:/windows/System32/drivers/etc/hosts 的配置
-            hostsFilePath = "C:/windows/System32/drivers/etc/hosts";
+            hostsFilePath = WINDOWS_HOST_FILE_PATH;
         } else {
             // 非 Windows 操作系统，加载路径: /etc/hosts
-            hostsFilePath = "/etc/hosts";
+            hostsFilePath = LINUX_HOST_FILE_PATH;
         }
 
         // 从标准的 hosts 文件中加载域名-IP解析
@@ -323,7 +329,7 @@ public class VirtualDnsUtil {
         if (null == domainIpMap) {
             domainIpMap = new HashMap<>(0);
         }
-        LOCAL_HOSTS_MAP = domainIpMap;
+        localHostsMap = domainIpMap;
 
         return getLocalHostsMap();
     }
@@ -370,9 +376,9 @@ public class VirtualDnsUtil {
      * @return 返回本地host配置
      */
     public static String getIpByLocalhost(String host) {
-        if (LOCAL_HOSTS_MAP != null && LOCAL_HOSTS_MAP.containsKey(host)) {
+        if (localHostsMap != null && localHostsMap.containsKey(host)) {
 
-            List<String> ips = LOCAL_HOSTS_MAP.get(host);
+            List<String> ips = localHostsMap.get(host);
             if (null != ips && !ips.isEmpty()) {
                 for (String ip : ips) {
                     if (!isBlank(ip)) {
@@ -396,12 +402,9 @@ public class VirtualDnsUtil {
             return null;
         }
 
-        List<String> ipDomainList = new ArrayList<String>();
-        BufferedReader reader = null;
+        List<String> ipDomainList = new ArrayList<>();
 
-        try {
-
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(hostsFormatFilePath)));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(hostsFormatFilePath)))) {
 
             String line = null;
 
@@ -410,13 +413,9 @@ public class VirtualDnsUtil {
                 ipDomainList.add(line.trim());
             }
 
-        } catch (Exception ignored) {
-        } finally {
-            if (null != reader) {
-                try {
-                    reader.close();
-                } catch (IOException ignored) {
-                }
+        } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
             }
         }
 
@@ -463,7 +462,7 @@ public class VirtualDnsUtil {
      * @return 返回 域名 to InetAddress 数组
      */
     private static Map<String, InetAddress[]> buildDnsInetAddressMap(Map<String, List<String>> domainIpMap) {
-        Map<String, InetAddress[]> map = new HashMap<String, InetAddress[]>();
+        Map<String, InetAddress[]> map = new HashMap<>();
 
         for (Map.Entry<String, List<String>> entry : domainIpMap.entrySet()) {
 
@@ -471,13 +470,16 @@ public class VirtualDnsUtil {
                 continue;
             }
 
-            List<InetAddress> inetAddressList = new ArrayList<InetAddress>();
+            List<InetAddress> inetAddressList = new ArrayList<>();
 
             for (String ip : entry.getValue()) {
                 try {
                     InetAddress inetAddress = InetAddress.getByAddress(ip, InetAddress.getByName(ip).getAddress());
                     inetAddressList.add(inetAddress);
-                } catch (UnknownHostException ignored) {
+                } catch (UnknownHostException e) {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug(e.getMessage(), e);
+                    }
                 }
             }
 
@@ -496,7 +498,7 @@ public class VirtualDnsUtil {
      * @return 返回 域名IP列表
      */
     public static Map<String, List<String>> buildDnsMapByIpDomainLines(List<String> ipDomainLines, boolean excludeLocalHost) {
-        Map<String, List<String>> domainIpMap = new HashMap<String, List<String>>();
+        Map<String, List<String>> domainIpMap = new HashMap<>();
         if (null == ipDomainLines || ipDomainLines.isEmpty()) {
             return domainIpMap;
         }
@@ -528,7 +530,7 @@ public class VirtualDnsUtil {
                 }
                 List<String> set = domainIpMap.get(domain);
                 if (set == null) {
-                    set = new ArrayList<String>();
+                    set = new ArrayList<>();
                     domainIpMap.put(domain, set);
                     set.add(ip);
                 } else {

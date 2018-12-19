@@ -13,7 +13,7 @@ import org.apache.thrift.transport.TTransport;
  */
 public class TSocketTransportFactory implements TTransportFactory {
 
-    protected final int DEFAULT_TIMEOUT_MILLIS = 5000;
+    protected static final int DEFAULT_TIMEOUT_MILLIS = 5000;
 
     @Override
     public TTransport create(TClientConfig clientConfig, ThriftServerNode serverNode) {

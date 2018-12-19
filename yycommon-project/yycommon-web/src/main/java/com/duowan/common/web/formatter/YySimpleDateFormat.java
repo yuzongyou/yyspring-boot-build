@@ -1,10 +1,13 @@
 package com.duowan.common.web.formatter;
 
 import com.duowan.common.web.converter.YyDateConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Arvin
@@ -13,7 +16,9 @@ import java.util.Date;
  */
 public class YySimpleDateFormat extends SimpleDateFormat {
 
-    private YyDateConverter converter = new YyDateConverter();
+    private static final Logger LOGGER = LoggerFactory.getLogger(YySimpleDateFormat.class);
+
+    private transient YyDateConverter converter = new YyDateConverter();
 
     public YySimpleDateFormat() {
     }
@@ -23,11 +28,34 @@ public class YySimpleDateFormat extends SimpleDateFormat {
     }
 
     @Override
-    public Date parse(String source) throws ParseException {
+    public Date parse(String source) {
         try {
             return super.parse(source);
-        } catch (ParseException ignored) {
+        } catch (ParseException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
         return converter.convert(source);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        YySimpleDateFormat that = (YySimpleDateFormat) o;
+        return Objects.equals(converter, that.converter);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), converter);
     }
 }

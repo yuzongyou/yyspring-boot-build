@@ -15,7 +15,7 @@ public class SecondPeriod extends AbstractPeriod {
      * @param seconds 单位秒
      */
     public SecondPeriod(int seconds) {
-        this.milliseconds = seconds * 1000;
+        this.milliseconds = seconds * 1000L;
     }
 
     @Override

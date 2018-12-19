@@ -1,13 +1,10 @@
 package com.duowan.common.web.exception.handler;
 
-import com.duowan.common.exception.CodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.validation.BindException;
-import org.springframework.validation.FieldError;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Arvin
@@ -16,16 +13,24 @@ public abstract class AbstractExceptionViewResolver implements ExceptionViewReso
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    protected static boolean isJavaxValidationImported = false;
+    protected List<ErrorMessageReader> errorMessageReaderList;
 
-    static {
-        try {
-            Class<?> clazz = Class.forName("javax.validation.ConstraintViolationException");
-            if (null != clazz) {
-                isJavaxValidationImported = true;
-            }
-        } catch (ClassNotFoundException ignored) {
+    public AbstractExceptionViewResolver(List<ErrorMessageReader> errorMessageReaderList) {
+        this.errorMessageReaderList = errorMessageReaderList;
+        if (this.errorMessageReaderList == null || this.errorMessageReaderList.isEmpty()) {
+            this.errorMessageReaderList = new ArrayList<>(2);
+            this.errorMessageReaderList.add(new CodeExceptionErrorMessageReader());
+            this.errorMessageReaderList.add(new ValidationExceptionErrorMessageReader());
         }
+
+        sortErrorMessageReaderList(this.errorMessageReaderList);
+    }
+
+    private void sortErrorMessageReaderList(List<ErrorMessageReader> errorMessageReaderList) {
+        errorMessageReaderList.sort((o1, o2) -> {
+            int ret = o1.getOrder() - o2.getOrder();
+            return Integer.compare(ret, 0);
+        });
     }
 
     protected boolean logException = true;
@@ -38,39 +43,38 @@ public abstract class AbstractExceptionViewResolver implements ExceptionViewReso
         this.logException = logException;
     }
 
-    protected static int getErrorCode(Exception ex) {
+    protected ErrorMessage getErrorMessage(Exception ex) {
+        ErrorMessage errorMessage = null;
         if (ex != null) {
-            if (ex instanceof CodeException) {
-                return ((CodeException) ex).getCode();
-            }
-            if (ex instanceof BindException || (isJavaxValidationImported && ex instanceof ConstraintViolationException)) {
-                return 400;
-            }
-        }
-        return 500;
-    }
-
-    protected static String getErrorMessage(Exception ex) {
-        if (ex != null) {
-
-            if (ex instanceof CodeException) {
-                return ex.getMessage();
-            }
-
-            if (isJavaxValidationImported) {
-                if (ex instanceof ConstraintViolationException) {
-                    ConstraintViolationException exception = (ConstraintViolationException) ex;
-                    for (ConstraintViolation<?> constraintViolation : exception.getConstraintViolations()) {
-                        return constraintViolation.getMessage();
-                    }
-                } else if (ex instanceof BindException) {
-                    FieldError fieldError = ((BindException) ex).getFieldError();
-                    if (null != fieldError) {
-                        return fieldError.getField() + ":" + fieldError.getDefaultMessage();
-                    }
+            for (ErrorMessageReader reader : this.errorMessageReaderList) {
+                errorMessage = reader.readErrorMessage(ex);
+                if (errorMessage.isCanHandle()) {
+                    break;
                 }
             }
         }
-        return "服务器繁忙，请稍候再试";
+
+        if (errorMessage == null) {
+            errorMessage = new ErrorMessage(true, 500, "服务器繁忙，请稍候再试", ex);
+        }
+
+        doExceptionErrorMessageLog(errorMessage);
+
+        return errorMessage;
+    }
+
+    private void doExceptionErrorMessageLog(ErrorMessage errorMessage) {
+
+        if (errorMessage.isCanHandle()) {
+            if (logException) {
+                logger.warn(errorMessage.getMessage(), errorMessage.getException());
+            } else {
+                logger.warn(errorMessage.getMessage());
+            }
+        } else {
+            // 如果是不可处理的异常则使用 error 进行打印
+            logger.error(errorMessage.getMessage(), errorMessage.getException());
+        }
+
     }
 }

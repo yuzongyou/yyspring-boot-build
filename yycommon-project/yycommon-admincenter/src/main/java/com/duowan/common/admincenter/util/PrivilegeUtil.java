@@ -1,9 +1,11 @@
 package com.duowan.common.admincenter.util;
 
+import com.duowan.common.admincenter.exception.PrivilegeParseException;
 import com.duowan.common.admincenter.model.Privilege;
 import com.duowan.common.admincenter.model.PrivilegeItem;
 import com.duowan.common.exception.CodeException;
 import com.duowan.common.utils.AssertUtil;
+import com.duowan.common.utils.Encodings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
@@ -26,31 +28,38 @@ import java.util.*;
  */
 public class PrivilegeUtil {
 
-    public static String DEFAULT_PRIVILEGE_XML_PATH = "/privilege.xml";
+    private PrivilegeUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static final String DEFAULT_PRIVILEGE_XML_PATH = "/privilege.xml";
 
     /**
      * 读取为string
      *
      * @param privilegeXmlPath 权限xml文件路径， 默认使用classpath:privilege.xml
      * @return 返回权限文件内容
-     * @throws Exception 任何异常
      */
-    public static String loadPrivilegeXmlAsString(String privilegeXmlPath) throws Exception {
-        String path = StringUtils.isBlank(privilegeXmlPath) ? DEFAULT_PRIVILEGE_XML_PATH : privilegeXmlPath;
-        File file = new File(path);
-        InputStream inputStream = null;
-        if (file.exists()) {
-            inputStream = new FileInputStream(file);
-        } else {
-            ClassPathResource resource = new ClassPathResource(path);
-            if (resource.exists()) {
-                inputStream = resource.getInputStream();
+    public static String loadPrivilegeXmlAsString(String privilegeXmlPath) {
+        try {
+            String path = StringUtils.isBlank(privilegeXmlPath) ? DEFAULT_PRIVILEGE_XML_PATH : privilegeXmlPath;
+            File file = new File(path);
+            InputStream inputStream = null;
+            if (file.exists()) {
+                inputStream = new FileInputStream(file);
             } else {
-                throw new CodeException(500, "权限文件[" + resource.getPath() + "] 不存在！");
+                ClassPathResource resource = new ClassPathResource(path);
+                if (resource.exists()) {
+                    inputStream = resource.getInputStream();
+                } else {
+                    throw new CodeException(500, "权限文件[" + resource.getPath() + "] 不存在！");
+                }
             }
-        }
 
-        return IOUtils.toString(new InputStreamReader(inputStream, "UTF-8"));
+            return IOUtils.toString(new InputStreamReader(inputStream, Encodings.DEFAULT_ENCODING));
+        } catch (Exception e) {
+            throw new PrivilegeParseException(e);
+        }
     }
 
     /**
@@ -59,18 +68,23 @@ public class PrivilegeUtil {
      * @param xmlText   XML 格式的权限列表，通常需要传入 classpath:privilege.xml
      * @param refParent 是否指向父级
      * @return 返回权限根对象列表
-     * @throws Exception 任何异常
      */
-    private static List<Privilege> parseByXml(String xmlText, boolean refParent) throws Exception {
+    private static List<Privilege> parseByXml(String xmlText, boolean refParent) {
 
         AssertUtil.assertNotBlank(xmlText, "权限XML文本不能为空");
 
         String pureXmlText = removeXmlBOM(xmlText);
-        Document document = DocumentHelper.parseText(pureXmlText);
+        List<Privilege> privilegeList = null;
+        try {
+            Document document = DocumentHelper.parseText(pureXmlText);
 
-        List<Privilege> privilegeList = new ArrayList<>();
+            privilegeList = new ArrayList<>();
 
-        parsePrivilegeFromPrivilegeXml(document.getRootElement(), null, privilegeList, refParent);
+            parsePrivilegeFromPrivilegeXml(document.getRootElement(), null, privilegeList, refParent);
+
+        } catch (DocumentException e) {
+            throw new PrivilegeParseException(e);
+        }
 
         return privilegeList;
     }
@@ -80,9 +94,8 @@ public class PrivilegeUtil {
      *
      * @param xmlText XML 格式的权限列表，通常需要传入 classpath:privilege.xml
      * @return 返回权限根对象列表
-     * @throws Exception 任何异常
      */
-    public static List<Privilege> parseByXmlRefParent(String xmlText) throws Exception {
+    public static List<Privilege> parseByXmlRefParent(String xmlText) {
         return parseByXml(xmlText, true);
     }
 
@@ -91,9 +104,8 @@ public class PrivilegeUtil {
      *
      * @param xmlText XML 格式的权限列表，通常需要传入 classpath:privilege.xml
      * @return 返回权限根对象列表
-     * @throws Exception 任何异常
      */
-    public static List<Privilege> parseByXmlUnRefParent(String xmlText) throws Exception {
+    public static List<Privilege> parseByXmlUnRefParent(String xmlText) {
         return parseByXml(xmlText, false);
     }
 
@@ -102,9 +114,8 @@ public class PrivilegeUtil {
      *
      * @param xmlText XML 格式的权限列表，通常需要传入 classpath:privilege.xml
      * @return 解析成map
-     * @throws Exception 任何异常
      */
-    public static Map<String, Object> parseAndToJSObject(String xmlText) throws Exception {
+    public static Map<String, Object> parseAndToJSObject(String xmlText) {
         return toJavaScriptObject(parseByXml(xmlText, false));
     }
 
@@ -506,11 +517,11 @@ public class PrivilegeUtil {
         }
     }
 
-    private static String removeXmlBOM(String info) throws DocumentException {
+    private static String removeXmlBOM(String info) throws PrivilegeParseException {
         if (info == null) {
-            throw new DocumentException("string could not be null");
+            throw new PrivilegeParseException("string could not be null");
         } else if (!info.contains("<?")) {
-            throw new DocumentException("string is not in xml format");
+            throw new PrivilegeParseException("string is not in xml format");
         } else {
             return info.substring(info.indexOf("<?"));
         }

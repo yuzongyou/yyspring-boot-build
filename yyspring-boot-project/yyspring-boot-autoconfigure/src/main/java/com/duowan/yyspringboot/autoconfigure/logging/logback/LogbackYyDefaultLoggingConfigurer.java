@@ -3,7 +3,6 @@ package com.duowan.yyspringboot.autoconfigure.logging.logback;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspringboot.autoconfigure.logging.AbstractYyDefaultLoggingConfigurer;
 import org.springframework.core.env.StandardEnvironment;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Arvin

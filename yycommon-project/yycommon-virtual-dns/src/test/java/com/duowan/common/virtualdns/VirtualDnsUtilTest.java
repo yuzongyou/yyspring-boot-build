@@ -16,12 +16,14 @@ import static org.junit.Assert.*;
  * @since 2018/9/7 17:07
  */
 public class VirtualDnsUtilTest {
+
     /**
      * 设置 DNS 缓存时间
      *
      * @param seconds 缓存时间，单位是秒, 0 表示不缓存，-1表示永久缓存， 正数表示缓存的秒数
      */
     public static void setDnsCacheTime(int seconds) throws Exception {
+
         int expire = seconds;
         if (seconds < 0) {
             expire = InetAddressCachePolicy.FOREVER;

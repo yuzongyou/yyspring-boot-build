@@ -1,5 +1,6 @@
 package com.duowan.common.utils;
 
+import com.duowan.common.utils.exception.UtilsException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -14,6 +15,10 @@ import java.util.List;
  * @author Arvin
  */
 public class ServerUtil {
+
+    private ServerUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     private static String hostAddress = null;
 
@@ -34,10 +39,10 @@ public class ServerUtil {
             try {
                 return getServerIp("eth0");
             } catch (SocketException e) {
-                throw new RuntimeException(e.getMessage(), e);
+                throw new UtilsException(e.getMessage(), e);
             }
         } else {
-            throw new RuntimeException("未知操作系统.");
+            throw new UtilsException("未知操作系统.");
         }
 
     }
@@ -47,30 +52,27 @@ public class ServerUtil {
         List<String> subIpList = listSubIp(networkInterface);
         List<String> ipList = listAllIp(networkInterface);
         ipList.removeAll(subIpList);
-        if (ipList.size() == 0) {
-            throw new RuntimeException("为什么IP列表为空?]");
+        if (ipList.isEmpty()) {
+            throw new UtilsException("为什么IP列表为空?]");
         } else if (ipList.size() > 1) {
-            throw new RuntimeException("怎么IP数量超过1个？[" + StringUtils.join(ipList, ",") + "]");
+            throw new UtilsException("怎么IP数量超过1个？[" + StringUtils.join(ipList, ",") + "]");
         }
-        String serverIp = ipList.get(0);
-        return serverIp;
+        return ipList.get(0);
     }
 
     private static List<String> listSubIp(NetworkInterface networkInterface) {
-        List<String> subIpList = new ArrayList<String>();
+        List<String> subIpList = new ArrayList<>();
         Enumeration<NetworkInterface> subInterfaces = networkInterface.getSubInterfaces();
         while (subInterfaces.hasMoreElements()) {
             NetworkInterface net = subInterfaces.nextElement();
             List<String> ipList = listAllIp(net);
-            String name = net.getName();
-            System.out.println("name:" + name + " ipList:" + ipList);
             subIpList.addAll(ipList);
         }
         return subIpList;
     }
 
     private static List<String> listAllIp(NetworkInterface networkInterface) {
-        List<String> ipList = new ArrayList<String>();
+        List<String> ipList = new ArrayList<>();
         Enumeration<InetAddress> ias = networkInterface.getInetAddresses();
         while (ias.hasMoreElements()) {
             InetAddress inet = ias.nextElement();

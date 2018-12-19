@@ -1,5 +1,6 @@
 package com.duowan.common.dns;
 
+import com.duowan.common.dns.exception.DnsException;
 import com.duowan.common.dns.util.OsUtil;
 import sun.net.util.IPAddressUtil;
 
@@ -95,7 +96,7 @@ public class MapDnsResolver implements DnsResolver {
      */
     public void add(String domain, Collection<String> ips) {
         if (isBlank(domain)) {
-            throw new RuntimeException("域名不能为空！");
+            throw new DnsException("域名不能为空！");
         }
 
         Map<String, List<String>> domainIpMap = new HashMap<String, List<String>>(1);
@@ -108,7 +109,7 @@ public class MapDnsResolver implements DnsResolver {
         }
 
         if (ipList.isEmpty()) {
-            throw new RuntimeException("没有指定[" + domain + "] 对应的解析IP");
+            throw new DnsException("没有指定[" + domain + "] 对应的解析IP");
         }
 
         domainIpMap.put(domain, ipList);
@@ -169,7 +170,7 @@ public class MapDnsResolver implements DnsResolver {
     /**
      * 本地hosts的域名映射MAP， 域名 to IP 列表
      */
-    private Map<String, List<String>> LOCAL_HOSTS_MAP = reloadLocalHosts();
+    private Map<String, List<String>> localHostsMap = reloadLocalHosts();
 
     /**
      * 每隔 10 秒重新刷新本地 host
@@ -192,27 +193,6 @@ public class MapDnsResolver implements DnsResolver {
     }
 
     /**
-     * 调度执行本地hosts刷新
-     */
-    private Thread scheduleReloadLocalHost() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(getLocalHostReloadInterval() * 1000);
-                        reloadLocalHosts();
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
-        });
-
-        thread.start();
-        return thread;
-    }
-
-    /**
      * 是否是系统本身的host， 通过检查系统的host配置文件来判断
      *
      * @param host 主机IP或者域名
@@ -220,10 +200,10 @@ public class MapDnsResolver implements DnsResolver {
      */
     public boolean isLocalHosts(String host) {
 
-        if (null == LOCAL_HOSTS_MAP) {
+        if (null == localHostsMap) {
             return false;
         }
-        return LOCAL_HOSTS_MAP.containsKey(host);
+        return localHostsMap.containsKey(host);
     }
 
     /**
@@ -232,7 +212,7 @@ public class MapDnsResolver implements DnsResolver {
      * @return 返回域名 to IP 列表映射
      */
     public Map<String, List<String>> getLocalHostsMap() {
-        return Collections.unmodifiableMap(LOCAL_HOSTS_MAP);
+        return Collections.unmodifiableMap(localHostsMap);
     }
 
     /**
@@ -259,7 +239,7 @@ public class MapDnsResolver implements DnsResolver {
         if (null == domainIpMap) {
             domainIpMap = new HashMap<String, List<String>>(0);
         }
-        LOCAL_HOSTS_MAP = domainIpMap;
+        localHostsMap = domainIpMap;
 
         return getLocalHostsMap();
     }
@@ -306,9 +286,9 @@ public class MapDnsResolver implements DnsResolver {
      * @return 返回本地host配置
      */
     public String getIpByLocalhost(String host) {
-        if (LOCAL_HOSTS_MAP != null && LOCAL_HOSTS_MAP.containsKey(host)) {
+        if (localHostsMap != null && localHostsMap.containsKey(host)) {
 
-            List<String> ips = LOCAL_HOSTS_MAP.get(host);
+            List<String> ips = localHostsMap.get(host);
             if (null != ips && !ips.isEmpty()) {
                 for (String ip : ips) {
                     if (!isBlank(ip)) {

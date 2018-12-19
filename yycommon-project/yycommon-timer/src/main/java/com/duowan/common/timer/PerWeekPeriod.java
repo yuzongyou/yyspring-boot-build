@@ -16,7 +16,7 @@ public class PerWeekPeriod extends AbstractPeriod {
     /**
      * 一周七天的时间间隔
      */
-    protected static final long WEEK_INTERVAL_MILLIS = 7 * 24 * 60 * 60 * 1000;
+    protected static final long WEEK_INTERVAL_MILLIS = 7 * 24 * 60 * 60 * 1000L;
 
     private final WeekDay weekDay;
     /**

@@ -72,24 +72,24 @@ public class ThriftServiceWrapper {
             throw new ThriftIfaceNotFoundException("类[" + this.serviceClass.getName() + "] 没有实现 Thrift 相关的Iface接口！");
         }
 
-        Class<?> ifaceClass = null;
+        Class<?> tempIfaceClass = null;
         for (Class<?> clazz : interfaceSet) {
             if (clazz.getName().endsWith("$Iface") && clazz.getEnclosingClass() != null) {
-                if (ifaceClass != null) {
+                if (tempIfaceClass != null) {
                     throw new DuplicateIfaceFoundException("类[" + this.serviceClass.getName() + "] 不允许实现 多个 Thrift Iface接口！");
                 }
-                ifaceClass = clazz;
+                tempIfaceClass = clazz;
             }
         }
 
-        return ifaceClass;
+        return tempIfaceClass;
     }
 
     private String deduceServiceRouter(String router, Class<?> thriftServiceClass) {
         if (null == router || "".equals(router.trim())) {
-            ThriftService thriftService = AnnotationUtils.findAnnotation(serviceClass, ThriftService.class);
-            if (null != thriftService) {
-                router = thriftService.router();
+            ThriftService thriftServiceAnn = AnnotationUtils.findAnnotation(serviceClass, ThriftService.class);
+            if (null != thriftServiceAnn) {
+                router = thriftServiceAnn.router();
             }
             if (null == router || "".equals(router.trim())) {
                 router = thriftServiceClass.getSimpleName();

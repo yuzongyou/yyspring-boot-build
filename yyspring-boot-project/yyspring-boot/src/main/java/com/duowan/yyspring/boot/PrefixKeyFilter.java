@@ -7,17 +7,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class PrefixKeyFilter implements KeyFilter {
 
-    private final String PREFIX;
+    private final String prefix;
 
     public PrefixKeyFilter(String prefix) {
-        PREFIX = prefix;
+        this.prefix = prefix;
     }
 
     @Override
     public boolean filter(String key) {
-        if (StringUtils.isBlank(PREFIX)) {
+        if (StringUtils.isBlank(prefix)) {
             return true;
         }
-        return !StringUtils.isBlank(key) && key.startsWith(PREFIX);
+        return !StringUtils.isBlank(key) && key.startsWith(prefix);
     }
 }

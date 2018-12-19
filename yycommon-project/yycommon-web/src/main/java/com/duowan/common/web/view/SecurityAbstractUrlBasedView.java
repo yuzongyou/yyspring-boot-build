@@ -16,7 +16,9 @@ import java.util.Map;
  */
 public class SecurityAbstractUrlBasedView extends AbstractUrlBasedView {
 
-    /** 所属视图 */
+    /**
+     * 所属视图
+     */
     private AbstractTextView ownerView;
 
     public SecurityAbstractUrlBasedView(AbstractTextView ownerView) {
@@ -35,7 +37,7 @@ public class SecurityAbstractUrlBasedView extends AbstractUrlBasedView {
         }
 
         // 输出内容
-        writeBody(body, model, request, response);
+        writeBody(body, response);
 
     }
 
@@ -43,11 +45,9 @@ public class SecurityAbstractUrlBasedView extends AbstractUrlBasedView {
      * 输出内容
      *
      * @param body     要输出的内容
-     * @param model    模型
-     * @param request  请求
      * @param response 响应
      */
-    private void writeBody(String body, Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void writeBody(String body, HttpServletResponse response) throws IOException {
         response.setContentType(this.ownerView.getContentType());
 
         String encoding = this.ownerView.getContentEncoding();

@@ -76,7 +76,7 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
     }
 
     private void extractUrl(String url) {
-        int index = url.indexOf("?");
+        int index = url.indexOf('?');
         if (index > -1) {
             this.url = url.substring(0, index);
             this.paramsMap = extractParamsAsMap(url.substring(index + 1));
@@ -298,23 +298,29 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
 
     protected void logHttpRequestInfo(T httpRequest) {
 
-        logger.info(httpRequest.getRequestLine().toString());
+        logger.info("{}", httpRequest.getRequestLine());
         Header[] headers = httpRequest.getAllHeaders();
         if (null != headers) {
             for (Header header : headers) {
-                logger.info("Header: " + header.getName() + ": " + header.getValue());
+                logger.info("Header: {} : {}", header.getName(), header.getValue());
             }
         }
 
-        if (!(httpRequest instanceof HttpGet)) {
-            if (null != paramsMap && !paramsMap.isEmpty()) {
-                for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
-                    logger.info("Param: " + entry.getKey() + ": " + entry.getValue());
-                }
+        if (isNotHttpGetRequest(httpRequest) && isIncludeParams()) {
+            for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+                logger.info("Param: {}:{}", entry.getKey(), entry.getValue());
             }
         }
 
-        logger.info(httpRequest.getConfig().toString());
+        logger.info("{}", httpRequest.getConfig());
+    }
+
+    protected boolean isNotHttpGetRequest(T httpRequest) {
+        return !(httpRequest instanceof HttpGet);
+    }
+
+    protected boolean isIncludeParams() {
+        return null != paramsMap && !paramsMap.isEmpty();
     }
 
     protected UrlEncodedFormEntity buildFormEntity() {
@@ -323,8 +329,8 @@ public abstract class AbstractHcRequestContext<S extends AbstractHcRequestContex
         }
 
         List<NameValuePair> list = new ArrayList<>();
-        for (String key : paramsMap.keySet()) {
-            list.add(new BasicNameValuePair(key, String.valueOf(paramsMap.get(key))));
+        for (Map.Entry<String, String> entry : paramsMap.entrySet()) {
+            list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
 
         return new UrlEncodedFormEntity(list, getCharset());

@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.SpringApplicationRunListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
@@ -118,6 +116,7 @@ public class YySpringApplicationRunListener extends SpringApplicationRunListener
 
     @Override
     public void doContextLoaded(ConfigurableApplicationContext context) {
+        // DO nothing
     }
 
     @Override
@@ -131,12 +130,12 @@ public class YySpringApplicationRunListener extends SpringApplicationRunListener
 
     @Override
     public void doRunning(ConfigurableApplicationContext context) {
-
+        // DO nothing
     }
 
     @Override
     public void doFailed(ConfigurableApplicationContext context, Throwable exception) {
-
+        // DO nothing
     }
 
     @Override

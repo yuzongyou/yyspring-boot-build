@@ -149,12 +149,12 @@ public class TClientConfig {
             throw new InvalidPrototolFactoriesException("TProtocolFactory 列表不能为空！");
         }
 
-        Map<String, TProtocolFactory> protocolFactoryMap = new HashMap<>(protocolFactories.size());
+        Map<String, TProtocolFactory> tempProtocolFactoryMap = new HashMap<>(protocolFactories.size());
         // 只有一个的时候，不管 router() 是否为空
         if (protocolFactories.size() == 1) {
             TProtocolFactory factory = protocolFactories.get(0);
-            protocolFactoryMap.put(ThriftUtil.fixRouter(factory.router()), factory);
-            return protocolFactoryMap;
+            tempProtocolFactoryMap.put(ThriftUtil.fixRouter(factory.router()), factory);
+            return tempProtocolFactoryMap;
         }
 
         // 多个的时候，不允许重复 router，并且不能有空的
@@ -168,9 +168,9 @@ public class TClientConfig {
                 throw new InvalidPrototolFactoriesException("TProtocolFactory列表不允许有多个 router=" + router + " 的实例！");
             }
             existsRouters.add(router);
-            protocolFactoryMap.put(router.toUpperCase(), factory);
+            tempProtocolFactoryMap.put(router.toUpperCase(), factory);
         }
-        return protocolFactoryMap;
+        return tempProtocolFactoryMap;
     }
 
     public TTransportFactory getTransportFactory() {

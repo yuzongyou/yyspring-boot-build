@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
  */
 public class UdbLoginBox {
 
+    private UdbLoginBox() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static final String ROOT_CONTEXT_PATH = "/";
 
     private static final Logger logger = LoggerFactory.getLogger(UdbLoginBox.class);
@@ -64,8 +68,8 @@ public class UdbLoginBox {
         StringBuilder builder = new StringBuilder();
 
         redirectUrl = StringUtils.isBlank(redirectUrl) ? "http://udb.duowan.com/" : redirectUrl;
-        logger.info("deleteCookieURL:" + deleteCookieURL);
-        logger.info("AfterDeleteCookieURL:" + redirectUrl);
+        logger.info("deleteCookieURL: {}", deleteCookieURL);
+        logger.info("AfterDeleteCookieURL: {}", redirectUrl);
         builder.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
         builder.append("<html>");
         builder.append("<head>");

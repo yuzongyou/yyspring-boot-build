@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.core.env.Environment;
 
 import java.util.*;
 
@@ -22,20 +21,22 @@ import java.util.*;
  */
 public class ThriftClientRegister {
 
-    private static final Logger logger = LoggerFactory.getLogger(ThriftClientRegister.class);
+    private ThriftClientRegister() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThriftClientRegister.class);
 
     /**
      * 注册 Thrift Client 相关的Bean， 主要是 TServiceClient，Iface， AsyncIface 等对象
      *
      * @param clientConfigList Thrift Client 配置列表
      * @param registry         注册器
-     * @param environment      运行环境
      * @return 返回注册的BeanMap
      */
     public static Map<String, BeanDefinition> registerThriftClientBeanDefinitions(
             List<TClientConfig> clientConfigList,
-            BeanDefinitionRegistry registry,
-            Environment environment) {
+            BeanDefinitionRegistry registry) {
 
         Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
@@ -44,7 +45,7 @@ public class ThriftClientRegister {
         }
 
         for (TClientConfig clientConfig : clientConfigList) {
-            Map<String, BeanDefinition> subBeanDefinitionMap = registerThriftClientBeanDefinition(clientConfig, registry, environment);
+            Map<String, BeanDefinition> subBeanDefinitionMap = registerThriftClientBeanDefinition(clientConfig, registry);
             if (null != subBeanDefinitionMap && !subBeanDefinitionMap.isEmpty()) {
                 beanDefinitionMap.putAll(subBeanDefinitionMap);
             }
@@ -58,10 +59,9 @@ public class ThriftClientRegister {
      *
      * @param clientConfig Thrift Client 配置对象
      * @param registry     注册器
-     * @param environment  运行环境
      * @return 返回注册的BeanMap
      */
-    public static Map<String, BeanDefinition> registerThriftClientBeanDefinition(TClientConfig clientConfig, BeanDefinitionRegistry registry, Environment environment) {
+    public static Map<String, BeanDefinition> registerThriftClientBeanDefinition(TClientConfig clientConfig, BeanDefinitionRegistry registry) {
         Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
         List<TProtocolFactory> protocolFactories = clientConfig.getProtocolFactories();
@@ -77,7 +77,8 @@ public class ThriftClientRegister {
             for (ClientType clientType : clientTypes) {
                 String beanName = ThriftUtil.buildDefaultThriftClientBeanName(serviceClass, router, clientType);
 
-                logger.info("注册ThriftBean： " + beanName + ", serviceClass=" + serviceClass.getSimpleName() + ", router=[" + router + "], clientType=" + clientType);
+                LOGGER.info("注册ThriftBean：{}, serviceClass={}, router=[{}], clientType={}",
+                        beanName, serviceClass.getSimpleName(), router, clientType);
 
                 GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
                 beanDefinition.setBeanClass(ThriftClientFactoryBean.class);
