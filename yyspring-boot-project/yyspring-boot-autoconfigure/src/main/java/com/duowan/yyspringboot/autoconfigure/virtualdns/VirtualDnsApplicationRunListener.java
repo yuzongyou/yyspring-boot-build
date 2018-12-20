@@ -55,7 +55,7 @@ public class VirtualDnsApplicationRunListener extends SpringApplicationRunListen
 
         List<Resource> defaultResourceList = new ArrayList<>();
         CommonUtil.appendList(defaultResourceList, AppContext.lookupConfigResourceList("hosts"));
-        CommonUtil.appendList(defaultResourceList, AppContext.lookupConfigResourceList("hosts.properties"));
+        CommonUtil.appendList(defaultResourceList, AppContext.lookupConfigResourceList("vdns.hosts"));
 
         if (!defaultResourceList.isEmpty()) {
             resourceList.addAll(defaultResourceList);
