@@ -13,7 +13,7 @@ public abstract class AbstractNotQueryBuilder<T> extends AbstractSqlBuilder<T> {
     /**
      * 最终的SQL
      */
-    private volatile String sql = null;
+    private String sql = null;
 
     protected AbstractNotQueryBuilder(Class<?> modelType, SqlBuilderType sqlBuilderType) {
         super(modelType, sqlBuilderType);

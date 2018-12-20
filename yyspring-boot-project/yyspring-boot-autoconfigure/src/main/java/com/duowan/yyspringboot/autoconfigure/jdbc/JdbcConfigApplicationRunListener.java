@@ -4,6 +4,7 @@ import com.duowan.common.jdbc.model.JdbcDefinition;
 import com.duowan.common.jdbc.model.RiseJdbcDefinition;
 import com.duowan.common.jdbc.provider.dbtype.DBProvider;
 import com.duowan.common.jdbc.provider.pooltype.PoolProvider;
+import com.duowan.common.jdbc.util.JdbcRegisterContext;
 import com.duowan.common.jdbc.util.JdbcRegisterUtil;
 import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ReflectUtil;
@@ -11,7 +12,6 @@ import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.SpringApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -46,11 +46,11 @@ public class JdbcConfigApplicationRunListener extends SpringApplicationRunListen
         JdbcProperties jdbcProperties = bindProperties(JdbcProperties.PROPERTIES_PREFIX, JdbcProperties.class);
 
         if (null != jdbcProperties) {
-            doAutoConfiguration(jdbcProperties, context, registry, environment);
+            doAutoConfiguration(jdbcProperties, registry, environment);
         }
     }
 
-    static void doAutoConfiguration(JdbcProperties jdbcProperties, ApplicationContext applicationContext, BeanDefinitionRegistry registry, Environment environment) {
+    static void doAutoConfiguration(JdbcProperties jdbcProperties, BeanDefinitionRegistry registry, Environment environment) {
 
         List<DBProvider> dbProviderList = ReflectUtil.newInstancesByDefaultConstructor(DBProvider.class, jdbcProperties.getDbProviderClasses());
         List<PoolProvider> poolProviderList = ReflectUtil.newInstancesByDefaultConstructor(PoolProvider.class, jdbcProperties.getPoolProviderClasses());
@@ -59,14 +59,15 @@ public class JdbcConfigApplicationRunListener extends SpringApplicationRunListen
 
         // 注册Bean
         JdbcRegisterUtil.registerJdbcBeanDefinitions(
-                dbProviderList,
-                poolProviderList,
-                jdbcProperties.getPrimaryId(),
-                jdbcProperties.getEnabledIds(),
-                jdbcProperties.getExcludeIds(),
-                jdbcDefinitionList,
-                registry,
-                environment);
+                new JdbcRegisterContext()
+                        .setDbProviderList(dbProviderList)
+                        .setPoolProviderList(poolProviderList)
+                        .setPrimaryId(jdbcProperties.getPrimaryId())
+                        .setEnabledIds(jdbcProperties.getEnabledIds())
+                        .setExcludeIds(jdbcProperties.getExcludeIds())
+                        .setJdbcDefinitionList(jdbcDefinitionList)
+                        .setRegistry(registry)
+                        .setEnvironment(environment));
     }
 
     private static List<JdbcDefinition> lookupJdbcDefList(JdbcProperties jdbcProperties) {

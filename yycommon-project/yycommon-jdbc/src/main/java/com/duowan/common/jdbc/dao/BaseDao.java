@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Arvin
  */
-public interface BaseDao<PK, T, Q> {
+public interface BaseDao<P, T, Q> {
 
     /**
      * 插入，并自动填充 自增主键和 uuid 主键
@@ -25,7 +25,7 @@ public interface BaseDao<PK, T, Q> {
      * @param primaryKey 主键ID
      * @return 返回数据库操作影响行数
      */
-    int delete(PK primaryKey);
+    int delete(P primaryKey);
 
     /**
      * 根据主键查询
@@ -33,7 +33,7 @@ public interface BaseDao<PK, T, Q> {
      * @param primaryKey 主键
      * @return 如果存在就返回对象，否则返回null
      */
-    T get(PK primaryKey);
+    T get(P primaryKey);
 
     /**
      * 根据主键更新数据

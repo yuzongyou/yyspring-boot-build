@@ -57,12 +57,12 @@ public class MysqlUpdateByPrimaryKeyBuilder extends AbstractMysqlUpdateBuilder<M
      */
     private List<FieldDef> calculateNeedUpdateColumnDefinitions() {
 
-        List<FieldDef> tempList = new ArrayList<FieldDef>();
+        List<FieldDef> tempList = new ArrayList<>();
 
         tempList.addAll(getMd().getAllDefList());
 
         // 清理掉不允许NULL但是目前的值是NULL的列
-        List<FieldDef> resultList = new ArrayList<FieldDef>();
+        List<FieldDef> resultList = new ArrayList<>();
 
         for (FieldDef fd : tempList) {
 

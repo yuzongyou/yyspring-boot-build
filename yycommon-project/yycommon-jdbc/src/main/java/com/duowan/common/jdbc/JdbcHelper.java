@@ -14,6 +14,10 @@ import java.util.*;
  */
 public abstract class JdbcHelper {
 
+    private JdbcHelper() {
+        throw new IllegalStateException("Helper class");
+    }
+
     /**
      * 生成UUID并去掉横杠，转化为大写
      *
@@ -76,7 +80,7 @@ public abstract class JdbcHelper {
         if (null == timeType) {
             return false;
         }
-        Set<Class<?>> supportTypes = new HashSet<Class<?>>(Arrays.asList(
+        Set<Class<?>> supportTypes = new HashSet<>(Arrays.asList(
                 Date.class,
                 java.sql.Date.class,
                 java.sql.Timestamp.class,
@@ -90,7 +94,7 @@ public abstract class JdbcHelper {
         if (null == type) {
             return false;
         }
-        Set<Class<?>> supportTypes = new HashSet<Class<?>>(Arrays.asList(
+        Set<Class<?>> supportTypes = new HashSet<>(Arrays.asList(
                 String.class, CharSequence.class
         ));
         return supportTypes.contains(type);
@@ -132,7 +136,7 @@ public abstract class JdbcHelper {
         if (null == type) {
             return false;
         }
-        Set<Class<?>> primitiveTypes = new HashSet<Class<?>>(Arrays.asList(
+        Set<Class<?>> primitiveTypes = new HashSet<>(Arrays.asList(
                 int.class, long.class, char.class, short.class,
                 byte.class, boolean.class, float.class, double.class
         ));
@@ -151,7 +155,7 @@ public abstract class JdbcHelper {
         if (null == type) {
             return false;
         }
-        Set<Class<?>> numberTypes = new HashSet<Class<?>>(Arrays.asList(
+        Set<Class<?>> numberTypes = new HashSet<>(Arrays.asList(
                 int.class, long.class, short.class,
                 float.class, double.class,
                 Integer.class, Long.class, Number.class, Double.class,
@@ -254,11 +258,7 @@ public abstract class JdbcHelper {
             return true;
         }
 
-        if (isTimeType(wrapFirstType) && isTimeType(wrapSecondType)) {
-            return true;
-        }
-
-        return false;
+        return isTimeType(wrapFirstType) && isTimeType(wrapSecondType);
 
     }
 
@@ -286,7 +286,7 @@ public abstract class JdbcHelper {
     /**
      * 符合条件的查询类
      */
-    private static String[] ACCEPT_QUERY_CONDITION_SUFFIXES = new String[]{
+    private static final String[] ACCEPT_QUERY_CONDITION_SUFFIXES = new String[]{
             "Query", "Dto", "DTO", "Vo", "VO", "Condition", "Bean"
     };
 
@@ -343,20 +343,20 @@ public abstract class JdbcHelper {
     }
 
     public static boolean isMapInstance(Object object) {
-        return null != object && (object instanceof Map);
+        return object instanceof Map;
     }
 
-    private static Set<Class<?>> ALLOW_AUTO_INCREMENT_TYPES = null;
+    private static Set<Class<?>> allowAutoIncrementTypes = null;
 
     public static Set<Class<?>> getAllowAutoIncrementTypes() {
-        if (null == ALLOW_AUTO_INCREMENT_TYPES) {
-            ALLOW_AUTO_INCREMENT_TYPES = new HashSet<>();
-            ALLOW_AUTO_INCREMENT_TYPES.add(int.class);
-            ALLOW_AUTO_INCREMENT_TYPES.add(Integer.class);
-            ALLOW_AUTO_INCREMENT_TYPES.add(long.class);
-            ALLOW_AUTO_INCREMENT_TYPES.add(Long.class);
+        if (null == allowAutoIncrementTypes) {
+            allowAutoIncrementTypes = new HashSet<>();
+            allowAutoIncrementTypes.add(int.class);
+            allowAutoIncrementTypes.add(Integer.class);
+            allowAutoIncrementTypes.add(long.class);
+            allowAutoIncrementTypes.add(Long.class);
         }
-        return ALLOW_AUTO_INCREMENT_TYPES;
+        return allowAutoIncrementTypes;
     }
 
     /**

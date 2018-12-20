@@ -116,10 +116,7 @@ public class MysqlInsertBuilder extends AbstractSqlBuilder<MysqlInsertBuilder> i
         if (fd.isInsertIgnore() || this.isIgnoreModelField(fd.getFieldName())) {
             return true;
         }
-        if (fd.isPrimaryKey() && fd.isAutoIncrement()) {
-            return true;
-        }
-        return false;
+        return fd.isPrimaryKey() && fd.isAutoIncrement();
     }
 
     private void appendNormalColumn(StringBuilder fieldsBuilder, StringBuilder valuesBuilder, FieldDef fd) {
@@ -159,7 +156,7 @@ public class MysqlInsertBuilder extends AbstractSqlBuilder<MysqlInsertBuilder> i
             } else {
                 appendColumn(fieldsBuilder, valuesBuilder, fd, pkValue);
             }
-            return ;
+            return;
         }
 
         AssertUtil.assertNotNull(pkValue, "主键值不能为空！");
@@ -169,10 +166,8 @@ public class MysqlInsertBuilder extends AbstractSqlBuilder<MysqlInsertBuilder> i
 
     private void appendColumn(StringBuilder fieldsBuilder, StringBuilder valuesBuilder, FieldDef fd, Object columnValue) {
 
-        if (null == columnValue) {
-            if (fd.isInsertIgnoreNull()) {
-                return;
-            }
+        if (null == columnValue && fd.isInsertIgnoreNull()) {
+            return;
         }
 
         if (null == columnValue) {

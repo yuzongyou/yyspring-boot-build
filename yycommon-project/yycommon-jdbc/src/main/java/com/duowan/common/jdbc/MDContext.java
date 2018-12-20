@@ -2,7 +2,6 @@ package com.duowan.common.jdbc;
 
 import com.duowan.common.jdbc.definition.QueryCondDef;
 import com.duowan.common.jdbc.exception.JdbcException;
-import com.duowan.common.jdbc.exception.ModelDefNotFoundException;
 import com.duowan.common.utils.AssertUtil;
 
 import java.util.HashMap;
@@ -14,7 +13,11 @@ import java.util.Map;
  * @author Arvin
  * @since 2018/1/1 8:36
  */
-public abstract class MDContext {
+public class MDContext {
+
+    private MDContext() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * ModelDef Map
@@ -24,16 +27,15 @@ public abstract class MDContext {
     /**
      * 查询条件类型
      */
-    private static final Map<Class<?>, QueryCondDef> QUERY_COND_DEF_MAP = new HashMap<Class<?>, QueryCondDef>();
+    private static final Map<Class<?>, QueryCondDef> QUERY_COND_DEF_MAP = new HashMap<>();
 
     /**
      * 获取指定模型类对应的 模型定义
      *
      * @param modelType 模型类
      * @return 返回模型定义，如果没有的话直接抛出异常
-     * @throws ModelDefNotFoundException 模型定义找不到
      */
-    public static ModelDef getMD(Class<?> modelType) throws ModelDefNotFoundException {
+    public static ModelDef getMD(Class<?> modelType) {
         ModelDef md = MD_MAP.get(modelType);
         if (null != md) {
             return md;
@@ -82,15 +84,7 @@ public abstract class MDContext {
      */
     public static QueryCondDef registerQueryConditionType(Class<?> queryConditionType) {
         if (null != queryConditionType) {
-            QueryCondDef queryConditionDefinition = QUERY_COND_DEF_MAP.get(queryConditionType);
-            if (null == queryConditionDefinition) {
-
-                queryConditionDefinition = new QueryCondDef(queryConditionType);
-
-                QUERY_COND_DEF_MAP.put(queryConditionType, queryConditionDefinition);
-
-            }
-            return queryConditionDefinition;
+            return QUERY_COND_DEF_MAP.computeIfAbsent(queryConditionType, key -> new QueryCondDef(queryConditionType));
         }
         return null;
     }

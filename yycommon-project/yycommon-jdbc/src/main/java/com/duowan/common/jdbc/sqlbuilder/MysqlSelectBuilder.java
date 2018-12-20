@@ -71,11 +71,11 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
     @Override
     public List<ConditionItem> parseConditionItemList() {
 
-        if (null == queryCondition) {
-            return null;
-        }
+        List<ConditionItem> conditionItemList = new ArrayList<>();
 
-        List<ConditionItem> conditionItemList = new ArrayList<ConditionItem>();
+        if (null == queryCondition) {
+            return conditionItemList;
+        }
 
         List<QueryCondFieldDef> queryConditionColumnDefinitionList = getQueryConditionColumnDefinitionList();
 
@@ -85,16 +85,13 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
 
             FieldDef modelColumnDefinition = getModelColumnDefinitionByQueryConditionColumnDefinition(queryConditionColumnDefinition);
 
-            if (null != modelColumnDefinition) {
+            if (null != modelColumnDefinition && !isCustomIgnoreCondition(modelColumnDefinition)) {
 
-                if (!isCustomIgnoreCondition(modelColumnDefinition)) {
+                // 计算查询条件的值
+                ConditionItem conditionItem = queryConditionColumnDefinition.createConditionItem(modelColumnDefinition);
 
-                    // 计算查询条件的值
-                    ConditionItem conditionItem = queryConditionColumnDefinition.createConditionItem(modelColumnDefinition);
-
-                    if (null != conditionItem) {
-                        conditionItemList.add(conditionItem);
-                    }
+                if (null != conditionItem) {
+                    conditionItemList.add(conditionItem);
                 }
             }
         }
@@ -128,7 +125,7 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
      */
     private List<QueryCondFieldDef> getQueryConditionColumnDefinitionList() {
         if (null == this.queryCondition || null == this.queryCondDef) {
-            return null;
+            return new ArrayList<>(0);
         }
 
         return this.queryCondDef.getQueryCondFieldDefs();
@@ -142,7 +139,7 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
     @Override
     protected List<OrderItem> parseOrderItemList() {
 
-        Set<OrderItem> orderItemSet = new HashSet<OrderItem>();
+        Set<OrderItem> orderItemSet = new HashSet<>();
 
         if (null != this.queryCondition) {
 
@@ -153,7 +150,7 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
             appendQueryConditionOrderItemList(orderItemSet);
         }
 
-        List<OrderItem> orderItemList = new ArrayList<OrderItem>(orderItemSet);
+        List<OrderItem> orderItemList = new ArrayList<>(orderItemSet);
 
         Collections.sort(orderItemList);
 
@@ -181,7 +178,7 @@ public class MysqlSelectBuilder extends AbstractSelectBuilder<MysqlSelectBuilder
         if (null != this.queryCondDef) {
             return this.queryCondDef.getFixedOrderItemSet(this.getModelType());
         }
-        return null;
+        return new HashSet<>();
     }
 
     @Override

@@ -13,7 +13,11 @@ import java.util.Set;
 /**
  * @author Arvin
  */
-public abstract class RedisDefinitionUtil {
+public class RedisDefinitionUtil {
+
+    private RedisDefinitionUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 过滤禁用的 ID 列表

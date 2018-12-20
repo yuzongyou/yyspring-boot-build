@@ -31,84 +31,72 @@ import java.util.*;
  *
  * @author Arvin
  */
-public abstract class JdbcRegisterUtil {
+public class JdbcRegisterUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcRegisterUtil.class);
+    private JdbcRegisterUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdbcRegisterUtil.class);
 
     /**
      * JdbcDefinition.id -- JdbcDefinition
      */
-    private static Map<String, JdbcDefinition> JDBC_DEF_MAP = new HashMap<>();
+    private static Map<String, JdbcDefinition> jdbcDefMap = new HashMap<>();
 
     /**
      * 主 定义
      */
-    private static volatile JdbcDefinition PRIMARY_JDBC_DEF = null;
+    private static JdbcDefinition primaryJdbcDef = null;
 
     /**
      * 检查是否有重复的
      */
-    private static List<JdbcDefinition> checkJdbcDefList(List<JdbcDefinition> jdbcDefinitionList) {
+    private static void checkJdbcDefList(List<JdbcDefinition> jdbcDefinitionList) {
 
         if (null == jdbcDefinitionList || jdbcDefinitionList.isEmpty()) {
-            return jdbcDefinitionList;
+            return;
         }
 
         for (JdbcDefinition jdbcDefinition : jdbcDefinitionList) {
-            AssertUtil.assertFalse(JDBC_DEF_MAP.containsKey(jdbcDefinition.getId()), "JdbcDefinition[id=" + jdbcDefinition.getId() + "]重复定义！");
+            AssertUtil.assertFalse(jdbcDefMap.containsKey(jdbcDefinition.getId()), "JdbcDefinition[id=" + jdbcDefinition.getId() + "]重复定义！");
 
             if (jdbcDefinition.isPrimary()) {
-                if (null == PRIMARY_JDBC_DEF) {
-                    PRIMARY_JDBC_DEF = jdbcDefinition;
+                if (null == primaryJdbcDef) {
+                    primaryJdbcDef = jdbcDefinition;
                 } else {
-                    AssertUtil.assertTrue(PRIMARY_JDBC_DEF.getId().equals(jdbcDefinition.getId()),
-                            "不能定义多个 primary JdbcDefinition 目前定义了[" + PRIMARY_JDBC_DEF.getId() + "," + jdbcDefinition.getId() + "]");
+                    AssertUtil.assertTrue(primaryJdbcDef.getId().equals(jdbcDefinition.getId()),
+                            "不能定义多个 primary JdbcDefinition 目前定义了[" + primaryJdbcDef.getId() + "," + jdbcDefinition.getId() + "]");
                 }
 
             }
 
-            JDBC_DEF_MAP.put(jdbcDefinition.getId(), jdbcDefinition);
+            jdbcDefMap.put(jdbcDefinition.getId(), jdbcDefinition);
         }
-
-        return jdbcDefinitionList;
     }
 
     /**
      * 注册  Bean
      *
-     * @param dbProviderList     DB 提供者列表
-     * @param poolProviderList   连接池提供者实例列表
-     * @param primaryId          主JdbcID
-     * @param enabledIds         要启用的ID列表，支持通配符 *
-     * @param excludeIds         要禁用的ID列表，支持通配符 *
-     * @param jdbcDefinitionList JDBC 定义列表
-     * @param registry           Bean 注册入口
-     * @param environment        环境
+     * @param registerContext        注册上下文
      * @return 返回注册的BeanDefinition MAP
      */
-    public static Map<String, BeanDefinition> registerJdbcBeanDefinitions(List<DBProvider> dbProviderList,
-                                                                          List<PoolProvider> poolProviderList,
-                                                                          String primaryId,
-                                                                          Set<String> enabledIds,
-                                                                          Set<String> excludeIds,
-                                                                          List<JdbcDefinition> jdbcDefinitionList,
-                                                                          BeanDefinitionRegistry registry,
-                                                                          Environment environment) {
+    public static Map<String, BeanDefinition> registerJdbcBeanDefinitions(JdbcRegisterContext registerContext) {
 
         // 过滤所有排除的 Jdbc 定义列表
-        jdbcDefinitionList = JdbcDefinitionUtil.filterExcludeDefList(excludeIds, jdbcDefinitionList);
+        List<JdbcDefinition> jdbcDefinitionList = JdbcDefinitionUtil.filterExcludeDefList(registerContext.getExcludeIds(), registerContext.getJdbcDefinitionList());
 
         // 提取所有启用的Jdbc定义列表
-        jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(enabledIds, jdbcDefinitionList);
+        jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(registerContext.getExcludeIds(), jdbcDefinitionList);
 
         // 设置属性
-        jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, environment);
+        jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, registerContext.getEnvironment());
 
         // 应用 主 定义
-        jdbcDefinitionList = JdbcDefinitionUtil.applyPrimaryJdbcDefList(primaryId, jdbcDefinitionList);
+        jdbcDefinitionList = JdbcDefinitionUtil.applyPrimaryJdbcDefList(registerContext.getPrimaryId(), jdbcDefinitionList);
 
         // 检查定义列表，看看是不是有重复、是否有多个 primary 定义的之类
-        jdbcDefinitionList = checkJdbcDefList(jdbcDefinitionList);
+        checkJdbcDefList(jdbcDefinitionList);
 
         Map<String, BeanDefinition> beanDefinitionMap = new HashMap<>();
 
@@ -116,15 +104,18 @@ public abstract class JdbcRegisterUtil {
         jdbcDefinitionList = JdbcDefinitionUtil.fillDefaultConfig(jdbcDefinitionList);
 
         if (jdbcDefinitionList == null || jdbcDefinitionList.isEmpty()) {
-            logger.info("定义了多个Jdbc，但是未启用！");
+            LOGGER.info("定义了多个Jdbc，但是未启用！");
             return beanDefinitionMap;
         }
 
-        dbProviderList = appendDefaultDbProviderAndFilterDuplicateInstance(dbProviderList);
-        poolProviderList = appendDefaultPoolProviderAndFilterDuplicateInstance(poolProviderList);
+        List<DBProvider> dbProviderList = appendDefaultDbProviderAndFilterDuplicateInstance(registerContext.getDbProviderList());
+        List<PoolProvider> poolProviderList = appendDefaultPoolProviderAndFilterDuplicateInstance(registerContext.getPoolProviderList());
+
+        BeanDefinitionRegistry registry = registerContext.getRegistry();
 
         for (JdbcDefinition jdbcDefinition : jdbcDefinitionList) {
-            logger.info("准备注册JdbcDef[primary=" + jdbcDefinition.isPrimary() + "]: " + JsonUtil.toPrettyJson(jdbcDefinition));
+            String prettyJson = JsonUtil.toPrettyJson(jdbcDefinition);
+            LOGGER.info("准备注册JdbcDef[primary={}]: {}", jdbcDefinition.isPrimary(), prettyJson);
 
             DBProvider dbProvider = JdbcDefinitionUtil.lookupDBProvider(dbProviderList, jdbcDefinition);
             PoolProvider poolProvider = JdbcDefinitionUtil.lookupPoolProvider(poolProviderList, jdbcDefinition);
@@ -133,10 +124,10 @@ public abstract class JdbcRegisterUtil {
             JdbcDefinitionUtil.fillDefaultPoolAndDriverConfig(jdbcDefinition, dbProvider, poolProvider);
 
             // 注册 DataSource
-            String dsBeanName = registerDataSourceBeanDefinition(beanDefinitionMap, registry, jdbcDefinition, dbProvider, poolProvider);
+            String dsBeanName = registerDataSourceBeanDefinition(beanDefinitionMap, registry, jdbcDefinition, poolProvider);
 
             // 注册 JdbcTemplate
-            String jdbcTemplateBeanName = registerJdbcTemplateBeanDefinition(beanDefinitionMap, registry, jdbcDefinition, dbProvider, poolProvider, dsBeanName);
+            String jdbcTemplateBeanName = registerJdbcTemplateBeanDefinition(beanDefinitionMap, registry, jdbcDefinition, dsBeanName);
 
             String txTemplateBeanMame = null;
             // 注册事务管理器和事务模版
@@ -155,7 +146,7 @@ public abstract class JdbcRegisterUtil {
 
             // 初始化JDBC
             if (jdbcDefinition.isInitJdbc()) {
-                registerJdbcBeanDefinition(beanDefinitionMap, registry, environment, jdbcDefinition, dbProvider, jdbcTemplateBeanName, txTemplateBeanMame);
+                registerJdbcBeanDefinition(beanDefinitionMap, registry, registerContext.getEnvironment(), jdbcDefinition, dbProvider, jdbcTemplateBeanName, txTemplateBeanMame);
             }
         }
 
@@ -334,12 +325,10 @@ public abstract class JdbcRegisterUtil {
      *
      * @param registry       BeanDefinition 注册器
      * @param jdbcDefinition jdbc 定义
-     * @param dbProvider     dbProvider
-     * @param poolProvider   连接池提供者
      * @param dsBeanName     dataSource BeanName
      * @return 返回 JdbcTemplateBeanName
      */
-    private static String registerJdbcTemplateBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, DBProvider dbProvider, PoolProvider poolProvider, String dsBeanName) {
+    private static String registerJdbcTemplateBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, String dsBeanName) {
 
         String beanName = jdbcDefinition.getId() + "JdbcTemplate";
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
@@ -360,11 +349,10 @@ public abstract class JdbcRegisterUtil {
      *
      * @param registry       BeanDefinition 注册器
      * @param jdbcDefinition jdbc 定义
-     * @param dbProvider     dbProvider
      * @param poolProvider   连接池提供者
      * @return 返回 DataSourceBeanName
      */
-    private static String registerDataSourceBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, DBProvider dbProvider, PoolProvider poolProvider) {
+    private static String registerDataSourceBeanDefinition(Map<String, BeanDefinition> beanDefinitionMap, BeanDefinitionRegistry registry, JdbcDefinition jdbcDefinition, PoolProvider poolProvider) {
 
         String beanName = jdbcDefinition.getId() + "DataSource";
 

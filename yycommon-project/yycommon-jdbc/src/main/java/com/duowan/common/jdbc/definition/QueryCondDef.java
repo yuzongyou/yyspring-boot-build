@@ -34,7 +34,7 @@ public class QueryCondDef {
     /**
      * 查询列对象定义列表
      */
-    private List<QueryCondFieldDef> queryCondFieldDefs = new ArrayList<QueryCondFieldDef>();
+    private List<QueryCondFieldDef> queryCondFieldDefs = new ArrayList<>();
 
     private final List<Field> fieldList;
 
@@ -52,15 +52,11 @@ public class QueryCondDef {
     private void parseDefinition() {
 
         // 记录已经处理过了的属性名称集合
-        Set<Field> processedFieldSet = new HashSet<Field>();
+        Set<Field> processedFieldSet = new HashSet<>();
 
         for (Field field : fieldList) {
-            if (!isIgnoreModelField(field)) {
-
-                if (!parseAsRangeQueryColumnDefinition(processedFieldSet, field)) {
-                    parseAsDirectQueryColumnDefinition(processedFieldSet, field);
-                }
-
+            if (!isIgnoreModelField(field) && !parseAsRangeQueryColumnDefinition(processedFieldSet, field)) {
+                parseAsDirectQueryColumnDefinition(processedFieldSet, field);
             }
         }
     }
@@ -73,52 +69,50 @@ public class QueryCondDef {
      */
     private boolean parseAsRangeQueryColumnDefinition(Set<Field> processedFieldSet, Field field) {
 
-        if (!processedFieldSet.contains(field)) {
-
-            NotRange notRangeAnnotation = ReflectUtil.getFieldAnnotation(field, NotRange.class);
-            if (null != notRangeAnnotation) {
-                return false;
-            }
-
-            String fieldName = field.getName();
-
-            boolean isBeg = fieldName.startsWith(BEG);
-            boolean isEnd = fieldName.startsWith(END);
-
-            if (isBeg || isEnd) {
-
-                String queryFieldNameWithFirstLetterUpperCase = fieldName.replaceFirst(REGEX_BEG_END, "");
-
-                String queryFieldName = CommonUtil.firstLetterToLowerCase(queryFieldNameWithFirstLetterUpperCase);
-
-                // 相反的属性名称
-                String oppositeFieldName = isBeg ? END + queryFieldNameWithFirstLetterUpperCase : BEG + queryFieldNameWithFirstLetterUpperCase;
-
-                Field oppositeField = lookupQueryFieldByName(oppositeFieldName);
-
-                // 说明有相反的属性
-                if (null != oppositeField) {
-
-                    Field begField = isBeg ? field : oppositeField;
-                    Field endField = isEnd ? field : oppositeField;
-
-                    RangeCondFieldDef fieldDef =
-                            new RangeCondFieldDef(begField, endField, queryFieldName, this);
-
-                    this.queryCondFieldDefs.add(fieldDef);
-
-                    processedFieldSet.add(begField);
-                    processedFieldSet.add(endField);
-
-                    return true;
-                }
-            }
-
-            return false;
-        } else {
+        if (processedFieldSet.contains(field)) {
             return true;
         }
 
+        NotRange notRangeAnnotation = ReflectUtil.getFieldAnnotation(field, NotRange.class);
+        if (null != notRangeAnnotation) {
+            return false;
+        }
+
+        String fieldName = field.getName();
+
+        boolean isBeg = fieldName.startsWith(BEG);
+        boolean isEnd = fieldName.startsWith(END);
+
+        if (isBeg || isEnd) {
+
+            String queryFieldNameWithFirstLetterUpperCase = fieldName.replaceFirst(REGEX_BEG_END, "");
+
+            String queryFieldName = CommonUtil.firstLetterToLowerCase(queryFieldNameWithFirstLetterUpperCase);
+
+            // 相反的属性名称
+            String oppositeFieldName = isBeg ? END + queryFieldNameWithFirstLetterUpperCase : BEG + queryFieldNameWithFirstLetterUpperCase;
+
+            Field oppositeField = lookupQueryFieldByName(oppositeFieldName);
+
+            // 说明有相反的属性
+            if (null != oppositeField) {
+
+                Field begField = isBeg ? field : oppositeField;
+                Field endField = isEnd ? field : oppositeField;
+
+                RangeCondFieldDef fieldDef =
+                        new RangeCondFieldDef(begField, endField, queryFieldName, this);
+
+                this.queryCondFieldDefs.add(fieldDef);
+
+                processedFieldSet.add(begField);
+                processedFieldSet.add(endField);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Field lookupQueryFieldByName(String fieldName) {
@@ -163,11 +157,8 @@ public class QueryCondDef {
 
         IgnoreField ignoreFieldAnnotation = ReflectUtil.getFieldAnnotation(modelField, IgnoreField.class);
 
-        if (null != ignoreFieldAnnotation) {
-            return true;
-        }
+        return null != ignoreFieldAnnotation;
 
-        return false;
     }
 
 
@@ -178,7 +169,7 @@ public class QueryCondDef {
     /**
      * 缓存模型到 排序项目的一个集合
      */
-    private Map<Class<?>, Set<OrderItem>> modelTypeToFixedOrderItemSetMap = new HashMap<Class<?>, Set<OrderItem>>();
+    private Map<Class<?>, Set<OrderItem>> modelTypeToFixedOrderItemSetMap = new HashMap<>();
 
     public Set<OrderItem> getFixedOrderItemSet(Class<?> modelType) {
 
@@ -190,7 +181,7 @@ public class QueryCondDef {
             return orderItemSet;
         }
 
-        orderItemSet = new HashSet<OrderItem>();
+        orderItemSet = new HashSet<>();
 
         for (QueryCondFieldDef fieldDef : this.queryCondFieldDefs) {
             OrderItem orderItem = fieldDef.createOrderItem(modelType);

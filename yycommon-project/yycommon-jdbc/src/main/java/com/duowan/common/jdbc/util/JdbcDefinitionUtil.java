@@ -20,7 +20,11 @@ import java.util.Set;
  *
  * @author Arvin
  */
-public abstract class JdbcDefinitionUtil {
+public class JdbcDefinitionUtil {
+
+    private JdbcDefinitionUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * 提取启用的列表
@@ -250,7 +254,7 @@ public abstract class JdbcDefinitionUtil {
 
                 List<RiseJdbcDefinition> subList = autoFillProperties((RiseJdbcDefinition) jdbcDefinition, environment);
 
-                if (null != subList && !subList.isEmpty()) {
+                if (!subList.isEmpty()) {
                     resultList.addAll(subList);
                 }
             } else {

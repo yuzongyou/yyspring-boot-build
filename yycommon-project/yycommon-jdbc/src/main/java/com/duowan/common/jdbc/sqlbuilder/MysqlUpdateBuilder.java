@@ -39,7 +39,7 @@ public class MysqlUpdateBuilder extends AbstractMysqlUpdateBuilder<MysqlUpdateBu
     /**
      * 自定义要更新的列名称集合， 如果没有设置的话就按照默认规则进行计算
      */
-    private Set<FieldDef> customNeedUpdateColumnDefinitionSet = new HashSet<FieldDef>();
+    private Set<FieldDef> customNeedUpdateColumnDefinitionSet = new HashSet<>();
 
     /**
      * @param model            要更新的对象
@@ -161,17 +161,11 @@ public class MysqlUpdateBuilder extends AbstractMysqlUpdateBuilder<MysqlUpdateBu
      */
     private List<FieldDef> calculateNeedUpdateColumnDefinitions() {
 
-        List<FieldDef> tempList = new ArrayList<FieldDef>();
-
-        if (!this.customNeedUpdateColumnDefinitionSet.isEmpty()) {
-            tempList.addAll(this.customNeedUpdateColumnDefinitionSet);
-        } else {
-            // 没有自定义，计算
-            tempList.addAll(getMd().getAllDefList());
-        }
+        List<FieldDef> tempList = new ArrayList<>();
+        fillUpdateColumnDefinitions(tempList);
 
         // 清理掉不允许NULL但是目前的值是NULL的列
-        List<FieldDef> resultList = new ArrayList<FieldDef>();
+        List<FieldDef> resultList = new ArrayList<>();
 
         for (FieldDef fd : tempList) {
 
@@ -181,21 +175,40 @@ public class MysqlUpdateBuilder extends AbstractMysqlUpdateBuilder<MysqlUpdateBu
 
             Object value = ReflectUtil.getFieldValue(this.model, fd.getField());
             if (null != value) {
-                if (fd.isPrimaryKey()) {
-                    if (JdbcHelper.isValidPrimaryKeyValue(value)) {
-                        resultList.add(fd);
-                    }
-                } else {
-                    resultList.add(fd);
-                }
+                addNeedUpdateColumnForNotNullValue(resultList, fd, value);
             } else {
-                if (!fd.isUpdateIgnoreNull()) {
-                    resultList.add(fd);
-                }
+                addNeedUpdateColumnForNullValue(resultList, fd);
             }
         }
 
         return resultList;
+    }
+
+    private void addNeedUpdateColumnForNullValue(List<FieldDef> resultList, FieldDef fd) {
+        if (!fd.isUpdateIgnoreNull()) {
+            resultList.add(fd);
+        }
+    }
+
+    private void addNeedUpdateColumnForNotNullValue(List<FieldDef> resultList, FieldDef fd, Object value) {
+        if (fd.isPrimaryKey()) {
+            if (JdbcHelper.isValidPrimaryKeyValue(value)) {
+                resultList.add(fd);
+            }
+        } else {
+            resultList.add(fd);
+        }
+    }
+
+    private void fillUpdateColumnDefinitions(List<FieldDef> resultList) {
+
+        if (!this.customNeedUpdateColumnDefinitionSet.isEmpty()) {
+            resultList.addAll(this.customNeedUpdateColumnDefinitionSet);
+        } else {
+            // 没有自定义，计算
+            resultList.addAll(getMd().getAllDefList());
+        }
+
     }
 
     private boolean lookupAndAppendUniqueKeyToWhereClause(StringBuilder sqlBuilder) {

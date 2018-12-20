@@ -51,7 +51,7 @@ public class CountSqlParser {
         }
         try {
             stmt = CCJSqlParserUtil.parse(sql);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             //无法解析的用一般方法返回count语句
             return getSimpleCountSql(sql);
         }
@@ -68,8 +68,7 @@ public class CountSqlParser {
         processWithItemsList(select.getWithItemsList());
         //处理为count查询
         sqlToCount(select, columnName);
-        String result = select.toString();
-        return result;
+        return select.toString();
     }
 
     /**
@@ -102,7 +101,7 @@ public class CountSqlParser {
     public void sqlToCount(Select select, String name) {
         SelectBody selectBody = select.getSelectBody();
         // 是否能简化count查询
-        List<SelectItem> countItem = new ArrayList<SelectItem>();
+        List<SelectItem> countItem = new ArrayList<>();
         countItem.add(new SelectExpressionItem(new Column("count(" + name + ")")));
         if (selectBody instanceof PlainSelect && isSimpleCount((PlainSelect) selectBody)) {
             ((PlainSelect) selectBody).setSelectItems(countItem);
@@ -138,10 +137,8 @@ public class CountSqlParser {
                 return false;
             }
             //如果查询列中包含函数，也不可以，函数可能会聚合列
-            if (item instanceof SelectExpressionItem) {
-                if (((SelectExpressionItem) item).getExpression() instanceof Function) {
-                    return false;
-                }
+            if (item instanceof SelectExpressionItem && ((SelectExpressionItem) item).getExpression() instanceof Function) {
+                return false;
             }
         }
         return true;
@@ -162,7 +159,7 @@ public class CountSqlParser {
             }
         } else {
             SetOperationList operationList = (SetOperationList) selectBody;
-            if (operationList.getSelects() != null && operationList.getSelects().size() > 0) {
+            if (operationList.getSelects() != null && !operationList.getSelects().isEmpty()) {
                 List<SelectBody> plainSelects = operationList.getSelects();
                 for (SelectBody plainSelect : plainSelects) {
                     processSelectBody(plainSelect);
@@ -186,7 +183,7 @@ public class CountSqlParser {
         if (plainSelect.getFromItem() != null) {
             processFromItem(plainSelect.getFromItem());
         }
-        if (plainSelect.getJoins() != null && plainSelect.getJoins().size() > 0) {
+        if (plainSelect.getJoins() != null && !plainSelect.getJoins().isEmpty()) {
             List<Join> joins = plainSelect.getJoins();
             for (Join join : joins) {
                 if (join.getRightItem() != null) {
@@ -202,7 +199,7 @@ public class CountSqlParser {
      * @param withItemsList 要处理的列表
      */
     public void processWithItemsList(List<WithItem> withItemsList) {
-        if (withItemsList != null && withItemsList.size() > 0) {
+        if (withItemsList != null && !withItemsList.isEmpty()) {
             for (WithItem item : withItemsList) {
                 processSelectBody(item.getSelectBody());
             }
@@ -216,33 +213,40 @@ public class CountSqlParser {
      */
     public void processFromItem(FromItem fromItem) {
         if (fromItem instanceof SubJoin) {
-            SubJoin subJoin = (SubJoin) fromItem;
-            List<Join> joinList = subJoin.getJoinList();
-            for (Join join : joinList) {
-                if (join.getRightItem() != null) {
-                    processFromItem(join.getRightItem());
-                }
-            }
-            if (subJoin.getLeft() != null) {
-                processFromItem(subJoin.getLeft());
-            }
+            processFromSubJoinItem((SubJoin) fromItem);
         } else if (fromItem instanceof SubSelect) {
-            SubSelect subSelect = (SubSelect) fromItem;
+            processFromSubSelectItem((SubSelect) fromItem);
+        } else if (fromItem instanceof LateralSubSelect) {
+            processFromLateralSubSelectItem((LateralSubSelect) fromItem);
+        }
+        //Table时不用处理
+    }
+
+    private void processFromLateralSubSelectItem(LateralSubSelect lateralSubSelect) {
+        if (lateralSubSelect.getSubSelect() != null) {
+            SubSelect subSelect = lateralSubSelect.getSubSelect();
             if (subSelect.getSelectBody() != null) {
                 processSelectBody(subSelect.getSelectBody());
             }
-        } else if (fromItem instanceof ValuesList) {
+        }
+    }
 
-        } else if (fromItem instanceof LateralSubSelect) {
-            LateralSubSelect lateralSubSelect = (LateralSubSelect) fromItem;
-            if (lateralSubSelect.getSubSelect() != null) {
-                SubSelect subSelect = lateralSubSelect.getSubSelect();
-                if (subSelect.getSelectBody() != null) {
-                    processSelectBody(subSelect.getSelectBody());
-                }
+    private void processFromSubSelectItem(SubSelect subSelect) {
+        if (subSelect.getSelectBody() != null) {
+            processSelectBody(subSelect.getSelectBody());
+        }
+    }
+
+    private void processFromSubJoinItem(SubJoin subJoin) {
+        List<Join> joinList = subJoin.getJoinList();
+        for (Join join : joinList) {
+            if (join.getRightItem() != null) {
+                processFromItem(join.getRightItem());
             }
         }
-        //Table时不用处理
+        if (subJoin.getLeft() != null) {
+            processFromItem(subJoin.getLeft());
+        }
     }
 
     /**

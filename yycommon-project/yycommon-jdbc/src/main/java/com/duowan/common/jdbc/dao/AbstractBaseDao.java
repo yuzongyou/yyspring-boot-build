@@ -11,9 +11,9 @@ import java.util.List;
  * @author Arvin
  * @since 2018/5/22 17:01
  */
-public abstract class AbstractBaseDao<PK, T, Q> implements BaseDao<PK, T, Q> {
+public abstract class AbstractBaseDao<P, T, Q> implements BaseDao<P, T, Q> {
 
-    protected final Class<PK> pkType;
+    protected final Class<P> pkType;
     protected final Class<T> modelType;
     protected final Class<Q> queryType;
 
@@ -21,7 +21,7 @@ public abstract class AbstractBaseDao<PK, T, Q> implements BaseDao<PK, T, Q> {
     public AbstractBaseDao() {
         Type[] types = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments();
 
-        this.pkType = (Class<PK>) types[0];
+        this.pkType = (Class<P>) types[0];
         this.modelType = (Class<T>) types[1];
         this.queryType = (Class<Q>) types[2];
     }
@@ -39,12 +39,12 @@ public abstract class AbstractBaseDao<PK, T, Q> implements BaseDao<PK, T, Q> {
     }
 
     @Override
-    public int delete(PK primaryKey) {
+    public int delete(P primaryKey) {
         return getJdbc().deleteByPrimaryKey(modelType, primaryKey);
     }
 
     @Override
-    public T get(PK primaryKey) {
+    public T get(P primaryKey) {
         return getJdbc().queryByPrimaryKey(modelType, primaryKey);
     }
 

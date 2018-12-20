@@ -46,7 +46,7 @@ public abstract class AbstractQueryCondFieldDef implements QueryCondFieldDef {
     /**
      * 模型类型列定义 --> 查询项
      */
-    private Map<FieldDef, ConditionItem> columnDefinitionConditionItemMap = new HashMap<FieldDef, ConditionItem>();
+    private Map<FieldDef, ConditionItem> columnDefinitionConditionItemMap = new HashMap<>();
 
     @Override
     public ConditionItem createConditionItem(FieldDef modelColumnDefinition) {
@@ -73,7 +73,7 @@ public abstract class AbstractQueryCondFieldDef implements QueryCondFieldDef {
     /**
      * 模型类型 -- 对应的排序项Map
      */
-    private Map<Class<?>, OrderItem> modelTypeToOrderItemMap = new HashMap<Class<?>, OrderItem>();
+    private Map<Class<?>, OrderItem> modelTypeToOrderItemMap = new HashMap<>();
 
     @Override
     public final OrderItem createOrderItem(Class<?> modelType) {

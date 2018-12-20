@@ -90,7 +90,7 @@ public class JdbcDefinition {
     /**
      * 连接池配置，会把 pool.param.xxx 所有的填充进来
      */
-    private Map<String, String> poolConfig = new HashMap<String, String>();
+    private Map<String, String> poolConfig = new HashMap<>();
 
     public String getId() {
         return id;

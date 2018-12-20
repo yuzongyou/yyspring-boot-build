@@ -21,22 +21,22 @@ public abstract class AbstractSqlBuilder<T> {
     /**
      * 参数列表
      */
-    private List<Object> params = new ArrayList<Object>();
+    private List<Object> params = new ArrayList<>();
 
     /**
      * 参数类型列表
      */
-    private List<Class<?>> paramTypes = new ArrayList<Class<?>>();
+    private List<Class<?>> paramTypes = new ArrayList<>();
 
     /**
      * sql 参数列表
      */
-    private List<SqlParam> sqlParamList = new ArrayList<SqlParam>();
+    private List<SqlParam> sqlParamList = new ArrayList<>();
 
     /**
      * 要忽略不进行处理的 Java 字段名称
      */
-    private Set<String> ignoreModelFields = new HashSet<String>();
+    private Set<String> ignoreModelFields = new HashSet<>();
 
     /**
      * 要处理的模型类型
@@ -135,7 +135,7 @@ public abstract class AbstractSqlBuilder<T> {
      * @return 返回Sql构造器本身
      */
     public T ignoreModelFields(Collection<String> ignoreModelFieldNames) {
-        if (null != ignoreModelFieldNames && ignoreModelFieldNames.size() > 0) {
+        if (null != ignoreModelFieldNames && !ignoreModelFieldNames.isEmpty()) {
             // 计算对应字段，添加到 ignoreColumns
             for (String ignoreModelField : ignoreModelFieldNames) {
                 if (StringUtils.isNotBlank(ignoreModelField)) {
@@ -223,11 +223,11 @@ public abstract class AbstractSqlBuilder<T> {
      */
     protected T addParamsByValues(Object... paramValues) {
         if (null != paramValues && paramValues.length > 0) {
-            List<SqlParam> sqlParamList = new ArrayList<SqlParam>();
+            List<SqlParam> tempSqlParamList = new ArrayList<>();
             for (Object value : paramValues) {
-                sqlParamList.add(new SqlParam(value));
+                tempSqlParamList.add(new SqlParam(value));
             }
-            addListSqlParams(sqlParamList);
+            addListSqlParams(tempSqlParamList);
         }
         return self();
     }

@@ -44,10 +44,10 @@ public abstract class AbstractMysqlUpdateBuilder<T> extends AbstractNotQueryBuil
     protected boolean lookupAndAppendPrimaryKeyToWhereClause(StringBuilder sqlBuilder) {
 
         List<FieldDef> pkfdList = getMd().getPrimaryKeyDefList();
-        List<SqlParam> sqlParamList = new ArrayList<SqlParam>();
+        List<SqlParam> sqlParamList = new ArrayList<>();
         if (null != pkfdList && !pkfdList.isEmpty()) {
             StringBuilder primaryKeyWhereBuilder = new StringBuilder(" WHERE ");
-            List<Object> primaryKeyValues = new ArrayList<Object>();
+            List<Object> primaryKeyValues = new ArrayList<>();
             for (FieldDef fd : pkfdList) {
                 Object value = ReflectUtil.getFieldValue(this.model, fd.getField());
                 if (JdbcHelper.isValidPrimaryKeyValue(value)) {

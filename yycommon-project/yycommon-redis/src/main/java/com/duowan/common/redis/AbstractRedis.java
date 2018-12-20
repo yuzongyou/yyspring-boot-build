@@ -77,7 +77,6 @@ public abstract class AbstractRedis implements Redis {
             pipeline.sync();
             return result;
         } catch (Exception e) {
-            logger.warn("Redis 执行错误, 销毁该连接{" + jedis + "}，ERROR=" + e.getMessage(), e);
             throw new RedisException(e);
         } finally {
             this.closeResource(jedis);
@@ -91,7 +90,6 @@ public abstract class AbstractRedis implements Redis {
             jedis = getResource();
             return executor.execute(jedis);
         } catch (Exception e) {
-            logger.warn("Redis 执行错误, 销毁该连接{" + jedis + "}，ERROR=" + e.getMessage(), e);
             throw new RedisException(e);
         } finally {
             this.closeResource(jedis);
@@ -100,766 +98,392 @@ public abstract class AbstractRedis implements Redis {
 
     @Override
     public String set(final String key, final String value, final int expireSeconds) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.setex(key, expireSeconds, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.setex(key, expireSeconds, value));
     }
 
     @Override
     public String set(final String key, final String value) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.set(key, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.set(key, value));
     }
 
     @Override
     public String get(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.get(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.get(key));
     }
 
     @Override
     public String get(final String key, final String defaultValue) {
-        return execute(defaultValue, new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.get(key);
-            }
-        });
+        return execute(defaultValue, jedis -> jedis.get(key));
     }
 
     @Override
     public Boolean getBoolean(final String key) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                return ConvertUtil.toBoolean(jedis.get(key));
-            }
-        });
+        return execute((JedisExecutor<Boolean>) jedis -> ConvertUtil.toBoolean(jedis.get(key)));
     }
 
     @Override
     public Boolean getBoolean(final String key, final Boolean defaultValue) {
-        return execute(defaultValue, new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                return ConvertUtil.toBoolean(jedis.get(key));
-            }
-        });
+        return execute(defaultValue, jedis -> ConvertUtil.toBoolean(jedis.get(key)));
     }
 
     @Override
     public Long getLong(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return ConvertUtil.toLong(jedis.get(key));
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> ConvertUtil.toLong(jedis.get(key)));
     }
 
     @Override
     public Long getLong(final String key, final Long defaultValue) {
-        return execute(defaultValue, new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return ConvertUtil.toLong(jedis.get(key));
-            }
-        });
+        return execute(defaultValue, jedis -> ConvertUtil.toLong(jedis.get(key)));
     }
 
     @Override
     public Integer getInteger(final String key) {
-        return execute(new JedisExecutor<Integer>() {
-            @Override
-            public Integer execute(Jedis jedis) {
-                return ConvertUtil.toInteger(jedis.get(key));
-            }
-        });
+        return execute((JedisExecutor<Integer>) jedis -> ConvertUtil.toInteger(jedis.get(key)));
     }
 
     @Override
     public Integer getInteger(final String key, final Integer defaultValue) {
-        return execute(defaultValue, new JedisExecutor<Integer>() {
-            @Override
-            public Integer execute(Jedis jedis) {
-                return ConvertUtil.toInteger(jedis.get(key));
-            }
-        });
+        return execute(defaultValue, jedis -> ConvertUtil.toInteger(jedis.get(key)));
     }
 
     @Override
     public Date getDate(final String key) {
-        return execute(new JedisExecutor<Date>() {
-            @Override
-            public Date execute(Jedis jedis) {
-                return ConvertUtil.toDate(jedis.get(key));
-            }
-        });
+        return execute((JedisExecutor<Date>) jedis -> ConvertUtil.toDate(jedis.get(key)));
     }
 
     @Override
     public Date getDate(final String key, Date defaultValue) {
-        return execute(defaultValue, new JedisExecutor<Date>() {
-            @Override
-            public Date execute(Jedis jedis) {
-                return ConvertUtil.toDate(jedis.get(key));
-            }
-        });
+        return execute(defaultValue, jedis -> ConvertUtil.toDate(jedis.get(key)));
     }
 
     @Override
     public Long expire(final String key, final int expireSeconds) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.expire(key, expireSeconds);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.expire(key, expireSeconds));
     }
 
     @Override
     public Long expireAt(final String key, final long unixTimeInSeconds) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.expireAt(key, unixTimeInSeconds);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.expireAt(key, unixTimeInSeconds));
     }
 
     @Override
     public String hget(final String mapKey, final String mapField) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.hget(mapKey, mapField);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.hget(mapKey, mapField));
     }
 
     @Override
     public Set<String> smembers(final String key) {
-        Set<String> resultSet = execute(new JedisExecutor<Set<String>>() {
-            @Override
-            public Set<String> execute(Jedis jedis) {
-                return jedis.smembers(key);
-            }
-        });
-        return null == resultSet ? new HashSet<String>() : resultSet;
+        Set<String> resultSet = execute((JedisExecutor<Set<String>>) jedis -> jedis.smembers(key));
+        return null == resultSet ? new HashSet<>() : resultSet;
     }
 
     @Override
     public boolean sismember(final String key, final String value) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                Boolean ret = jedis.sismember(key, value);
-                return ret != null ? ret : false;
-            }
+        return execute((JedisExecutor<Boolean>) jedis -> {
+            Boolean ret = jedis.sismember(key, value);
+            return ret != null ? ret : false;
         });
     }
 
     @Override
     public boolean exists(final String key) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                Boolean ret = jedis.exists(key);
-                return ret != null ? ret : false;
-            }
+        return execute((JedisExecutor<Boolean>) jedis -> {
+            Boolean ret = jedis.exists(key);
+            return ret != null ? ret : false;
         });
     }
 
     @Override
     public String set(final String key, final String value, final String nxxx, final String expx, final long time) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.set(key, value, nxxx, expx, time);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.set(key, value, nxxx, expx, time));
     }
 
     @Override
     public String set(final String key, final String value, final String nxxx) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.set(key, value, nxxx);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.set(key, value, nxxx));
     }
 
     @Override
     public Long persist(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.persist(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.persist(key));
     }
 
     @Override
     public String type(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.type(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.type(key));
     }
 
     @Override
     public Long pexpire(final String key, final long milliseconds) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.pexpire(key, milliseconds);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.pexpire(key, milliseconds));
     }
 
     @Override
     public Long pexpireAt(final String key, final long millisecondsTimestamp) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.pexpireAt(key, millisecondsTimestamp);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.pexpireAt(key, millisecondsTimestamp));
     }
 
     @Override
     public Long ttl(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.ttl(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.ttl(key));
     }
 
     @Override
     public Long pttl(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.pttl(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.pttl(key));
     }
 
     @Override
     public Boolean setbit(final String key, final long offset, final boolean value) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                return jedis.setbit(key, offset, value);
-            }
-        });
+        return execute((JedisExecutor<Boolean>) jedis -> jedis.setbit(key, offset, value));
     }
 
     @Override
     public Boolean setbit(final String key, final long offset, final String value) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                return jedis.setbit(key, offset, value);
-            }
-        });
+        return execute((JedisExecutor<Boolean>) jedis -> jedis.setbit(key, offset, value));
     }
 
     @Override
     public Boolean getbit(final String key, final long offset) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                return jedis.getbit(key, offset);
-            }
-        });
+        return execute((JedisExecutor<Boolean>) jedis -> jedis.getbit(key, offset));
     }
 
     @Override
     public Long setrange(final String key, final long offset, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.setrange(key, offset, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.setrange(key, offset, value));
     }
 
     @Override
     public String getrange(final String key, final long startOffset, final long endOffset) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.getrange(key, startOffset, endOffset);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.getrange(key, startOffset, endOffset));
     }
 
     @Override
     public String getSet(final String key, final String value) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.getSet(key, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.getSet(key, value));
     }
 
     @Override
     public Long setnx(final String key, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.setnx(key, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.setnx(key, value));
     }
 
     @Override
     public String setex(final String key, final int seconds, final String value) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.setex(key, seconds, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.setex(key, seconds, value));
     }
 
     @Override
     public String psetex(final String key, final long milliseconds, final String value) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.psetex(key, milliseconds, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.psetex(key, milliseconds, value));
     }
 
     @Override
     public Long decrBy(final String key, final long integer) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.decrBy(key, integer);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.decrBy(key, integer));
     }
 
     @Override
     public Long decr(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.decr(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.decr(key));
     }
 
     @Override
     public Long incrBy(final String key, final long integer) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.incrBy(key, integer);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.incrBy(key, integer));
     }
 
     @Override
     public Double incrByFloat(final String key, final double value) {
-        return execute(new JedisExecutor<Double>() {
-            @Override
-            public Double execute(Jedis jedis) {
-                return jedis.incrByFloat(key, value);
-            }
-        });
+        return execute((JedisExecutor<Double>) jedis -> jedis.incrByFloat(key, value));
     }
 
     @Override
     public Long incr(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.incr(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.incr(key));
     }
 
     @Override
     public Long append(final String key, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.append(key, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.append(key, value));
     }
 
     @Override
     public String substr(final String key, final int start, final int end) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.substr(key, start, end);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.substr(key, start, end));
     }
 
     @Override
     public Long hset(final String key, final String field, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.hset(key, field, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.hset(key, field, value));
     }
 
     @Override
     public Long hsetnx(final String key, final String field, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.hsetnx(key, field, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.hsetnx(key, field, value));
     }
 
     @Override
     public String hmset(final String key, final Map<String, String> hash) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.hmset(key, hash);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.hmset(key, hash));
     }
 
     @Override
     public List<String> hmget(final String key, final String... fields) {
-        return execute(new JedisExecutor<List<String>>() {
-            @Override
-            public List<String> execute(Jedis jedis) {
-                return jedis.hmget(key, fields);
-            }
-        });
+        return execute((JedisExecutor<List<String>>) jedis -> jedis.hmget(key, fields));
     }
 
     @Override
     public Long hincrBy(final String key, final String field, final long value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.hincrBy(key, field, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.hincrBy(key, field, value));
     }
 
     @Override
     public Double hincrByFloat(final String key, final String field, final double value) {
-        return execute(new JedisExecutor<Double>() {
-            @Override
-            public Double execute(Jedis jedis) {
-                return jedis.hincrByFloat(key, field, value);
-            }
-        });
+        return execute((JedisExecutor<Double>) jedis -> jedis.hincrByFloat(key, field, value));
     }
 
     @Override
     public Boolean hexists(final String key, final String field) {
-        return execute(new JedisExecutor<Boolean>() {
-            @Override
-            public Boolean execute(Jedis jedis) {
-                Boolean ret = jedis.hexists(key, field);
-                return ret == null ? false : ret;
-            }
+        return execute((JedisExecutor<Boolean>) jedis -> {
+            Boolean ret = jedis.hexists(key, field);
+            return ret == null ? false : ret;
         });
     }
 
     @Override
     public Long hdel(final String key, final String... field) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.hdel(key, field);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.hdel(key, field));
     }
 
     @Override
     public Long hlen(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.hlen(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.hlen(key));
     }
 
     @Override
     public Set<String> hkeys(final String key) {
-        return execute(new JedisExecutor<Set<String>>() {
-            @Override
-            public Set<String> execute(Jedis jedis) {
-                return jedis.hkeys(key);
-            }
-        });
+        return execute((JedisExecutor<Set<String>>) jedis -> jedis.hkeys(key));
     }
 
     @Override
     public List<String> hvals(final String key) {
-        return execute(new JedisExecutor<List<String>>() {
-            @Override
-            public List<String> execute(Jedis jedis) {
-                return jedis.hvals(key);
-            }
-        });
+        return execute((JedisExecutor<List<String>>) jedis -> jedis.hvals(key));
     }
 
     @Override
     public Map<String, String> hgetAll(final String key) {
-        return execute(new JedisExecutor<Map<String, String>>() {
-            @Override
-            public Map<String, String> execute(Jedis jedis) {
-                return jedis.hgetAll(key);
-            }
-        });
+        return execute((JedisExecutor<Map<String, String>>) jedis -> jedis.hgetAll(key));
     }
 
     @Override
     public Long rpush(final String key, final String... string) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.rpush(key, string);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.rpush(key, string));
     }
 
     @Override
     public Long lpush(final String key, final String... string) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.lpush(key, string);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.lpush(key, string));
     }
 
     @Override
     public Long llen(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.llen(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.llen(key));
     }
 
     @Override
     public List<String> lrange(final String key, final long start, final long end) {
-        return execute(new JedisExecutor<List<String>>() {
-            @Override
-            public List<String> execute(Jedis jedis) {
-                return jedis.lrange(key, start, end);
-            }
-        });
+        return execute((JedisExecutor<List<String>>) jedis -> jedis.lrange(key, start, end));
     }
 
     @Override
     public String ltrim(final String key, final long start, final long end) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.ltrim(key, start, end);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.ltrim(key, start, end));
     }
 
     @Override
     public String lindex(final String key, final long index) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.lindex(key, index);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.lindex(key, index));
     }
 
     @Override
     public String lset(final String key, final long index, final String value) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.lset(key, index, value);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.lset(key, index, value));
     }
 
     @Override
     public Long lrem(final String key, final long count, final String value) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.lrem(key, count, value);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.lrem(key, count, value));
     }
 
     @Override
     public String lpop(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.lpop(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.lpop(key));
     }
 
     @Override
     public String rpop(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.rpop(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.rpop(key));
     }
 
     @Override
     public Long sadd(final String key, final String... member) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.sadd(key, member);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.sadd(key, member));
     }
 
     @Override
     public Long srem(final String key, final String... member) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.srem(key, member);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.srem(key, member));
     }
 
     @Override
     public String spop(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.spop(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.spop(key));
     }
 
     @Override
     public Set<String> spop(final String key, final long count) {
-        return execute(new JedisExecutor<Set<String>>() {
-            @Override
-            public Set<String> execute(Jedis jedis) {
-                return jedis.spop(key, count);
-            }
-        });
+        return execute((JedisExecutor<Set<String>>) jedis -> jedis.spop(key, count));
     }
 
     @Override
     public Long scard(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.scard(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.scard(key));
     }
 
     @Override
     public String srandmember(final String key) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.srandmember(key);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.srandmember(key));
     }
 
     @Override
     public List<String> srandmember(final String key, final int count) {
-        return execute(new JedisExecutor<List<String>>() {
-            @Override
-            public List<String> execute(Jedis jedis) {
-                return jedis.srandmember(key, count);
-            }
-        });
+        return execute((JedisExecutor<List<String>>) jedis -> jedis.srandmember(key, count));
     }
 
     @Override
     public Long strlen(final String key) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.strlen(key);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.strlen(key));
     }
 
     @Override
     public Long zadd(final String key, final double score, final String member) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.zadd(key, score, member);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.zadd(key, score, member));
     }
 
     @Override
     public Long zadd(final String key, final double score, final String member, final ZAddParams params) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.zadd(key, score, member, params);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.zadd(key, score, member, params));
     }
 
     @Override
     public Long zadd(final String key, final Map<String, Double> scoreMembers) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.zadd(key, scoreMembers);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.zadd(key, scoreMembers));
     }
 
     @Override
     public Long zadd(final String key, final Map<String, Double> scoreMembers, final ZAddParams params) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.zadd(key, scoreMembers, params);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.zadd(key, scoreMembers, params));
     }
 
     @Override
@@ -4568,212 +4192,121 @@ public abstract class AbstractRedis implements Redis {
 
     @Override
     public byte[] brpoplpush(final byte[] source, final byte[] destination, final int timeout) {
-        return execute(new JedisExecutor<byte[]>() {
-            @Override
-            public byte[] execute(Jedis jedis) {
-                return jedis.brpoplpush(source, destination, timeout);
-            }
-        });
+        return execute((JedisExecutor<byte[]>) jedis -> jedis.brpoplpush(source, destination, timeout));
     }
 
 
     @Override
     public Long publish(final byte[] channel, final byte[] message) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.publish(channel, message);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.publish(channel, message));
     }
 
 
     @Override
     public void subscribe(final BinaryJedisPubSub jedisPubSub, final byte[]... channels) {
-        execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                jedis.subscribe(jedisPubSub, channels);
-                return null;
-            }
+        execute((JedisExecutor<Object>) jedis -> {
+            jedis.subscribe(jedisPubSub, channels);
+            return null;
         });
     }
 
 
     @Override
     public void psubscribe(final BinaryJedisPubSub jedisPubSub, final byte[]... patterns) {
-        execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                jedis.psubscribe(jedisPubSub, patterns);
-                return null;
-            }
+        execute((JedisExecutor<Object>) jedis -> {
+            jedis.psubscribe(jedisPubSub, patterns);
+            return null;
         });
     }
 
 
     @Override
     public byte[] randomBinaryKey() {
-        return execute(new JedisExecutor<byte[]>() {
-            @Override
-            public byte[] execute(Jedis jedis) {
-                return jedis.randomBinaryKey();
-            }
-        });
+        return execute(BinaryJedis::randomBinaryKey);
     }
 
 
     @Override
     public Long bitop(final BitOP op, final byte[] destKey, final byte[]... srcKeys) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.bitop(op, destKey, srcKeys);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.bitop(op, destKey, srcKeys));
     }
 
 
     @Override
     public String pfmerge(final byte[] destkey, final byte[]... sourcekeys) {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.pfmerge(destkey, sourcekeys);
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.pfmerge(destkey, sourcekeys));
     }
 
 
     @Override
     public Long pfcount(final byte[]... keys) {
-        return execute(new JedisExecutor<Long>() {
-            @Override
-            public Long execute(Jedis jedis) {
-                return jedis.pfcount(keys);
-            }
-        });
+        return execute((JedisExecutor<Long>) jedis -> jedis.pfcount(keys));
     }
 
 
     @Override
     public Object eval(final byte[] script, final byte[] keyCount, final byte[]... params) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.eval(script, keyCount, params);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.eval(script, keyCount, params));
     }
 
 
     @Override
     public Object eval(final byte[] script, final int keyCount, final byte[]... params) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.eval(script, keyCount, params);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.eval(script, keyCount, params));
     }
 
 
     @Override
     public Object eval(final byte[] script, final List<byte[]> keys, final List<byte[]> args) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.eval(script, keys, args);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.eval(script, keys, args));
     }
 
 
     @Override
     public Object eval(final byte[] script) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.eval(script);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.eval(script));
     }
 
 
     @Override
     public Object evalsha(final byte[] script) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.evalsha(script);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.evalsha(script));
     }
 
 
     @Override
     public Object evalsha(final byte[] sha1, final List<byte[]> keys, final List<byte[]> args) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.evalsha(sha1, keys, args);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.evalsha(sha1, keys, args));
     }
 
 
     @Override
     public Object evalsha(final byte[] sha1, final int keyCount, final byte[]... params) {
-        return execute(new JedisExecutor<Object>() {
-            @Override
-            public Object execute(Jedis jedis) {
-                return jedis.evalsha(sha1, keyCount, params);
-            }
-        });
+        return execute((JedisExecutor<Object>) jedis -> jedis.evalsha(sha1, keyCount, params));
     }
 
 
     @Override
     public List<Long> scriptExists(final byte[]... sha1) {
-        return execute(new JedisExecutor<List<Long>>() {
-            @Override
-            public List<Long> execute(Jedis jedis) {
-                return jedis.scriptExists(sha1);
-            }
-        });
+        return execute((JedisExecutor<List<Long>>) jedis -> jedis.scriptExists(sha1));
     }
 
 
     @Override
     public byte[] scriptLoad(final byte[] script) {
-        return execute(new JedisExecutor<byte[]>() {
-            @Override
-            public byte[] execute(Jedis jedis) {
-                return jedis.scriptLoad(script);
-            }
-        });
+        return execute((JedisExecutor<byte[]>) jedis -> jedis.scriptLoad(script));
     }
 
 
     @Override
     public String scriptFlush() {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.scriptFlush();
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.scriptFlush());
     }
 
 
     @Override
     public String scriptKill() {
-        return execute(new JedisExecutor<String>() {
-            @Override
-            public String execute(Jedis jedis) {
-                return jedis.scriptKill();
-            }
-        });
+        return execute((JedisExecutor<String>) jedis -> jedis.scriptKill());
     }
 
 }

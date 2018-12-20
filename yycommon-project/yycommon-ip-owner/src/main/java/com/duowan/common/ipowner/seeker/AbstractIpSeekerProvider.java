@@ -11,6 +11,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 抽象类
@@ -23,7 +24,7 @@ public abstract class AbstractIpSeekerProvider extends AbstractTimer implements 
 
     protected int instanceCount = Runtime.getRuntime().availableProcessors() * 2;
 
-    private volatile int nextIpSeekerIndex = 0;
+    private AtomicInteger nextIpSeekerIndex = new AtomicInteger(0);
 
     private IpSeeker[] ipSeekers;
 
@@ -51,10 +52,10 @@ public abstract class AbstractIpSeekerProvider extends AbstractTimer implements 
     }
 
     private int getNextIpSeekerIndex() {
-        int index = nextIpSeekerIndex++;
+        int index = nextIpSeekerIndex.getAndIncrement();
         if (index >= ipSeekers.length) {
             index = 0;
-            nextIpSeekerIndex = 1;
+            nextIpSeekerIndex.set(1);
         }
         return index;
     }
@@ -193,7 +194,6 @@ public abstract class AbstractIpSeekerProvider extends AbstractTimer implements 
                 logger.info("[{}] 文件下载完成，共计耗时[{}] 毫秒！", ipdatDownloadUrl, endTime - begTime);
                 logLastUpdateInfo();
             } catch (Exception e) {
-                logger.error("[" + ipdatDownloadUrl + "] 文件下载失败，error=" + e.getMessage(), e);
                 throw new IpownerException(e);
             }
         } else {

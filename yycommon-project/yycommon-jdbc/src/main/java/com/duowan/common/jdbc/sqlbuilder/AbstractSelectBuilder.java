@@ -18,6 +18,8 @@ import java.util.*;
  */
 public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
 
+    public static final String ALL_COLUMN = "*";
+
     /**
      * 分页查询的时候，页码
      */
@@ -62,17 +64,12 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
     /**
      * 自定义要查询的列
      */
-    private List<FieldDef> customSelectFieldDefs = new ArrayList<FieldDef>();
+    private List<FieldDef> customSelectFieldDefs = new ArrayList<>();
 
     /**
      * 自定义要忽略查询的列
      */
-    private List<FieldDef> customIgnoreSelectFieldDefs = new ArrayList<FieldDef>();
-
-    /**
-     * 查询条件项
-     */
-    private List<ConditionItem> conditionItemList = new ArrayList<ConditionItem>();
+    private List<FieldDef> customIgnoreSelectFieldDefs = new ArrayList<>();
 
     /**
      * 展开查询列
@@ -179,7 +176,7 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
     /**
      * 自定义要忽略的模型查询条件
      */
-    private Set<Field> customIgnoreModelQueryConditionFieldSet = new HashSet<Field>();
+    private Set<Field> customIgnoreModelQueryConditionFieldSet = new HashSet<>();
 
     /**
      * 添加自定义要忽略的查询条件
@@ -234,9 +231,9 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
      */
     private void buildWhereClause() {
         if (customWhereBuilder == null) {
-            List<ConditionItem> conditionItemList = parseConditionItemList();
-            if (CommonUtil.isNotEmpty(conditionItemList)) {
-                for (ConditionItem conditionItem : conditionItemList) {
+            List<ConditionItem> tempConditionItemList = parseConditionItemList();
+            if (CommonUtil.isNotEmpty(tempConditionItemList)) {
+                for (ConditionItem conditionItem : tempConditionItemList) {
                     conditionItem.appendToWhereBuilder(getQueryCondition(), whereBuilder,
                             getCustomCompareType(conditionItem.getQueryConditionField()));
                 }
@@ -257,10 +254,10 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
 
         StringBuilder sqlBuilder = new StringBuilder(" FROM ").append(getWrapTableName());
 
-        for (WhereBuilder whereBuilder : effectWhereBuilder) {
-            if (whereBuilder != null && whereBuilder.conditionCount() > 0) {
-                sqlBuilder.append(whereBuilder.getWhereSql());
-                addListSqlParams(whereBuilder.getSqlParamList());
+        for (WhereBuilder wb : effectWhereBuilder) {
+            if (wb != null && wb.conditionCount() > 0) {
+                sqlBuilder.append(wb.getWhereSql());
+                addListSqlParams(wb.getSqlParamList());
             }
         }
         return sqlBuilder;
@@ -273,58 +270,69 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
      */
     private String buildSelectColumnSql() {
 
-        this.selectColumnSql = null;
+        this.selectColumnSql = applyCustomSelectColumnSql();
 
-        if (StringUtils.isNotBlank(this.getCustomSelectColumnSql())) {
-            this.selectColumnSql = getCustomSelectColumnSql();
-        } else {
-
-            boolean hasCustomIgnoreSelectColumn = CommonUtil.isNotEmpty(this.customIgnoreSelectFieldDefs);
-            boolean hasCustomSelectColumn = CommonUtil.isNotEmpty(this.customSelectFieldDefs);
-
-            if (!hasCustomIgnoreSelectColumn && !hasCustomSelectColumn) {
-                this.selectColumnSql = "*";
-            }
-
-            Set<FieldDef> tempFieldDefs = new HashSet<FieldDef>();
-            if (hasCustomIgnoreSelectColumn && !hasCustomSelectColumn) {
-                tempFieldDefs.addAll(getMd().getAllDefList());
-            } else {
-                tempFieldDefs.addAll(this.customSelectFieldDefs);
-            }
-
-            if (CommonUtil.isNotEmpty(tempFieldDefs)) {
-                StringBuilder builder = new StringBuilder();
-                for (FieldDef fieldDef : tempFieldDefs) {
-                    if (!this.customIgnoreSelectFieldDefs.contains(fieldDef)) {
-                        builder.append(fieldDef.getColumnName()).append(" '").append(fieldDef.getFieldName()).append("',");
-                    }
-                }
-                if (builder.length() > 0) {
-                    builder.setLength(builder.length() - 1);
-                    this.selectColumnSql = builder.toString();
-                } else {
-                    this.selectColumnSql = "*";
-                }
-                return this.selectColumnSql;
-            } else {
-                this.selectColumnSql = "*";
-            }
+        if (StringUtils.isBlank(this.selectColumnSql)) {
+            this.selectColumnSql = buildSelectColumnSqlByCustomColumnConfig();
         }
 
-        if ("*".equals(this.selectColumnSql) && isExpandSelectColumn()) {
-            List<FieldDef> fieldDefList = getMd().getAllDefList();
-            StringBuilder builder = new StringBuilder();
-            for (FieldDef fieldDef : fieldDefList) {
-                if (!this.customIgnoreSelectFieldDefs.contains(fieldDef)) {
-                    builder.append(wrapColumnName(fieldDef.getColumnName())).append(" '").append(fieldDef.getFieldName()).append("',");
-                }
-            }
-            builder.setLength(builder.length() - 1);
-            this.selectColumnSql = builder.toString();
+        if (StringUtils.isBlank(this.selectColumnSql)) {
+            this.selectColumnSql = ALL_COLUMN;
+        }
+
+        if (ALL_COLUMN.equals(this.selectColumnSql) && isExpandSelectColumn()) {
+            this.selectColumnSql = extractAllSelectColumn();
         }
 
         return this.selectColumnSql;
+    }
+
+    private String buildSelectColumnSqlByCustomColumnConfig() {
+
+        boolean hasCustomIgnoreSelectColumn = CommonUtil.isNotEmpty(this.customIgnoreSelectFieldDefs);
+        boolean hasCustomSelectColumn = CommonUtil.isNotEmpty(this.customSelectFieldDefs);
+
+        if (!hasCustomIgnoreSelectColumn && !hasCustomSelectColumn) {
+            return ALL_COLUMN;
+        }
+
+        Set<FieldDef> tempFieldDefs = new HashSet<>();
+        if (hasCustomIgnoreSelectColumn && !hasCustomSelectColumn) {
+            tempFieldDefs.addAll(getMd().getAllDefList());
+        } else {
+            tempFieldDefs.addAll(this.customSelectFieldDefs);
+        }
+
+        if (CommonUtil.isNotEmpty(tempFieldDefs)) {
+            StringBuilder builder = new StringBuilder();
+            for (FieldDef fieldDef : tempFieldDefs) {
+                if (!this.customIgnoreSelectFieldDefs.contains(fieldDef)) {
+                    builder.append(fieldDef.getColumnName()).append(" '").append(fieldDef.getFieldName()).append("',");
+                }
+            }
+            if (builder.length() > 0) {
+                builder.setLength(builder.length() - 1);
+                return builder.toString();
+            }
+        }
+
+        return ALL_COLUMN;
+    }
+
+    private String extractAllSelectColumn() {
+        List<FieldDef> fieldDefList = getMd().getAllDefList();
+        StringBuilder builder = new StringBuilder();
+        for (FieldDef fieldDef : fieldDefList) {
+            if (!this.customIgnoreSelectFieldDefs.contains(fieldDef)) {
+                builder.append(wrapColumnName(fieldDef.getColumnName())).append(" '").append(fieldDef.getFieldName()).append("',");
+            }
+        }
+        builder.setLength(builder.length() - 1);
+        return builder.toString();
+    }
+
+    private String applyCustomSelectColumnSql() {
+        return getCustomSelectColumnSql();
     }
 
     private void buildLimitSql() {
@@ -360,7 +368,7 @@ public abstract class AbstractSelectBuilder<T> extends AbstractQueryBuilder<T> {
     /**
      * 自定义的字段比较类型
      */
-    private Map<Field, CompareType> customCompareTypeMap = new HashMap<Field, CompareType>();
+    private Map<Field, CompareType> customCompareTypeMap = new HashMap<>();
 
     public CompareType getCustomCompareType(Field queryConditionField) {
         AssertUtil.assertNotNull(queryConditionField, "要获取自定义比较类型的字段不存在！");

@@ -212,7 +212,7 @@ public class OSUtil {
 
             if (pid == null) {
                 LOGGER.warn("Cannot get pid, random one ...");
-                Random rand = new Random();
+                Random rand = new Random(System.currentTimeMillis());
                 pid = rand.nextInt(65536) + "";
             }
             if (pid.length() > 5) {

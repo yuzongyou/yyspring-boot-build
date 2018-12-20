@@ -5,7 +5,7 @@ package com.duowan.common.jdbc.model;
  *
  * @author Arvin
  */
-public class RiseJdbcDefinition extends JdbcDefinition implements Cloneable {
+public class RiseJdbcDefinition extends JdbcDefinition {
 
     /**
      * 数据源实例名称，如： cloudapp_cloudmysql1219
@@ -86,4 +86,5 @@ public class RiseJdbcDefinition extends JdbcDefinition implements Cloneable {
 
         }
     }
+
 }

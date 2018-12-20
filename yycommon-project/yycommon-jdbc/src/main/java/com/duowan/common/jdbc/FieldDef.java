@@ -7,6 +7,7 @@ import com.duowan.common.utils.ReflectUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 /**
  * 数据库属性定义
@@ -171,9 +172,9 @@ public class FieldDef implements Comparable<FieldDef> {
 
     private void initColumnName(Column columnAnn) {
         if (null != columnAnn) {
-            String columnName = columnAnn.columnName();
-            if (StringUtils.isNotBlank(columnName)) {
-                this.columnName = columnName;
+            String tempColumnName = columnAnn.columnName();
+            if (StringUtils.isNotBlank(tempColumnName)) {
+                this.columnName = tempColumnName;
                 return;
             }
         }
@@ -314,5 +315,34 @@ public class FieldDef implements Comparable<FieldDef> {
         }
 
         return 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        FieldDef fieldDef = (FieldDef) o;
+        return primaryKey == fieldDef.primaryKey &&
+                autoIncrement == fieldDef.autoIncrement &&
+                useUuid == fieldDef.useUuid &&
+                uniqueKey == fieldDef.uniqueKey &&
+                insertIgnore == fieldDef.insertIgnore &&
+                insertIgnoreNull == fieldDef.insertIgnoreNull &&
+                updateIgnore == fieldDef.updateIgnore &&
+                updateIgnoreNull == fieldDef.updateIgnoreNull &&
+                Objects.equals(modelDef, fieldDef.modelDef) &&
+                Objects.equals(field, fieldDef.field) &&
+                Objects.equals(fieldType, fieldDef.fieldType) &&
+                Objects.equals(fieldName, fieldDef.fieldName) &&
+                Objects.equals(columnName, fieldDef.columnName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelDef, field, fieldType, fieldName, columnName, primaryKey, autoIncrement, useUuid, uniqueKey, insertIgnore, insertIgnoreNull, updateIgnore, updateIgnoreNull);
     }
 }

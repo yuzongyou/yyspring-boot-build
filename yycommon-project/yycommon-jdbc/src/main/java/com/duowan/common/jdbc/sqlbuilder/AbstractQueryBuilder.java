@@ -15,7 +15,7 @@ public abstract class AbstractQueryBuilder<T> extends AbstractSqlBuilder<T> impl
     /**
      * 最终的SQL
      */
-    private volatile String sql = null;
+    private String sql = null;
 
     public AbstractQueryBuilder(Class<?> modelType, SqlBuilderType sqlBuilderType) {
         super(modelType, sqlBuilderType);

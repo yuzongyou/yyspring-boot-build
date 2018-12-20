@@ -18,7 +18,7 @@ public abstract class AbstractOrderByQuery<Q> implements OrderByQuery {
     /**
      * Order By 语句
      */
-    private Set<OrderItem> orderBySet = new HashSet<OrderItem>();
+    private Set<OrderItem> orderBySet = new HashSet<>();
 
     public AbstractOrderByQuery(Class<?> modelType) {
         this.modelType = modelType;

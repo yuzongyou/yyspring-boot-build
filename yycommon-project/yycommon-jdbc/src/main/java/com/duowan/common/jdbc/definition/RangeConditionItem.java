@@ -3,7 +3,7 @@ package com.duowan.common.jdbc.definition;
 
 import com.duowan.common.jdbc.FieldDef;
 import com.duowan.common.jdbc.enums.CompareType;
-import com.duowan.common.jdbc.exception.SqlBuilderException;
+import com.duowan.common.jdbc.exception.JdbcException;
 import com.duowan.common.jdbc.sqlbuilder.WhereBuilder;
 import com.duowan.common.utils.ReflectUtil;
 
@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class RangeConditionItem extends AbstractConditionItem<RangeCondFieldDef> {
 
-    private static Set<CompareType> supportCompareTypeSet = new HashSet<CompareType>(Arrays.asList(
+    private static Set<CompareType> supportCompareTypeSet = new HashSet<>(Arrays.asList(
             CompareType.BETWEEN, CompareType.IS_NOT_NULL, CompareType.IS_NULL
     ));
 
@@ -51,7 +51,7 @@ public class RangeConditionItem extends AbstractConditionItem<RangeCondFieldDef>
                 whereBuilder.andBetween(unWrapColumnName, begValue, endValue);
                 break;
             default:
-                throw new SqlBuilderException("不支持的比较类型！");
+                throw new JdbcException("不支持的比较类型！");
         }
 
         return true;

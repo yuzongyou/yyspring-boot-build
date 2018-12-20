@@ -43,32 +43,32 @@ public class AppContext {
     /**
      * 环境
      */
-    private static volatile String env;
+    private static String env;
 
     /**
      * 项目代号
      */
-    private static volatile String projectNo;
+    private static String projectNo;
 
     /**
      * 模块代号
      **/
-    private static volatile String moduleNo;
+    private static String moduleNo;
 
     /**
      * 运行当前项目的目录，这个选项在开发环境下和模块目录才有区别
      **/
-    private static volatile String projectDir;
+    private static String projectDir;
 
     /**
      * 当前运行模块的根路径
      **/
-    private static volatile String moduleDir;
+    private static String moduleDir;
 
     /**
      * 日志目录
      **/
-    private static volatile String logDir;
+    private static String logDir;
 
     /**
      * 资源文件搜索目录
@@ -586,12 +586,7 @@ public class AppContext {
             int projectDirIndex = -1;
             for (int i = 0; i < list.size(); ++i) {
                 File file = list.get(i);
-                String[] filenames = file.list(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return "pom.xml".equalsIgnoreCase(name);
-                    }
-                });
+                String[] filenames = file.list((dir, name) -> "pom.xml".equalsIgnoreCase(name));
                 if (null != filenames && filenames.length > 0) {
                     if (projectDirIndex == -1) {
                         projectDirIndex = i;

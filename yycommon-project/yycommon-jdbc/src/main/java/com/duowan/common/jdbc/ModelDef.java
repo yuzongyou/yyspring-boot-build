@@ -68,7 +68,7 @@ public class ModelDef {
      */
     private Map<Field, FieldDef> fieldToFieldDefMap = new HashMap<>();
 
-    public ModelDef(Class<?> type) throws Exception {
+    public ModelDef(Class<?> type) {
         this.type = type;
 
         // 初始化模型定义
@@ -81,9 +81,9 @@ public class ModelDef {
         if (null == tableAnn) {
             this.tableName = CommonUtil.humpToUnderline(this.type.getSimpleName());
         } else {
-            String tableName = tableAnn.tablename();
-            if (StringUtils.isNotBlank(tableName)) {
-                this.tableName = tableName;
+            String tempTableName = tableAnn.tablename();
+            if (StringUtils.isNotBlank(tempTableName)) {
+                this.tableName = tempTableName;
             } else {
                 if (tableAnn.underline()) {
                     this.tableName = CommonUtil.humpToUnderline(this.type.getSimpleName());
@@ -140,12 +140,6 @@ public class ModelDef {
 
     }
 
-
-    /**
-     * java属性名称 --> 忽略的java属性
-     */
-    private Map<String, Field> modelFieldNameToIgnoredModelFieldMap = new HashMap<String, Field>();
-
     private static final String SERIAL_VERSION_ID = "serialVersionUID";
 
     /**
@@ -162,13 +156,7 @@ public class ModelDef {
 
         Ignore ignoreAnn = ReflectUtil.getFieldAnnotation(field, Ignore.class);
 
-        if (null == ignoreAnn) {
-            return false;
-        }
-
-        modelFieldNameToIgnoredModelFieldMap.put(field.getName(), field);
-
-        return true;
+        return null != ignoreAnn;
     }
 
     public Class<?> getType() {

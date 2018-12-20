@@ -114,6 +114,7 @@ public class MysqlWhereBuilder extends AbstractQueryBuilder<MysqlWhereBuilder> i
         return whereBuilder;
     }
 
+    @Override
     protected String wrapColumnName(String columnName) {
         return DIALECT.wrapColumnName(columnName);
     }
@@ -242,7 +243,7 @@ public class MysqlWhereBuilder extends AbstractQueryBuilder<MysqlWhereBuilder> i
     @Override
     public WhereBuilder orIsNotNullOrBlank(String columnName) {
         columnName = wrapColumnName(columnName);
-        preAdapter(true).append("(").append(columnName).append(" IS NOT NULL OR ").append(columnName).append(" != '')");
+        preAdapter(false).append("(").append(columnName).append(" IS NOT NULL OR ").append(columnName).append(" != '')");
         return this;
     }
 

@@ -1,5 +1,6 @@
 package com.duowan.common.dns.hook;
 
+import com.duowan.common.dns.DnsConstants;
 import com.duowan.common.dns.DnsResolver;
 import com.duowan.common.dns.util.NameServiceInterceptor;
 import com.duowan.common.dns.util.NameServiceListWrapper;
@@ -82,7 +83,7 @@ public class Jdk6InetAddressHook extends AbstractInetAddressHook {
 
         try {
 
-            return ReflectUtil.getFieldInstance(InetAddress.class, NameService.class, "nameService");
+            return ReflectUtil.getFieldInstance(InetAddress.class, NameService.class, DnsConstants.FIELD_NAME_SERVICE);
 
         } catch (Exception ignored) {
         }
@@ -99,9 +100,8 @@ public class Jdk6InetAddressHook extends AbstractInetAddressHook {
             }
 
             try {
-                ReflectUtil.setFieldInstance(InetAddress.class, "nameService", hookNameService);
-            } catch (Exception e) {
-                e.printStackTrace();
+                ReflectUtil.setFieldInstance(InetAddress.class, DnsConstants.FIELD_NAME_SERVICE, hookNameService);
+            } catch (Exception ignored) {
             }
         }
         setHookEnabled(true);
@@ -110,9 +110,8 @@ public class Jdk6InetAddressHook extends AbstractInetAddressHook {
     @Override
     public void unhook() {
         try {
-            ReflectUtil.setFieldInstance(InetAddress.class, "nameService", ORIGIN_NAME_SERVICE);
-        } catch (Exception e) {
-            e.printStackTrace();
+            ReflectUtil.setFieldInstance(InetAddress.class, DnsConstants.FIELD_NAME_SERVICE, ORIGIN_NAME_SERVICE);
+        } catch (Exception ignored) {
         }
         setHookEnabled(false);
     }
