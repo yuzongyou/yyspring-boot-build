@@ -1,5 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.virtualdns;
 
+import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.virtualdns.VirtualDnsUtil;
 import com.duowan.yyspring.boot.AppContext;
@@ -52,7 +53,10 @@ public class VirtualDnsApplicationRunListener extends SpringApplicationRunListen
             resourceList.addAll(customResourceList);
         }
 
-        List<Resource> defaultResourceList = AppContext.lookupConfigResourceList("hosts");
+        List<Resource> defaultResourceList = new ArrayList<>();
+        CommonUtil.appendList(defaultResourceList, AppContext.lookupConfigResourceList("hosts"));
+        CommonUtil.appendList(defaultResourceList, AppContext.lookupConfigResourceList("hosts.properties"));
+
         if (!defaultResourceList.isEmpty()) {
             resourceList.addAll(defaultResourceList);
         }
