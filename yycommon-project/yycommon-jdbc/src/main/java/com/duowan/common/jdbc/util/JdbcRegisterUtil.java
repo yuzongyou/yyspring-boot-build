@@ -87,7 +87,7 @@ public class JdbcRegisterUtil {
         List<JdbcDefinition> jdbcDefinitionList = JdbcDefinitionUtil.filterExcludeDefList(registerContext.getExcludeIds(), registerContext.getJdbcDefinitionList());
 
         // 提取所有启用的Jdbc定义列表
-        jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(registerContext.getExcludeIds(), jdbcDefinitionList);
+        jdbcDefinitionList = JdbcDefinitionUtil.extractEnabledJdbcDefList(registerContext.getEnabledIds(), jdbcDefinitionList);
 
         // 设置属性
         jdbcDefinitionList = JdbcDefinitionUtil.autoFillProperties(jdbcDefinitionList, registerContext.getEnvironment());
