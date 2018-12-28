@@ -1,8 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.web;
 
-import com.duowan.common.web.error.YyBasicErrorController;
-import com.duowan.common.web.exception.ExtendErrorAttributes;
 import com.duowan.common.web.exception.handler.*;
+import com.duowan.yyspringboot.autoconfigure.web.error.ExtendErrorAttributes;
+import com.duowan.yyspringboot.autoconfigure.web.error.YyBasicErrorController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Configuration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyBasicErrorController.class})
+@ConditionalOnClass({Servlet.class, DispatcherServlet.class})
 @AutoConfigureBefore(ErrorMvcAutoConfiguration.class)
 @EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class, WebMvcProperties.class})
 public class YyErrorMvcAutoConfiguration {
