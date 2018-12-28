@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.apollo;
 
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 
 /**
  * @author dw_xiajiqiu1
@@ -12,7 +12,7 @@ public class ApolloUtil {
     public static final String APOLLO_KEY_PREFIX = "yyspring.apollo.";
 
     public static boolean isApolloKey(String key) {
-        return StringUtils.isNotBlank(key) && key.startsWith(APOLLO_KEY_PREFIX);
+        return StringUtil.isNotBlank(key) && key.startsWith(APOLLO_KEY_PREFIX);
     }
 
     public static String wrapAsApolloKey(String key) {

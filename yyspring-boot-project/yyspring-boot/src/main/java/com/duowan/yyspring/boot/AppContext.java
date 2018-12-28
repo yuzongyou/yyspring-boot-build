@@ -2,10 +2,10 @@ package com.duowan.yyspring.boot;
 
 import com.duowan.common.exception.CodeException;
 import com.duowan.common.utils.AssertUtil;
-import com.duowan.common.utils.JsonUtil;
+import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.PathUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.annotations.YYSpringBootApplication;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.system.ApplicationHome;
@@ -17,7 +17,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +103,7 @@ public class AppContext {
      * @return 返回是否和给定的环境一致
      */
     public static boolean isEnvMatched(String givenEnv) {
-        return StringUtils.equals(givenEnv, env);
+        return StringUtil.equals(givenEnv, env);
     }
 
     public static boolean isDev() {
@@ -219,6 +218,10 @@ public class AppContext {
         return bootstrapClass;
     }
 
+    public static boolean isInitialize() {
+        return hadInit;
+    }
+
     /**
      * 初始化应用环境， 项目代号， 环境， 日志等
      *
@@ -269,7 +272,7 @@ public class AppContext {
         // 校准时间基线
         adapterSpringJacksonTimeZone(environment, applicationProperties);
 
-        initInfo.add(JsonUtil.toPrettyJson(projectInfoMap));
+        initInfo.add(CommonUtil.mapToPrettyJson(projectInfoMap));
 
         initAppAllKeySet();
     }
@@ -288,7 +291,7 @@ public class AppContext {
     private static void adapterSpringJacksonTimeZone(StandardEnvironment environment, Map<String, Object> applicationProperties) {
         String timeZoneKey = "spring.jackson.time-zone";
         String timeZone = environment.getProperty(timeZoneKey);
-        if (StringUtils.isBlank(timeZone) || "none".equalsIgnoreCase(timeZone)) {
+        if (StringUtil.isBlank(timeZone) || "none".equalsIgnoreCase(timeZone)) {
             System.setProperty(timeZoneKey, TimeZone.getDefault().getID());
         }
     }
@@ -300,7 +303,7 @@ public class AppContext {
             logDir = applicationAnn.logDir();
         }
 
-        if (StringUtils.isBlank(logDir)) {
+        if (StringUtil.isBlank(logDir)) {
             if (isDev()) {
                 logDir = System.getProperty("user.dir");
             } else {
@@ -308,7 +311,7 @@ public class AppContext {
             }
         }
 
-        if (StringUtils.isNotBlank(logDir)) {
+        if (StringUtil.isNotBlank(logDir)) {
             logDir = environment.resolvePlaceholders(logDir);
         }
 
@@ -471,6 +474,7 @@ public class AppContext {
 
             if (lookupPath.startsWith("classpath")) {
                 Resource resource = getClasspathResource(lookupPath);
+
                 if (null != resource && resource.exists()) {
                     resourceList.add(resource);
                 }
@@ -492,9 +496,9 @@ public class AppContext {
      * @param configFilename 配置文件名称
      * @return 返回非 null 列表
      */
-    private static List<String> extractLookupConfigResourcePaths(String configFilename) {
+    public static List<String> extractLookupConfigResourcePaths(String configFilename) {
 
-        if (StringUtils.isBlank(configFilename)) {
+        if (StringUtil.isBlank(configFilename)) {
             return new ArrayList<>();
         }
 
@@ -558,7 +562,7 @@ public class AppContext {
 
     public static List<Resource> tryGetResources(String[] paths) {
         List<Resource> resourceList = new ArrayList<>();
-        if (!StringUtils.isAllBlank(paths)) {
+        if (!StringUtil.isAllBlank(paths)) {
             for (String path : paths) {
                 Resource resource = tryGetResource(path);
                 if (null != resource) {
@@ -664,7 +668,7 @@ public class AppContext {
             envReader = new DefaultEnvReader();
         }
         String env = envReader.readRuntimeEnv(appEnvironment, sourceClass);
-        if (StringUtils.isBlank(env)) {
+        if (StringUtil.isBlank(env)) {
             return ENV_DEV;
         }
         return env;
@@ -684,17 +688,17 @@ public class AppContext {
             reader = new DefaultProjectNoReader();
         }
         String projectNo = reader.readProjectNo(appEnvironment, sourceClass);
-        if (StringUtils.isNotBlank(projectNo)) {
+        if (StringUtil.isNotBlank(projectNo)) {
             return projectNo;
         }
-        if (StringUtils.isBlank(projectNo) && isDev()) {
+        if (StringUtil.isBlank(projectNo) && isDev()) {
             // 开发环境的话，允许直接通过项目目录计算项目代号，如果项目目录为空则通过模块目录计算
-            if (StringUtils.isNotBlank(projectDir)) {
+            if (StringUtil.isNotBlank(projectDir)) {
                 projectNo = getLastSepFolderName(projectDir);
                 if (isDev() && "trunk".equalsIgnoreCase(projectNo)) {
                     projectNo = getLastSepFolderName(projectDir.replaceFirst("[/\\\\]trunk[/\\\\]?$", ""));
                 }
-            } else if (StringUtils.isNotBlank(moduleDir)) {
+            } else if (StringUtil.isNotBlank(moduleDir)) {
                 projectNo = getLastSepFolderName(moduleDir);
             } else {
                 projectNo = "dev";
@@ -709,27 +713,27 @@ public class AppContext {
 
         String mno = environment.getProperty("MODULENO");
 
-        if (StringUtils.isBlank(mno)) {
+        if (StringUtil.isBlank(mno)) {
             if (null != applicationAnn) {
                 mno = applicationAnn.moduleNo();
-                if (StringUtils.isNoneBlank(mno)) {
+                if (StringUtil.isNoneBlank(mno)) {
                     return mno;
                 }
                 mno = applicationAnn.value();
-                if (StringUtils.isNoneBlank(mno)) {
+                if (StringUtil.isNoneBlank(mno)) {
                     return mno;
                 }
             }
         }
-        if (StringUtils.isBlank(mno)) {
-            if (StringUtils.isNotBlank(moduleDir)) {
+        if (StringUtil.isBlank(mno)) {
+            if (StringUtil.isNotBlank(moduleDir)) {
                 mno = getLastSepFolderName(moduleDir);
             }
         }
-        if (StringUtils.isNotBlank(mno)) {
+        if (StringUtil.isNotBlank(mno)) {
             mno = environment.resolvePlaceholders(mno);
         }
-        if (StringUtils.isNotBlank(mno) && mno.startsWith(projectNo) && !mno.equals(projectNo)) {
+        if (StringUtil.isNotBlank(mno) && mno.startsWith(projectNo) && !mno.equals(projectNo)) {
             mno = mno.replaceFirst(projectNo, "");
             mno = mno.replaceFirst("^-+", "");
         }
@@ -737,7 +741,7 @@ public class AppContext {
     }
 
     private static String getLastSepFolderName(String dirPath) {
-        if (StringUtils.isBlank(dirPath)) {
+        if (StringUtil.isBlank(dirPath)) {
             return null;
         }
         return dirPath.replaceAll("[\\\\/]*$", "").replaceFirst(".*[\\\\/](.*)$", "$1");
@@ -747,7 +751,7 @@ public class AppContext {
         for (String projectNoKey : keys) {
             try {
                 String value = appEnvironment.resolveRequiredPlaceholders("${" + projectNoKey + "}");
-                if (StringUtils.isNotBlank(value)) {
+                if (StringUtil.isNotBlank(value)) {
                     return value;
                 }
             } catch (IllegalArgumentException ignored) {
@@ -759,7 +763,7 @@ public class AppContext {
     public static String getSystemVar(String key, String defaultValue) {
         String env = System.getenv(key);
 
-        if (StringUtils.isBlank(env)) {
+        if (StringUtil.isBlank(env)) {
             return System.getProperty(key, defaultValue);
         }
 
@@ -769,7 +773,7 @@ public class AppContext {
     public static String getAppProperty(String key, String defaultValue) {
         try {
             String realKey = environment.resolveRequiredPlaceholders(key);
-            if (StringUtils.isBlank(realKey)) {
+            if (StringUtil.isBlank(realKey)) {
                 return defaultValue;
             }
             return environment.getProperty(realKey, defaultValue);

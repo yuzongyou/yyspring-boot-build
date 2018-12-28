@@ -1,6 +1,6 @@
 package com.duowan.yyspring.boot;
 
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 
 /**
  * @author Arvin
@@ -15,9 +15,9 @@ public class PrefixKeyFilter implements KeyFilter {
 
     @Override
     public boolean filter(String key) {
-        if (StringUtils.isBlank(prefix)) {
+        if (StringUtil.isBlank(prefix)) {
             return true;
         }
-        return !StringUtils.isBlank(key) && key.startsWith(prefix);
+        return !StringUtil.isBlank(key) && key.startsWith(prefix);
     }
 }

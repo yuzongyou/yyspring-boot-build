@@ -3,7 +3,7 @@ package com.duowan.yyspringboot.autoconfigure.ipowner;
 import com.duowan.common.ipowner.IpOwnerServiceImpl;
 import com.duowan.common.ipowner.seeker.IpSeekerDistrictProvider;
 import com.duowan.common.ipowner.seeker.IpSeekerProvinceAndCityProvider;
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -37,11 +37,11 @@ public class IpOwnerAutoConfiguration {
 
         provider.setAsyncInit(properties.isDistrictAsyncInit());
 
-        if (StringUtils.isNotBlank(properties.getDistrictIpdatxDownloadUrl())) {
+        if (StringUtil.isNotBlank(properties.getDistrictIpdatxDownloadUrl())) {
             provider.setIpdatxDownloadUrl(environment.resolvePlaceholders(properties.getDistrictIpdatxDownloadUrl()));
         }
 
-        if (StringUtils.isNotBlank(properties.getDistrictIpdatxFilePath())) {
+        if (StringUtil.isNotBlank(properties.getDistrictIpdatxFilePath())) {
             provider.setIpdatxFilePath(environment.resolvePlaceholders(properties.getDistrictIpdatxFilePath()));
         }
 
@@ -62,11 +62,11 @@ public class IpOwnerAutoConfiguration {
 
         provider.setAsyncInit(properties.isProvinceCityAsyncInit());
 
-        if (StringUtils.isNotBlank(properties.getProvinceCityIpdatxDownloadUrl())) {
+        if (StringUtil.isNotBlank(properties.getProvinceCityIpdatxDownloadUrl())) {
             provider.setIpdatxDownloadUrl(environment.resolvePlaceholders(properties.getProvinceCityIpdatxDownloadUrl()));
         }
 
-        if (StringUtils.isNotBlank(properties.getProvinceCityIpdatxFilePath())) {
+        if (StringUtil.isNotBlank(properties.getProvinceCityIpdatxFilePath())) {
             provider.setIpdatxFilePath(environment.resolvePlaceholders(properties.getProvinceCityIpdatxFilePath()));
         }
 

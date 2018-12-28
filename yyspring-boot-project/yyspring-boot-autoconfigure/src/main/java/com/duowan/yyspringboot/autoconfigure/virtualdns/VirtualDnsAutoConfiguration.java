@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2018/9/1 19:52
  */
 @Configuration
-@ConditionalOnClass({com.duowan.common.virtualdns.VirtualDnsUtil.class, com.duowan.common.dns.util.InetAddressUtil.class})
+@ConditionalOnClass({com.duowan.common.vdns.VirtualDnsUtil.class})
 @EnableConfigurationProperties(VirtualDnsProperties.class)
 public class VirtualDnsAutoConfiguration {
 

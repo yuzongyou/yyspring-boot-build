@@ -1,8 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.web;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -60,7 +60,7 @@ public class YyWebSpringApplicationRunListener extends SpringApplicationRunListe
 
         String serverPortKey = "server.port";
         String serverPort = environment.getProperty(serverPortKey);
-        if (StringUtils.isNotBlank(serverPort)) {
+        if (StringUtil.isNotBlank(serverPort)) {
             AppContext.getApplicationProperties().put(serverPortKey, serverPort);
         }
 

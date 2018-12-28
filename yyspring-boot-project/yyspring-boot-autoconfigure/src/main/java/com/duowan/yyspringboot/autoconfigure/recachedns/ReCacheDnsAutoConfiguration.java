@@ -1,6 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.recachedns;
 
-import com.duowan.common.dns.util.DnsInterceptor;
+import com.duowan.common.dns.DnsInterceptor;
 import com.duowan.common.recachedns.DnsCacheUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 2018/9/7 10:50
  */
 @Configuration
-@ConditionalOnClass({com.duowan.common.recachedns.DnsCacheUtil.class, com.duowan.common.dns.util.InetAddressUtil.class})
+@ConditionalOnClass({com.duowan.common.recachedns.DnsCacheUtil.class})
 @EnableConfigurationProperties(ReCacheDnsProperties.class)
 public class ReCacheDnsAutoConfiguration {
 
@@ -43,7 +43,7 @@ public class ReCacheDnsAutoConfiguration {
         // 启用自动缓存刷新
         DnsCacheUtil.enabledAutoReCache();
 
-        logger.info("开启DNS自动刷新缓存成功： " + infoBuilder.toString());
+        logger.info("开启DNS自动刷新缓存成功： {}", infoBuilder.toString());
     }
 
 

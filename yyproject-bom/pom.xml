@@ -5,7 +5,7 @@
     <parent>
         <artifactId>yyspring-boot-build</artifactId>
         <groupId>com.duowan</groupId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -20,6 +20,9 @@
 
         <spring.version>5.0.7.RELEASE</spring.version>
         <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
+        <platform.bom.version>Cairo-SR2</platform.bom.version>
+        <spring.cloud.dependencies.version>Finchley.SR1</spring.cloud.dependencies.version>
+        <yycommon.version>1.1.0-SNAPSHOT</yycommon.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>4.12</junit.version>
@@ -82,7 +85,7 @@
             <dependency>
                 <groupId>io.spring.platform</groupId>
                 <artifactId>platform-bom</artifactId>
-                <version>Cairo-SR2</version>
+                <version>${platform.bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -90,7 +93,15 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Finchley.SR1</version>
+                <version>${spring.cloud.dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.duowan</groupId>
+                <artifactId>yycommon-bom</artifactId>
+                <version>${yycommon.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -411,137 +422,10 @@
             </dependency>
 
             <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-parent</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-exception</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-utils</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-httpclient</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-codec</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-dns-util</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-virtual-dns</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-recache-dns</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-timer</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-alarm</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.ctrip.framework.apollo</groupId>
                 <artifactId>apollo-client</artifactId>
                 <version>${apollo.client.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-inner-ip</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-ip-owner</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-udb-sdk</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-udb-security</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-admincenter</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-thrift-client</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-thrift-server</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-jdbc</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-redis</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-web</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.duowan</groupId>
-                <artifactId>yycommon-wxmp-sdk</artifactId>
-                <version>${yyproject.version}</version>
-            </dependency>
-
 
             <dependency>
                 <groupId>com.duowan</groupId>

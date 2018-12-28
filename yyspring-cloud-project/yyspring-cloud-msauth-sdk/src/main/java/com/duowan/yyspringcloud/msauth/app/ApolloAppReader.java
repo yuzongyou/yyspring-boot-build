@@ -2,9 +2,9 @@ package com.duowan.yyspringcloud.msauth.app;
 
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspringcloud.msauth.Constants;
 import com.duowan.yyspringcloud.msauth.exception.EmptyApolloNamespaceException;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class ApolloAppReader implements AppReader, Ordered {
 
         List<String> result = new ArrayList<>();
         for (String namespace : namespaces) {
-            if (StringUtils.isNotBlank(namespace) && !result.contains(namespace)) {
+            if (StringUtil.isNotBlank(namespace) && !result.contains(namespace)) {
                 result.add(namespace);
             }
         }
@@ -87,10 +87,10 @@ public class ApolloAppReader implements AppReader, Ordered {
 
         String secretKey = Constants.SECRET_KEY_PREFIX + appId;
         String secret = config.getProperty(secretKey, null);
-        if (StringUtils.isBlank(secret)) {
+        if (StringUtil.isBlank(secret)) {
             secret = config.getProperty(Constants.DEFAULT_SECRET_KEY, null);
         }
-        if (StringUtils.isBlank(secret)) {
+        if (StringUtil.isBlank(secret)) {
             return null;
         }
 

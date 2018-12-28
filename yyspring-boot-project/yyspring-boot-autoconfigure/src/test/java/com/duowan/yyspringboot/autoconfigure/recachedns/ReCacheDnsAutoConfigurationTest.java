@@ -1,9 +1,10 @@
 package com.duowan.yyspringboot.autoconfigure.recachedns;
 
-import com.duowan.common.dns.util.DnsInterceptor;
-import com.duowan.common.dns.util.InetAddressUtil;
+import com.duowan.common.dns.DnsInterceptor;
+import com.duowan.common.dns.MapDnsResolver;
 import com.duowan.common.recachedns.DnsCacheUtil;
-import com.duowan.common.virtualdns.VirtualDnsUtil;
+import com.duowan.common.recachedns.Jdk678DnsCacheHook;
+import com.duowan.common.vdns.VirtualDnsUtil;
 import com.duowan.yyspringboot.autoconfigure.BaseTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,11 +51,12 @@ public class ReCacheDnsAutoConfigurationTest extends BaseTest {
             }
         });
 
-        VirtualDnsUtil.enabled();
-        VirtualDnsUtil.add(host, "127.0.0.1");
+        MapDnsResolver resolver = new MapDnsResolver();
+        resolver.add(host, "127.0.0.1");
 
+        VirtualDnsUtil.hook(resolver, null);
 
-        Map<String, Object> cacheMap = InetAddressUtil.getPositiveAddressCache();
+        Map<String, Object> cacheMap = Jdk678DnsCacheHook.getPositiveAddressCache();
 
         assertTrue(!cacheMap.containsKey(host));
 
@@ -65,7 +67,7 @@ public class ReCacheDnsAutoConfigurationTest extends BaseTest {
         // 使得缓存过期
         Thread.sleep(2100);
 
-        assertNotNull(InetAddressUtil.getAddressFromCache(host));
+        assertNotNull(Jdk678DnsCacheHook.getAddressFromCache(host));
 
     }
 

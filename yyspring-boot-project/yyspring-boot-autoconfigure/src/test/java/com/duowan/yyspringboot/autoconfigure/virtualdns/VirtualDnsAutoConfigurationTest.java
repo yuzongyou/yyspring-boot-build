@@ -25,7 +25,7 @@ public class VirtualDnsAutoConfigurationTest extends BaseTest {
     public void virtualDns() throws Exception {
 
         String ip = InetAddress.getByName("www.baidu.com").getHostAddress();
-        assertEquals("127.0.0.1", ip);
+        assertEquals("127.0.0.2", ip);
 
         ip = InetAddress.getByName("www.google.com").getHostAddress();
         assertEquals("127.0.0.1", ip);

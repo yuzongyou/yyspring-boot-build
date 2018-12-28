@@ -1,8 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.logging;
 
 import com.duowan.common.utils.ConvertUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.ClassUtils;
 
@@ -65,7 +65,7 @@ public abstract class AbstractYyDefaultLoggingConfigurer implements YyDefaultLog
     protected String getLogDir(StandardEnvironment environment, String[] args) {
         String logDir = AppContext.getLogDir();
 
-        if (StringUtils.isBlank(logDir)) {
+        if (StringUtil.isBlank(logDir)) {
             logDir = System.getProperty("user.dir");
         }
 
@@ -75,7 +75,7 @@ public abstract class AbstractYyDefaultLoggingConfigurer implements YyDefaultLog
     private String deduceLogFileNamePrefix(StandardEnvironment environment, String[] args) {
         String moduleNo = AppContext.getModuleNo();
 
-        if (StringUtils.isNotBlank(moduleNo)) {
+        if (StringUtil.isNotBlank(moduleNo)) {
             return moduleNo + "-";
         }
         return "";

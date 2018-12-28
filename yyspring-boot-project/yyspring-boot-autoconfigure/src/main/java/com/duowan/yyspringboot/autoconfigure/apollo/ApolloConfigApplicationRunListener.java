@@ -1,8 +1,8 @@
 package com.duowan.yyspringboot.autoconfigure.apollo;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 
 import java.lang.reflect.Field;
@@ -21,10 +21,7 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
         this.needAutoConfigurer = isClassesImported(
                 "com.ctrip.framework.foundation.spi.provider.ApplicationProvider",
                 "com.ctrip.framework.foundation.internals.DefaultProviderManager"
-                );
-        if (isFirstInit("constructor") && needAutoConfigurer()) {
-            initialize();
-        }
+        );
     }
 
     @Override
@@ -36,10 +33,10 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
         // 重新设置环境变量
         String dwanvKey = "DWENV";
         String dwanv = System.getenv(dwanvKey);
-        if (StringUtils.isBlank(dwanv)) {
+        if (StringUtil.isBlank(dwanv)) {
             dwanv = System.getProperty(dwanvKey);
         }
-        if (StringUtils.isBlank(dwanv)) {
+        if (StringUtil.isBlank(dwanv)) {
             System.setProperty(dwanvKey, AppContext.getEnv());
         }
 
@@ -52,7 +49,7 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
             Object instance = field.get(foundationClass);
             if (instance != null && instance.getClass() != Class.forName("com.ctrip.framework.foundation.internals.DefaultProviderManager")) {
                 field.setAccessible(false);
-                return ;
+                return;
             }
 
             field.set(foundationClass, new YYApolloProviderManager());
@@ -61,4 +58,11 @@ public class ApolloConfigApplicationRunListener extends SpringApplicationRunList
         }
     }
 
+    @Override
+    protected void doStarting() {
+        super.doStarting();
+        if (isFirstInit("constructor") && needAutoConfigurer()) {
+            initialize();
+        }
+    }
 }

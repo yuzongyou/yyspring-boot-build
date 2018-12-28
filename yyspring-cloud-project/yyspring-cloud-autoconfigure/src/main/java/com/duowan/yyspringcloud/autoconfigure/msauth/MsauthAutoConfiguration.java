@@ -1,5 +1,6 @@
 package com.duowan.yyspringcloud.autoconfigure.msauth;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspringcloud.msauth.app.ApolloAppReader;
 import com.duowan.yyspringcloud.msauth.app.AppReader;
@@ -9,7 +10,6 @@ import com.duowan.yyspringcloud.msauth.feign.FeignAuthHeaderRequestInterceptor;
 import com.duowan.yyspringcloud.msauth.web.*;
 import com.duwoan.yyspringcloud.msauth.gateway.GatewayAddHeaderGlobalFilter;
 import feign.RequestInterceptor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,12 +36,12 @@ import java.util.List;
 public class MsauthAutoConfiguration {
 
     private static String resolveAppId(Environment environment, MsauthProperties properties) {
-        if (StringUtils.isNotBlank(properties.getAppId())) {
+        if (StringUtil.isNotBlank(properties.getAppId())) {
             return properties.getAppId();
         }
 
         String appId = environment.getProperty("spring.application.name");
-        if (StringUtils.isBlank(appId)) {
+        if (StringUtil.isBlank(appId)) {
             throw new IllegalArgumentException("Ms auth appid should not be null");
         }
 
@@ -76,7 +76,7 @@ public class MsauthAutoConfiguration {
             GatewayAddHeaderGlobalFilter filter = new GatewayAddHeaderGlobalFilter(properties.getAppId(), appReader);
 
             filter.setOrder(properties.getHeaderGatewayFilterOrder());
-            if (StringUtils.isNotBlank(properties.getAuthHeader())) {
+            if (StringUtil.isNotBlank(properties.getAuthHeader())) {
                 filter.setAuthHeader(properties.getAuthHeader());
             }
 
@@ -101,7 +101,7 @@ public class MsauthAutoConfiguration {
             public FeignAuthHeaderRequestInterceptor feignAuthHeaderRequestInterceptor(MsauthProperties properties, Environment environment, AppReader appReader) {
                 FeignAuthHeaderRequestInterceptor interceptor = new FeignAuthHeaderRequestInterceptor(resolveAppId(environment, properties), appReader);
 
-                if (StringUtils.isNotBlank(properties.getAuthHeader())) {
+                if (StringUtil.isNotBlank(properties.getAuthHeader())) {
                     interceptor.setAuthHeader(properties.getAuthHeader());
                 }
 
@@ -153,7 +153,7 @@ public class MsauthAutoConfiguration {
                 UnauthorizedHandler unauthorizedHandler) {
             SecurityApiAuthServerHandlerInterceptor interceptor = new SecurityApiAuthServerHandlerInterceptor(decider, validator, unauthorizedHandler);
 
-            if (StringUtils.isNotBlank(properties.getAuthHeader())) {
+            if (StringUtil.isNotBlank(properties.getAuthHeader())) {
                 interceptor.setAuthHeader(properties.getAuthHeader());
             }
 

@@ -2,8 +2,8 @@ package com.duowan.yyspringboot.autoconfigure.web;
 
 import com.duowan.common.utils.ClassUtil;
 import com.duowan.common.utils.PathUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.bind.BindResult;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.core.env.StandardEnvironment;
@@ -71,7 +71,7 @@ public class WebPrepareUtil {
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 String value = String.valueOf(entry.getValue());
                 String locationKey = locationKeyPrefix + entry.getKey();
-                if (StringUtils.isBlank(value)) {
+                if (StringUtil.isBlank(value)) {
                     continue;
                 }
                 String newValue = resetLocationForDevEnv(resourceLocationPrefix, locationKeyPrefix, locationKey, value);
@@ -167,7 +167,7 @@ public class WebPrepareUtil {
 
         String thymeleafModeValue = AppContext.getAppProperty(thymeleafModeKey, null);
 
-        if (StringUtils.isBlank(thymeleafModeValue) || deprecatedModeValue.equals(thymeleafModeValue.trim())) {
+        if (StringUtil.isBlank(thymeleafModeValue) || deprecatedModeValue.equals(thymeleafModeValue.trim())) {
             // 开发环境下，如果没有配置的或者配置的过时了就设置为 HTML
             initInfo.add("默认[" + thymeleafModeKey + "]配置=" + thymeleafModeValue + ", 更正为： HTML");
             System.setProperty(thymeleafModeKey, "HTML");
@@ -182,7 +182,7 @@ public class WebPrepareUtil {
 
         String thymeleafCacheValue = AppContext.getAppProperty(thymeleafCacheKey, null);
 
-        if (StringUtils.isBlank(thymeleafCacheValue)) {
+        if (StringUtil.isBlank(thymeleafCacheValue)) {
             // 开发环境下，如果没有配置的话，默认关闭缓存
             System.setProperty(thymeleafCacheKey, "false");
         }
@@ -211,11 +211,11 @@ public class WebPrepareUtil {
             String thymeleafTemplatePrefix = AppContext.getAppProperty(thymeleafPrefixKey, null);
             String thymeleafTemplatePathPrefix = getThymeleafTemplatePrefix(thymeleafTemplatePrefix, resourceDir, true);
 
-            if (StringUtils.isBlank(thymeleafTemplatePathPrefix)) {
+            if (StringUtil.isBlank(thymeleafTemplatePathPrefix)) {
                 thymeleafTemplatePathPrefix = getThymeleafTemplatePrefix(thymeleafTemplatePrefix, testResourceDir, true);
             }
 
-            if (StringUtils.isBlank(thymeleafTemplatePathPrefix)) {
+            if (StringUtil.isBlank(thymeleafTemplatePathPrefix)) {
                 thymeleafTemplatePathPrefix = getThymeleafTemplatePrefix(thymeleafTemplatePrefix, resourceDir, false);
             }
 

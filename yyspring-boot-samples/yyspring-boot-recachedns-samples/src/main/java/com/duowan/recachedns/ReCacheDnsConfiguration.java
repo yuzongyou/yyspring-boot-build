@@ -1,6 +1,6 @@
 package com.duowan.recachedns;
 
-import com.duowan.common.dns.util.DnsInterceptor;
+import com.duowan.common.dns.DnsInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

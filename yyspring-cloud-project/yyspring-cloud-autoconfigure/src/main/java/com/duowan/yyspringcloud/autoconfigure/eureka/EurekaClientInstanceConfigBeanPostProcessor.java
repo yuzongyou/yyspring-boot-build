@@ -1,6 +1,6 @@
 package com.duowan.yyspringcloud.autoconfigure.eureka;
 
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
@@ -18,7 +18,7 @@ public class EurekaClientInstanceConfigBeanPostProcessor implements BeanPostProc
     public EurekaClientInstanceConfigBeanPostProcessor(int nonSecurePort, String hostname) {
         this.nonSecurePort = nonSecurePort;
         this.hostname = hostname;
-        if (StringUtils.isBlank(hostname)) {
+        if (StringUtil.isBlank(hostname)) {
             throw new IllegalArgumentException("必须填写注册到Eureka的服务域名");
         }
     }

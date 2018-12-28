@@ -1,6 +1,0 @@
-thrift 下载地址：
-http://archive.apache.org/dist/thrift/0.10.0/
-
-cd 到thrift的文件目录，然后执行
-
-thrift-0.10.0.exe -gen java TestService.thrift

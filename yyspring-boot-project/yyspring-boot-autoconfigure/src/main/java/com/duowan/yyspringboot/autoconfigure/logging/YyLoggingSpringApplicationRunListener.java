@@ -1,10 +1,10 @@
 package com.duowan.yyspringboot.autoconfigure.logging;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspring.boot.SpringApplicationRunListenerAdapter;
 import com.duowan.yyspringboot.autoconfigure.logging.log4j2.Log4jYyDefaultLoggingConfigurer;
 import com.duowan.yyspringboot.autoconfigure.logging.logback.LogbackYyDefaultLoggingConfigurer;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.util.ClassUtils;
@@ -30,7 +30,7 @@ public class YyLoggingSpringApplicationRunListener extends SpringApplicationRunL
 
         StandardEnvironment environment = AppContext.getEnvironment();
         String loggingFile = environment.getProperty(LoggingConstants.CONFIG_PROPERTY);
-        if (StringUtils.isNotBlank(loggingFile)) {
+        if (StringUtil.isNotBlank(loggingFile)) {
             return;
         }
 

@@ -1,7 +1,7 @@
 package com.duowan.yyspringcloud.msauth;
 
 import com.duowan.common.utils.EncryptUtil;
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 
 /**
  * @author Arvin
@@ -32,7 +32,7 @@ public class Signer {
 
     public static boolean isValid(String appId, String secret, String reqSign) {
 
-        if (StringUtils.isBlank(reqSign)) {
+        if (StringUtil.isBlank(reqSign)) {
             return false;
         }
         int index = reqSign.indexOf('|');

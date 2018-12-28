@@ -3,9 +3,9 @@ package com.duowan.yyspringboot.autoconfigure.admincenter;
 import com.duowan.common.admincenter.exception.NoPrivilegeException;
 import com.duowan.common.admincenter.service.AdmincenterService;
 import com.duowan.common.exception.CodeException;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.common.web.view.AbstractTextView;
 import com.duowan.udb.security.PrivilegeInterceptor;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,7 +50,7 @@ public class AdmincenterPrivilegeInterceptor implements PrivilegeInterceptor {
             }
         }
 
-        if (StringUtils.isBlank(forbiddenUrl)) {
+        if (StringUtil.isBlank(forbiddenUrl)) {
             ajaxView = true;
         }
 

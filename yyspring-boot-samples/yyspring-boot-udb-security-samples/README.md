@@ -25,7 +25,7 @@
     <parent>
         <groupId>com.duowan</groupId>
         <artifactId>yyproject-bom</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <version>2.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>yyspring-boot-udb-security-samples</artifactId>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>com.duowan</groupId>
                 <artifactId>yyproject-bom</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <version>2.0.1-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

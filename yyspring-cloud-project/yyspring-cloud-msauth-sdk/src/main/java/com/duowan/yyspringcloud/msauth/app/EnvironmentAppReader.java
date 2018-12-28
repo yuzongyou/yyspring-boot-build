@@ -1,7 +1,7 @@
 package com.duowan.yyspringcloud.msauth.app;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspringcloud.msauth.Constants;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
@@ -38,10 +38,10 @@ public class EnvironmentAppReader implements AppReader, EnvironmentAware, Ordere
         }
 
         String secret = environment.getProperty(Constants.SECRET_KEY_PREFIX + appId);
-        if (StringUtils.isBlank(secret)) {
+        if (StringUtil.isBlank(secret)) {
             secret = environment.getProperty(Constants.DEFAULT_SECRET_KEY);
         }
-        if (StringUtils.isBlank(secret)) {
+        if (StringUtil.isBlank(secret)) {
             return null;
         }
 

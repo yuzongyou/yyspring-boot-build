@@ -36,18 +36,18 @@ public abstract class SpringApplicationRunListenerAdapter implements SpringAppli
         this.args = args;
     }
 
-    private static final Map<String, Boolean> instanceMethodInitMap = new HashMap<>();
+    private static final Map<String, Boolean> INSTANCE_METHOD_INIT_MAP = new HashMap<>();
 
     protected synchronized boolean isFirstInit(String method) {
 
-        synchronized (instanceMethodInitMap) {
+        synchronized (INSTANCE_METHOD_INIT_MAP) {
 
             String className = getClass().getName();
             String methodKey = className + "." + method;
 
-            Boolean hadInit = instanceMethodInitMap.get(methodKey);
+            Boolean hadInit = INSTANCE_METHOD_INIT_MAP.get(methodKey);
             if (hadInit == null) {
-                instanceMethodInitMap.put(methodKey, true);
+                INSTANCE_METHOD_INIT_MAP.put(methodKey, true);
                 return true;
             }
             return false;

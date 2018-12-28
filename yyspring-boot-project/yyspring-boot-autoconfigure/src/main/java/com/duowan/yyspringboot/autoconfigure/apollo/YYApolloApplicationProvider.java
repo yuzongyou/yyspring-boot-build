@@ -7,8 +7,8 @@ import com.ctrip.framework.foundation.spi.provider.ApplicationProvider;
 import com.ctrip.framework.foundation.spi.provider.Provider;
 import com.duowan.common.utils.ConvertUtil;
 import com.duowan.common.utils.JsonUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +80,7 @@ public class YYApolloApplicationProvider implements ApplicationProvider {
         Env env = Env.fromString(currentEnv);
 
         String value = AppContext.getAppProperty(ApolloUtil.wrapAsApolloKey("meta"), null);
-        if (StringUtils.isNotBlank(value)) {
+        if (StringUtil.isNotBlank(value)) {
             domainMap.put(env, value);
         }
 
@@ -88,7 +88,7 @@ public class YYApolloApplicationProvider implements ApplicationProvider {
             if (!env.equals(env1)) {
                 String key = ApolloUtil.wrapAsApolloKey(env.name().toLowerCase() + ".meta");
                 String val = AppContext.getAppProperty(key, null);
-                if (StringUtils.isNotBlank(val)) {
+                if (StringUtil.isNotBlank(val)) {
                     domainMap.put(env1, val);
                 }
             }

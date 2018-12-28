@@ -8,10 +8,10 @@ import com.duowan.common.admincenter.model.Privilege;
 import com.duowan.common.admincenter.service.AdmincenterService;
 import com.duowan.common.admincenter.service.impl.AdmincenterInterceptorService;
 import com.duowan.common.utils.AssertUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbSecurityAutoConfiguration;
 import com.duowan.yyspringboot.autoconfigure.udbsecurity.UdbSecurityProperties;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -80,10 +80,10 @@ public class AdmincenterAutoConfiguration {
     @Bean
     public AdmincenterPatternProvider admincenterPatternProvider(AdmincenterProperties admincenterProperties, PrivilegeContext privilegeContext) {
         Set<String> excludePatterns = new HashSet<>(Arrays.asList(admincenterProperties.getExcludePathPatterns()));
-        if (StringUtils.isNotBlank(admincenterProperties.getForbiddenUrl())) {
+        if (StringUtil.isNotBlank(admincenterProperties.getForbiddenUrl())) {
             excludePatterns.add(admincenterProperties.getForbiddenUrl());
         }
-        if (StringUtils.isNotBlank(admincenterProperties.getLogoutUrl())) {
+        if (StringUtil.isNotBlank(admincenterProperties.getLogoutUrl())) {
             excludePatterns.add(admincenterProperties.getLogoutUrl());
         }
 
@@ -100,7 +100,7 @@ public class AdmincenterAutoConfiguration {
                 List<String> urlList = privilege.getUrlList();
                 if (null != urlList && !urlList.isEmpty()) {
                     for (String url : urlList) {
-                        if (StringUtils.isNotBlank(url)) {
+                        if (StringUtil.isNotBlank(url)) {
                             patterns.add(url);
                         }
                     }
@@ -116,7 +116,7 @@ public class AdmincenterAutoConfiguration {
     public PrivilegeController privilegeController(AdmincenterProperties admincenterProperties) {
         AssertUtil.assertNotBlank(admincenterProperties.getProductId(), "Admincenter's productId should not be null");
         String logoutUrl = admincenterProperties.getLogoutUrl();
-        if (StringUtils.isBlank(logoutUrl)) {
+        if (StringUtil.isBlank(logoutUrl)) {
             logoutUrl = "/udb/logout.do";
         }
         return new PrivilegeController(

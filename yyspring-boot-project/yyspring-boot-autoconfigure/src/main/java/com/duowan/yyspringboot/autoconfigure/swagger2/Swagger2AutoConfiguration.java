@@ -1,9 +1,9 @@
 package com.duowan.yyspringboot.autoconfigure.swagger2;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -60,7 +60,7 @@ public class Swagger2AutoConfiguration {
 
         private Contact resolveContact(Swagger2Properties properties) {
 
-            if (StringUtils.isAllBlank(properties.getContactName(), properties.getContactUrl(), properties.getContactEmail())) {
+            if (StringUtil.isAllBlank(properties.getContactName(), properties.getContactUrl(), properties.getContactEmail())) {
                 return null;
             }
 
@@ -69,7 +69,7 @@ public class Swagger2AutoConfiguration {
         }
 
         private String resolveVersion(Swagger2Properties properties) {
-            if (StringUtils.isNotBlank(properties.getVersion())) {
+            if (StringUtil.isNotBlank(properties.getVersion())) {
                 return properties.getVersion();
             }
             return "1.0";
@@ -77,7 +77,7 @@ public class Swagger2AutoConfiguration {
 
         private String resolveTitle(Swagger2Properties properties) {
 
-            if (StringUtils.isNotBlank(properties.getTitle())) {
+            if (StringUtil.isNotBlank(properties.getTitle())) {
                 return properties.getTitle();
             }
 
@@ -87,7 +87,7 @@ public class Swagger2AutoConfiguration {
 
         private String resolveDescription(Swagger2Properties properties) {
 
-            if (StringUtils.isNotBlank(properties.getDescription())) {
+            if (StringUtil.isNotBlank(properties.getDescription())) {
                 return properties.getTitle();
             }
 
@@ -111,7 +111,7 @@ public class Swagger2AutoConfiguration {
             if (properties.isJustWithApiOperationAnnotation()) {
                 builder.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class));
             }
-            if (StringUtils.isNotBlank(properties.getBasePackage())) {
+            if (StringUtil.isNotBlank(properties.getBasePackage())) {
                 // 自行修改为自己的包路径
                 builder.apis(RequestHandlerSelectors.basePackage(properties.getBasePackage()));
             }

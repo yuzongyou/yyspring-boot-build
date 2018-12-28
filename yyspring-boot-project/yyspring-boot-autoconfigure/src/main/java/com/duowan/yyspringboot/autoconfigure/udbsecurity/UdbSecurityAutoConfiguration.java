@@ -1,5 +1,6 @@
 package com.duowan.yyspringboot.autoconfigure.udbsecurity;
 
+import com.duowan.udb.security.NeedForwardLoginUIDecider;
 import com.duowan.udb.security.PrivilegeInterceptor;
 import com.duowan.udb.security.UdbSecurityInterceptor;
 import com.duowan.udb.security.controller.UdbSecurityController;
@@ -32,6 +33,11 @@ import java.util.Set;
 public class UdbSecurityAutoConfiguration {
 
     @Bean
+    public WebJsonViewNeedForwardLoginUIDecider webJsonViewNeedForwardLoginUIDecider() {
+        return new WebJsonViewNeedForwardLoginUIDecider();
+    }
+
+    @Bean
     public UdbLoginRequirePatternProvider udbLoginRequirePatternProvider() {
         return new UdbLoginRequirePatternProvider();
     }
@@ -43,8 +49,9 @@ public class UdbSecurityAutoConfiguration {
 
     @Bean
     public MappedInterceptor udbSecurityMappedInterceptor(UdbSecurityProperties udbSecurityProperties,
-                                               @Autowired(required = false) PrivilegeInterceptor privilegeInterceptor,
-                                               @Autowired(required = false) List<PatternProvider> patternProviders) {
+                                                          @Autowired(required = false) PrivilegeInterceptor privilegeInterceptor,
+                                                          @Autowired(required = false) List<PatternProvider> patternProviders,
+                                                          @Autowired(required = false) List<NeedForwardLoginUIDecider> needForwardLoginUIDeciders) {
 
         Set<String> excludePackagesOrClassNames = new HashSet<String>(Arrays.asList(udbSecurityProperties.getExcludePackagesAndClasses()));
         // 默认派排除 spring 内置的
@@ -60,6 +67,8 @@ public class UdbSecurityAutoConfiguration {
         if (null != privilegeInterceptor) {
             udbSecurityInterceptor.setPrivilegeInterceptor(privilegeInterceptor);
         }
+        // 设置决定是否调整登录页面
+        udbSecurityInterceptor.setNeedForwardLoginUIDeciders(needForwardLoginUIDeciders);
 
         return new MappedInterceptor(new String[]{"/**"}, udbSecurityInterceptor);
     }

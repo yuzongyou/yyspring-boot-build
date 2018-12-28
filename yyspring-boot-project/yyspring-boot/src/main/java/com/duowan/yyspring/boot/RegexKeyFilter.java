@@ -1,6 +1,6 @@
 package com.duowan.yyspring.boot;
 
-import org.apache.commons.lang3.StringUtils;
+import com.duowan.common.utils.StringUtil;
 
 /**
  * @author Arvin
@@ -15,9 +15,9 @@ public class RegexKeyFilter implements KeyFilter {
 
     @Override
     public boolean filter(String key) {
-        if (StringUtils.isBlank(regex)) {
+        if (StringUtil.isBlank(regex)) {
             return true;
         }
-        return !StringUtils.isBlank(key) && key.matches(regex);
+        return !StringUtil.isBlank(key) && key.matches(regex);
     }
 }

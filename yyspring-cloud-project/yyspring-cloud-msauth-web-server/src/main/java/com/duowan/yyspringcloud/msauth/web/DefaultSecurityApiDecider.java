@@ -1,7 +1,7 @@
 package com.duowan.yyspringcloud.msauth.web;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspringcloud.msauth.web.annotations.SecurityApi;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.method.HandlerMethod;
 
@@ -97,7 +97,7 @@ public class DefaultSecurityApiDecider implements SecurityApiDecider {
     }
 
     private boolean isMatchPatterns(String requestUri, Set<String> patterns) {
-        if (patterns == null || patterns.isEmpty() || StringUtils.isBlank(requestUri)) {
+        if (patterns == null || patterns.isEmpty() || StringUtil.isBlank(requestUri)) {
             return false;
         }
         for (String pattern : patterns) {

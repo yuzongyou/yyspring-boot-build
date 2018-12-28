@@ -24,6 +24,12 @@ public class VirtualDnsProperties {
      **/
     private String[] hostsPaths = null;
 
+    /** 是否忽略不存在的文件, 默认是忽略的 **/
+    private boolean ignoredUnknownFile = true;
+
+    /** 重新加载的时间间隔，单位是毫秒，默认是不进行重新加载， -1 表示不需要重新加载 **/
+    private long reloadIntervalMillis = -1;
+
     public String[] getMatchEnvs() {
         return matchEnvs;
     }
@@ -38,5 +44,21 @@ public class VirtualDnsProperties {
 
     public void setHostsPaths(String[] hostsPaths) {
         this.hostsPaths = hostsPaths;
+    }
+
+    public boolean isIgnoredUnknownFile() {
+        return ignoredUnknownFile;
+    }
+
+    public void setIgnoredUnknownFile(boolean ignoredUnknownFile) {
+        this.ignoredUnknownFile = ignoredUnknownFile;
+    }
+
+    public long getReloadIntervalMillis() {
+        return reloadIntervalMillis;
+    }
+
+    public void setReloadIntervalMillis(long reloadIntervalMillis) {
+        this.reloadIntervalMillis = reloadIntervalMillis;
     }
 }

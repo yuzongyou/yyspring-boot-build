@@ -1,13 +1,13 @@
 package com.duowan.yyspringboot.autoconfigure.udbwxmp.parameter;
 
 import com.duowan.common.utils.ConvertUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.common.web.ParamLookupScope;
 import com.duowan.common.web.argresolvers.AbstractArgumentResolver;
 import com.duowan.common.web.util.ParamScopeUtil;
 import com.duowan.udb.sdk.AESHelper;
 import com.duowan.udb.sdk.UdbClient;
 import com.duowan.udb.sdk.UdbConstants;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -34,7 +34,7 @@ public class UdbWxmpSessionKeyArgumentResolver extends AbstractArgumentResolver 
             this.wxmpLookupScopes = new ParamLookupScope[]{ParamLookupScope.COOKIE, ParamLookupScope.HEADER, ParamLookupScope.ATTRIBUTE, ParamLookupScope.REQUEST};
         }
 
-        if (StringUtils.isBlank(udbAppId)) {
+        if (StringUtil.isBlank(udbAppId)) {
             this.udbAppId = UdbConstants.DEFAULT_UDB_APPID;
         } else {
             this.udbAppId = udbAppId;
@@ -53,13 +53,13 @@ public class UdbWxmpSessionKeyArgumentResolver extends AbstractArgumentResolver 
         Object value = ParamScopeUtil.resolveArgument(this.wxmpLookupScopes, "partnerInfo", parameter, mavContainer, webRequest, nativeRequest, binderFactory);
         String encryptData = ConvertUtil.toString(value, null);
 
-        if (StringUtils.isBlank(encryptData)) {
+        if (StringUtil.isBlank(encryptData)) {
             return null;
         }
         String aesKey = UdbClient.getAesEncryptKey(udbAppId);
         String decryptPartnerInfo = AESHelper.decrypt(encryptData, aesKey);
 
-        if (StringUtils.isBlank(decryptPartnerInfo)) {
+        if (StringUtil.isBlank(decryptPartnerInfo)) {
             return null;
         }
 

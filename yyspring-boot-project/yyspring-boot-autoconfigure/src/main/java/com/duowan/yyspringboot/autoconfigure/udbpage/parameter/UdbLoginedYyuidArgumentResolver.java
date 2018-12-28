@@ -1,11 +1,11 @@
 package com.duowan.yyspringboot.autoconfigure.udbpage.parameter;
 
 import com.duowan.common.utils.ConvertUtil;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.common.web.ParamLookupScope;
 import com.duowan.common.web.argresolvers.AbstractArgumentResolver;
 import com.duowan.udb.sdk.*;
 import com.duowan.yyspringboot.autoconfigure.udbpage.annotations.UdbLoginCheck;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -24,7 +24,7 @@ public class UdbLoginedYyuidArgumentResolver extends AbstractArgumentResolver {
     private final String udbAppKey;
 
     public UdbLoginedYyuidArgumentResolver(String udbAppId, String udbAppKey) {
-        if (StringUtils.isBlank(udbAppId) || StringUtils.isBlank(udbAppKey)) {
+        if (StringUtil.isBlank(udbAppId) || StringUtil.isBlank(udbAppKey)) {
             this.udbAppId = UdbConstants.DEFAULT_UDB_APPID;
             this.udbAppKey = UdbConstants.DEFAULT_UDB_APPKEY;
         } else {

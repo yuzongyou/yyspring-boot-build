@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -90,6 +91,12 @@ public class HelloController extends BaseController {
         paramsMap.put("requestBody", params);
 
         return new JsonResponse<>(paramsMap);
+    }
+
+    @RequestMapping("/cal")
+    @ResponseBody
+    public JsonResponse<Object> cal(int a, int b) {
+        return new JsonResponse<>(a / b);
     }
 
 }

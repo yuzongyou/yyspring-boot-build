@@ -1,7 +1,7 @@
 package com.duowan.yyspringcloud.autoconfigure.eureka;
 
+import com.duowan.common.utils.StringUtil;
 import com.netflix.appinfo.EurekaInstanceConfig;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,12 +33,12 @@ public class YyEurekaAutoConfiguration {
         }
 
         private String resolveDomain(Environment environment, EurekaClientProperties properties) {
-            if (StringUtils.isNotBlank(properties.getDomain())) {
+            if (StringUtil.isNotBlank(properties.getDomain())) {
                 return properties.getDomain();
             }
 
             String domain = environment.getProperty("eureka.instance.hostname");
-            if (StringUtils.isBlank(domain)) {
+            if (StringUtil.isBlank(domain)) {
                 throw new IllegalArgumentException("注册域名未知，请设置： yyspring.cloud.eureka.client.domain");
             }
 

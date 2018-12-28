@@ -3,8 +3,8 @@ package com.duowan.yyspringboot.autoconfigure.admincenter;
 import com.duowan.common.admincenter.annotations.NoPrivilege;
 import com.duowan.common.admincenter.model.Privilege;
 import com.duowan.common.admincenter.service.AdmincenterService;
+import com.duowan.common.utils.StringUtil;
 import com.duowan.common.web.view.JsonView;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +43,7 @@ public class PrivilegeController {
     @NoPrivilege
     public JsonView privileges(String weakPassport, HttpServletRequest request, HttpServletResponse response) {
 
-        if (StringUtils.isBlank(weakPassport)) {
+        if (StringUtil.isBlank(weakPassport)) {
             return new JsonView();
         }
 
@@ -68,7 +68,7 @@ public class PrivilegeController {
             for (Privilege privilege : privileges) {
                 Map<String, Object> map = new HashMap<>();
                 Privilege parent = privilege.getParent();
-                String parentId = parent == null || StringUtils.isBlank(parent.getPrivilegeId()) ? "root" : parent.getPrivilegeId();
+                String parentId = parent == null || StringUtil.isBlank(parent.getPrivilegeId()) ? "root" : parent.getPrivilegeId();
                 map.put("parentPrivilegeId", parentId);
                 map.put("privilegeId", privilege.getPrivilegeId());
                 map.put("privilegeName", privilege.getName());
@@ -78,7 +78,7 @@ public class PrivilegeController {
                 map.put("ext", privilege.getExt());
 
                 String firstUrl = privilege.getFirstUrl();
-                if (StringUtils.isNotBlank(firstUrl)) {
+                if (StringUtil.isNotBlank(firstUrl)) {
                     map.put("privilegeUrl", firstUrl);
                 }
 
@@ -95,7 +95,7 @@ public class PrivilegeController {
         Map<String, Object> productMap = new HashMap<>(3);
         productMap.put("logoutUrl", logoutUrl);
         productMap.put("productId", productId);
-        productMap.put("productName", StringUtils.isBlank(productName) ? productId : productName);
+        productMap.put("productName", StringUtil.isBlank(productName) ? productId : productName);
 
         dataMap.put("product", productMap);
 

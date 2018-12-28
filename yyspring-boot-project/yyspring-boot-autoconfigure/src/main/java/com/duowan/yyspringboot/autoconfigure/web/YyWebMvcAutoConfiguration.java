@@ -1,12 +1,12 @@
 package com.duowan.yyspringboot.autoconfigure.web;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.common.web.WebContext;
 import com.duowan.common.web.YyServletContextInitializer;
 import com.duowan.common.web.converter.YyDateConverter;
 import com.duowan.common.web.filter.YyRootFilter;
 import com.duowan.common.web.interceptor.RequestLogHandlerInterceptor;
 import com.duowan.common.web.view.AjaxView;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,27 +43,27 @@ public class YyWebMvcAutoConfiguration {
 
     private void initializeWebContext(WebMvcProperties webMvcProperties) {
 
-        if (StringUtils.isNotBlank(webMvcProperties.getAjaxStatusCodeName())) {
+        if (StringUtil.isNotBlank(webMvcProperties.getAjaxStatusCodeName())) {
             AjaxView.setAjaxStatusCodeName(webMvcProperties.getAjaxStatusCodeName());
         }
 
-        if (!StringUtils.isAllBlank(webMvcProperties.getDateFormatVars())) {
+        if (!StringUtil.isAllBlank(webMvcProperties.getDateFormatVars())) {
             WebContext.setDateFormatVars(webMvcProperties.getDateFormatVars());
         }
 
-        if (!StringUtils.isAllBlank(webMvcProperties.getJavascriptVars())) {
+        if (!StringUtil.isAllBlank(webMvcProperties.getJavascriptVars())) {
             WebContext.setJavascriptVars(webMvcProperties.getJavascriptVars());
         }
 
-        if (!StringUtils.isAllBlank(webMvcProperties.getJsonpCallbackVars())) {
+        if (!StringUtil.isAllBlank(webMvcProperties.getJsonpCallbackVars())) {
             WebContext.setJsonpCallbackVars(webMvcProperties.getJsonpCallbackVars());
         }
 
-        if (!StringUtils.isAllBlank(webMvcProperties.getLookupClientIpHeaders())) {
+        if (!StringUtil.isAllBlank(webMvcProperties.getLookupClientIpHeaders())) {
             WebContext.setLookupClientIpHeaders(webMvcProperties.getLookupClientIpHeaders());
         }
 
-        if (!StringUtils.isAllBlank(webMvcProperties.getLookupProtocolHeaders())) {
+        if (!StringUtil.isAllBlank(webMvcProperties.getLookupProtocolHeaders())) {
             WebContext.setLookupProtocolHeaders(webMvcProperties.getLookupProtocolHeaders());
         }
 
@@ -74,7 +74,7 @@ public class YyWebMvcAutoConfiguration {
     public YyServletContextInitializer yyServletContextInitializer(WebMvcProperties webMvcProperties) {
         YyServletContextInitializer initializer = new YyServletContextInitializer();
 
-        if (StringUtils.isNotBlank(webMvcProperties.getCookieSessionIdName())) {
+        if (StringUtil.isNotBlank(webMvcProperties.getCookieSessionIdName())) {
             initializer.setSessionIdName(webMvcProperties.getCookieSessionIdName());
         }
 

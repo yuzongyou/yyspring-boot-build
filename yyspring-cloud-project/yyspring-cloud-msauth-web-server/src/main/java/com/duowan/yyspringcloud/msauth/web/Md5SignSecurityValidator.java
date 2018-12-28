@@ -1,11 +1,11 @@
 package com.duowan.yyspringcloud.msauth.web;
 
+import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspringcloud.msauth.Constants;
 import com.duowan.yyspringcloud.msauth.Signer;
 import com.duowan.yyspringcloud.msauth.app.App;
 import com.duowan.yyspringcloud.msauth.app.AppReader;
 import com.duowan.yyspringcloud.msauth.exception.EmptyAppReaderException;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,7 +28,7 @@ public class Md5SignSecurityValidator implements SecurityValidator {
     @Override
     public SecurityCode validate(String token, HttpServletRequest request, Object handler) {
 
-        if (StringUtils.isBlank(token)) {
+        if (StringUtil.isBlank(token)) {
             return SecurityCode.SC_UNAUTHORIZED;
         }
 
@@ -40,13 +40,13 @@ public class Md5SignSecurityValidator implements SecurityValidator {
         String appId = token.substring(0, index);
         String sign = token.substring(index + 1);
 
-        if (StringUtils.isAnyBlank(appId, sign)) {
+        if (StringUtil.isAnyBlank(appId, sign)) {
             return SecurityCode.SC_UNAUTHORIZED;
         }
 
         // 计算签名
         App app = appReader.read(appId);
-        if (null == app || StringUtils.isAnyBlank(app.getAppId(), app.getSecretKey())) {
+        if (null == app || StringUtil.isAnyBlank(app.getAppId(), app.getSecretKey())) {
             return SecurityCode.SC_UNAUTHORIZED;
         }
         if (Signer.isValid(appId, app.getSecretKey(), sign)) {
