@@ -5,8 +5,8 @@ import com.ctrip.framework.apollo.core.enums.Env;
 import com.ctrip.framework.foundation.internals.Utils;
 import com.ctrip.framework.foundation.spi.provider.ApplicationProvider;
 import com.ctrip.framework.foundation.spi.provider.Provider;
+import com.duowan.common.utils.CommonUtil;
 import com.duowan.common.utils.ConvertUtil;
-import com.duowan.common.utils.JsonUtil;
 import com.duowan.common.utils.StringUtil;
 import com.duowan.yyspring.boot.AppContext;
 import org.slf4j.Logger;
@@ -94,7 +94,7 @@ public class YYApolloApplicationProvider implements ApplicationProvider {
             }
         }
 
-        logger.info("Apollo MetaDomainConsts: " + JsonUtil.toPrettyJson(domainMap));
+        logger.info("Apollo MetaDomainConsts: " + CommonUtil.mapToPrettyJson(domainMap));
     }
 
     @Override
