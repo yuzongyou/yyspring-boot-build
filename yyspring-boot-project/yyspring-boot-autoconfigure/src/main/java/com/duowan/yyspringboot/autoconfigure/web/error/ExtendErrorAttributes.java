@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class ExtendErrorAttributes extends DefaultErrorAttributes implements ErrorAttributes, HandlerExceptionResolver, Ordered {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(com.duowan.common.web.exception.ExtendErrorAttributes.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExtendErrorAttributes.class);
 
     private List<ExceptionViewResolver> exceptionViewResolverList;
 
