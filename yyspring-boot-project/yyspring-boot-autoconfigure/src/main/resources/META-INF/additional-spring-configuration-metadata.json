@@ -37,6 +37,11 @@
       "name": "yyspring.swagger2.gateway-route-path",
       "type": "java.lang.String",
       "description": "API 网关路由地址，默认是使用 spring.application.name."
+    },
+    {
+      "name": "yyspring.mvc.cookie.dot-enabled",
+      "type": "java.lang.Boolean",
+      "description": "写顶级域名Cookie的时候，允许使用'.', 如 '.yy.com' ."
     }
   ]
 }

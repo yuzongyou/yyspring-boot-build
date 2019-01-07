@@ -7,11 +7,17 @@ import com.duowan.common.web.converter.YyDateConverter;
 import com.duowan.common.web.filter.YyRootFilter;
 import com.duowan.common.web.interceptor.RequestLogHandlerInterceptor;
 import com.duowan.common.web.view.AjaxView;
+import org.apache.catalina.Context;
+import org.apache.tomcat.util.http.CookieProcessor;
+import org.apache.tomcat.util.http.LegacyCookieProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -121,5 +127,15 @@ public class YyWebMvcAutoConfiguration {
     @ConditionalOnClass({RequestLogHandlerInterceptor.class})
     public MappedInterceptor logRequestInfoMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/**"}, new RequestLogHandlerInterceptor());
+    }
+
+    @Bean
+    @ConditionalOnClass(CookieProcessor.class)
+    @ConditionalOnProperty(value = "yyspring.mvc.cookie.dot-enabled", matchIfMissing = false)
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
+        return factory -> factory.addContextCustomizers((TomcatContextCustomizer) context -> {
+            // 不以 '.' 开头则使用 Rfc6265CookieProcessor
+            context.setCookieProcessor(new LegacyCookieProcessor());
+        });
     }
 }
