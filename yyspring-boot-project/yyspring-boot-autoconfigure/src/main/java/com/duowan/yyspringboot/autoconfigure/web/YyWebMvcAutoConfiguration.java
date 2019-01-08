@@ -21,6 +21,7 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.handler.MappedInterceptor;
@@ -38,6 +39,7 @@ import java.util.Collections;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnClass({Servlet.class, DispatcherServlet.class, YyServletContextInitializer.class})
 @EnableConfigurationProperties({WebMvcProperties.class})
+@Import({TomcatCookieImportBeanDefinitionRegistrar.class})
 public class YyWebMvcAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(YyWebMvcAutoConfiguration.class);
@@ -127,15 +129,5 @@ public class YyWebMvcAutoConfiguration {
     @ConditionalOnClass({RequestLogHandlerInterceptor.class})
     public MappedInterceptor logRequestInfoMappedInterceptor() {
         return new MappedInterceptor(new String[]{"/**"}, new RequestLogHandlerInterceptor());
-    }
-
-    @Bean
-    @ConditionalOnClass(CookieProcessor.class)
-    @ConditionalOnProperty(value = "yyspring.mvc.cookie.dot-enabled", matchIfMissing = false)
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
-        return factory -> factory.addContextCustomizers((TomcatContextCustomizer) context -> {
-            // 不以 '.' 开头则使用 Rfc6265CookieProcessor
-            context.setCookieProcessor(new LegacyCookieProcessor());
-        });
     }
 }
