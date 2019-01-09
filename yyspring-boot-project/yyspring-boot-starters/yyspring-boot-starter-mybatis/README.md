@@ -61,9 +61,7 @@ public interface SampleMapper {
 
 上述对应的 <code>SampleMapper.xml</code> 为：
 ```xml
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.duowan.mybatis.dao.mybatis.SampleMapper">
     <select id="selectSelf" resultType="java.lang.String">
         select #{self} from dual
@@ -71,6 +69,38 @@ public interface SampleMapper {
 </mapper>
 ```
 
+## 多数据源开发说明
+如果是多数据源的话，建议将不同数据源的对应的 <code>Mapper</code> 接口和 <code>XML</code> 文件分开包、目录进行存储，一个数据源对应一个包。
+
+假设我们有两个数据源， common, user, 推荐创建如下目录结构：
+
+|--com/duowan/xxx/mapper/  
+|-----------------------/common/  
+|------------------------------/XxxxMapper.java  
+|-----------------------/user/  
+|------------------------------/YyyyMapper.java  
+
+|--src/main/resources/  
+|--------------------/mapper/   
+|---------------------------/common/  
+|----------------------------------/mybatis-config.xml  
+|----------------------------------/XxxxMapper.xml  
+|---------------------------/user/  
+|--------------------------------/mybatis-config.xml  
+|--------------------------------/YyyyMapper.xml  
+
+配置 mybatis 的时候，配置类似如下：
+```properties
+# 定义 common 数据源的 mybatis 配置
+yyspring.mybatis.sources.common.mapper-scan.base-package-classes=com.duowan.xxx.mapper.common.XxxxMapper
+yyspring.mybatis.sources.common.config-location=classpath:mapper/common/mybatis-config.xml
+yyspring.mybatis.sources.common.mapper-locations=classpath:mybatis/common/*Mapper.xml
+
+# 定义 user 数据源的 mybatis 配置
+yyspring.mybatis.sources.user.mapper-scan.base-package-classes=com.duowan.xxx.mapper.user.YyyyMapper
+yyspring.mybatis.sources.user.config-location=classpath:mapper/user/mybatis-config.xml
+yyspring.mybatis.sources.user.mapper-locations=classpath:mybatis/user/*Mapper.xml
+```
 
 
 
