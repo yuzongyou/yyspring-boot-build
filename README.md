@@ -36,6 +36,7 @@ mvn clean deploy
 | [yyspring-boot-starter-redis](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-redis)   | Redis 支持(包括升龙、标准Redis和哨兵redis)，支持多数据源。 |
 | [yyspring-boot-starter-thrift-client](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-thrift-client)   | Thrift Client 支持，支持连接池、监控等。 |
 | [yyspring-boot-starter-thrift-server](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-thrift-server)   | Thrift Server 支持，支持同时发布多个 Thrift 服务到一个端口以及多种发布方式。 |
+| [yyspring-boot-starter-mybatis](yyspring-boot-project/yyspring-boot-starters/yyspring-boot-starter-mybatis)   | mybatis 支持，基于 jdbc 模块，支持单、多数据源。 |
 
 
 # 其他模块说明

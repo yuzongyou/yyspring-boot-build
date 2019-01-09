@@ -23,6 +23,7 @@ com.duowan.yyspringboot.autoconfigure.udbpage.UdbPageAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.udbwxmp.UdbWxmpAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.admincenter.AdmincenterAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.jdbc.JdbcAutoConfiguration,\
+com.duowan.yyspringboot.autoconfigure.mybatis.MybatisAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.redis.RedisAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.timer.TimerScheduleAutoConfiguration,\
 com.duowan.yyspringboot.autoconfigure.thriftclient.ThriftClientAutoConfiguration,\

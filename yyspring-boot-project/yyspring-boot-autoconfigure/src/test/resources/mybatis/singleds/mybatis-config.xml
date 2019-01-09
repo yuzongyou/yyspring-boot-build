@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+       Copyright 2015-2016 the original author or authors.
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+-->
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <package name="com.duowan.yyspringboot.autoconfigure.mybatis"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="mybatis/singleds/SingleDsMapper.xml"/>
+        <!--
+            mapper 单个注册（mapper如果多的话，不太可能用这种方式）
+                resource：引用类路径下的文件
+                url：引用磁盘路径下的资源
+                class，引用接口
+            package 批量注册（基本上使用这种方式）
+                name：mapper接口与mapper.xml所在的包名
+        -->
+
+        <!-- 第一种：注册sql映射文件-->
+        <!--<mapper resource="com/spldeolin/mapper/UserMapper.xml" />-->
+
+        <!-- 第二种：注册接口   sql映射文件必须与接口同名，并且放在同一目录下-->
+        <!--<mapper class="com.spldeolin.mapper.UserMapper" />-->
+
+        <!-- 第三种：注册基于注解的接口  基于注解   没有sql映射文件，所有的sql都是利用注解写在接口上-->
+        <!--<mapper class="com.spldeolin.mapper.TeacherMapper" />-->
+
+        <!-- 第四种：批量注册  需要将sql配置文件和接口放到同一目录下-->
+        <!--<package name="com.spldeolin.mapper" />-->
+    </mappers>
+</configuration>

@@ -225,6 +225,20 @@
             <optional>true</optional>
         </dependency>
 
+
+        <!-- mybatis base for jdbc -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
 
     <build>

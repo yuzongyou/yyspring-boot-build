@@ -22,6 +22,7 @@
         <module>yyspring-boot-admincenter-samples</module>
         <module>yyspring-boot-admincenter-ui-smaples</module>
         <module>yyspring-boot-udb-security-samples</module>
+        <module>yyspring-boot-mybatis-samples</module>
     </modules>
 
     <properties>

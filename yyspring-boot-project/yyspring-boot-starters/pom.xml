@@ -37,5 +37,6 @@
         <module>yyspring-boot-starter-thrift-server</module>
         <module>yyspring-boot-starter-swagger2</module>
         <module>yyspring-boot-starter-springcache</module>
+        <module>yyspring-boot-starter-mybatis</module>
     </modules>
 </project>
