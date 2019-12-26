@@ -32,7 +32,7 @@
         <guava.version>20.0</guava.version>
         <zxa.version>1.1.0-SNAPSHOT</zxa.version>
         <apollo.client.version>0.10.3-SNAPSHOT</apollo.client.version>
-        <thrift.version>0.10.0</thrift.version>
+        <thrift.version>0.12.0</thrift.version>
         <commons.pool2.version>2.5.0</commons.pool2.version>
         <fastjson.version>1.2.49</fastjson.version>
         <okhttp3.version>3.11.0</okhttp3.version>
