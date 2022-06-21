@@ -50,7 +50,7 @@
         <jaxb.api.version>2.3.1</jaxb.api.version>
         <swagger2.version>2.9.2</swagger2.version>
 
-        <mysql.connector.version>5.1.46</mysql.connector.version>
+        <mysql.connector.version>8.0.28</mysql.connector.version>
         <HikariCP.version>3.1.0</HikariCP.version>
         <tomcat.jdbc.version>8.5.24</tomcat.jdbc.version>
         <druid.version>1.1.9</druid.version>
